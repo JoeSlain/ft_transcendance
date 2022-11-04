@@ -1,6 +1,6 @@
 import './App.css';
 import { useState } from 'react'
-import UserPage from './pages/user'
+import LoginPage from './pages/login'
 import HomePage from './pages/home'
 import {
   BrowserRouter as Router,
@@ -12,9 +12,9 @@ function App() {
   return (
     <div id="main">
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="homepage/" element={<HomePage />} />
-        <Route path="/login" element={<UserPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="homepage/" element={<LoginPage />} />
+        <Route path="/login" element={<HomePage />} />
       </Routes>
     </div>
   );
