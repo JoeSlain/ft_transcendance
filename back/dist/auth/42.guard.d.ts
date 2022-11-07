@@ -1,4 +1,4 @@
-declare const FortyTwoAuthGuard_base: import("@nestjs/passport").Type<import("@nestjs/passport").IAuthGuard>;
+declare const FortyTwoAuthGuard_base: any;
 export declare class FortyTwoAuthGuard extends FortyTwoAuthGuard_base {
 }
 export {};
