@@ -14,7 +14,6 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
 const auth_service_1 = require("./auth/auth.service");
 const _42_guard_1 = require("./auth/42.guard");
 let AppController = class AppController {
@@ -27,16 +26,10 @@ let AppController = class AppController {
     }
     async redirect(req, res) {
         console.log('redirect');
-        const token = await this.authService.login(req.user);
-        const url = new URL('http://localhost');
-        url.port = '3000';
-        url.pathname = 'login';
-        url.searchParams.set('code', token);
-        console.log('url', url.href);
-        res.redirect(url.href);
+        res.send(200);
     }
     getProfile(req) {
-        return req.user;
+        return 'ok';
     }
 };
 __decorate([
@@ -56,8 +49,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "redirect", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)('login'),
+    (0, common_1.UseGuards)(_42_guard_1.AuthenticatedGuard),
+    (0, common_1.Get)('home'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

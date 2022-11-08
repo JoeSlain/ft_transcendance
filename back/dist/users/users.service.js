@@ -13,12 +13,12 @@ let UsersService = class UsersService {
         this.users = [
             {
                 userId: 1,
-                username: 'dndn',
+                username: 'dchheang',
                 password: 'sup',
             },
             {
                 userId: 2,
-                username: 'dndn2',
+                username: 'denis',
                 password: 'sup',
             },
         ];

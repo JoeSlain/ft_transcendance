@@ -7,11 +7,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { FortyTwoStrategy } from './42.strategy';
+import { SessionSerializer } from './utils/Serializer';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    SessionSerializer,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },

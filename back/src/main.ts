@@ -13,7 +13,7 @@ async function bootstrap() {
   });
   app.use(session({
     cookie: {
-      maxAge: 60000 * 60 * 24;
+      maxAge: 60000 * 60 * 24,
     },
     secret: process.env.FT_SECRET,
     resave: false,

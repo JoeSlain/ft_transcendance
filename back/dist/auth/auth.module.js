@@ -16,6 +16,7 @@ const passport_1 = require("@nestjs/passport");
 const jwt_1 = require("@nestjs/jwt");
 const constants_1 = require("./constants");
 const _42_strategy_1 = require("./42.strategy");
+const Serializer_1 = require("./utils/Serializer");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
@@ -23,6 +24,7 @@ AuthModule = __decorate([
         imports: [
             users_module_1.UsersModule,
             passport_1.PassportModule,
+            Serializer_1.SessionSerializer,
             jwt_1.JwtModule.register({
                 secret: constants_1.jwtConstants.secret,
                 signOptions: { expiresIn: '60s' },

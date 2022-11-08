@@ -1,4 +1,4 @@
-import { UsersService } from '../users/users.service';
+import { UsersService, User } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 export declare class AuthService {
     private usersService;
@@ -6,4 +6,5 @@ export declare class AuthService {
     constructor(usersService: UsersService, jwtService: JwtService);
     validateUser(username: string, pass: string): Promise<any>;
     login(user: any): Promise<string>;
+    findUser(username: string): Promise<User | undefined>;
 }
