@@ -8,47 +8,42 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const User_1 = require("../database/entities/User");
 let AuthService = class AuthService {
-    constructor(usersService, jwtService) {
-        this.usersService = usersService;
+    constructor(jwtService, userRepository) {
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
-    async validateUser(username, pass) {
-        const user = await this.usersService.findOne(username);
-        if (user && user.password === pass) {
-            const { password } = user, result = __rest(user, ["password"]);
-            return result;
+    async validateUser(username) {
+        const user = await this.userRepository.findOneBy({ username });
+        console.log(user);
+        if (user) {
+            return user;
         }
-        return null;
+        const newUser = this.userRepository.create({ username });
+        console.log('user not found. Creating...');
+        console.log('newUser', newUser);
+        return this.userRepository.save(newUser);
     }
-    async login(user) {
-        const payload = { username: user.username, sub: user.userId };
-        return this.jwtService.sign(payload);
-    }
-    async findUser(username) {
-        return this.usersService.findOne(username);
+    async findUser(id) {
+        const user = await this.userRepository.findOneBy({ id });
+        return user;
     }
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+    __param(1, (0, typeorm_1.InjectRepository)(User_1.User)),
+    __metadata("design:paramtypes", [jwt_1.JwtService,
+        typeorm_2.Repository])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

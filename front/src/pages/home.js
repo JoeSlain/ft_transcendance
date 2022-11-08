@@ -2,6 +2,12 @@ import axios from "axios"
 import { useState, useEffect } from "react"
 
 const HomePage = () => {
+    useEffect(() => {
+        axios
+            .get('http://localhost:3001/api/auth/home')
+            .then(response => console.log(response))
+    }, [])
+    
     return (
         <div>
             Welcome user !

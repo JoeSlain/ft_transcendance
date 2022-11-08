@@ -1,5 +1,4 @@
 import './App.css';
-import { useState } from 'react'
 import LoginPage from './pages/login'
 import HomePage from './pages/home'
 import {
@@ -13,8 +12,8 @@ function App() {
     <div id="main">
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="homepage/" element={<LoginPage />} />
-        <Route path="/login" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/home" element={<HomePage />} />
       </Routes>
     </div>
   );

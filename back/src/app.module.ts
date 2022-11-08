@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './database/entities/User';
 
 @Module({
   imports: [
@@ -16,9 +16,17 @@ import { PassportModule } from '@nestjs/passport';
         FT_CALLBACK_URL: Joi.string().required(),
       }),
     }),
-    UsersModule,
+    TypeOrmModule.forRoot({
+      type: "postgres",
+      host: process.env.DB_HOST,
+      port: 5432,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      entities: [User],
+      synchronize: true,
+    }),
     AuthModule,
-    PassportModule.register({session: true}),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,30 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService, User } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/database/entities/User';
+import { UserDetails } from 'src/utils/types';
 
 @Injectable()
-export class AuthService{
+export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService
-  ) {}
+    private jwtService: JwtService,
+    @InjectRepository(User) private readonly userRepository: Repository<User>
+  ) { }
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+  async validateUser(username: string) {
+    const user = await this.userRepository.findOneBy({ username });
+
+    console.log(user);
+    if (user) {
+      return user;
     }
-    return null;
+    const newUser = this.userRepository.create({username});
+    console.log('user not found. Creating...')
+    console.log('newUser', newUser);
+    return this.userRepository.save(newUser);
   }
 
-  async login(user: any) : Promise<string> {
-    const payload = { username: user.username, sub: user.userId };
-    
-    return this.jwtService.sign(payload);
-  }
+  async findUser(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
 
-  async findUser(username: string): Promise<User | undefined> {
-    return this.usersService.findOne(username);
+    return user;
   }
 }

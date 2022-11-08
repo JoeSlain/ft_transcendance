@@ -10,11 +10,11 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
-const users_module_1 = require("./users/users.module");
 const auth_module_1 = require("./auth/auth.module");
 const config_1 = require("@nestjs/config");
 const Joi = require("joi");
-const passport_1 = require("@nestjs/passport");
+const typeorm_1 = require("@nestjs/typeorm");
+const User_1 = require("./database/entities/User");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -27,9 +27,17 @@ AppModule = __decorate([
                     FT_CALLBACK_URL: Joi.string().required(),
                 }),
             }),
-            users_module_1.UsersModule,
+            typeorm_1.TypeOrmModule.forRoot({
+                type: "postgres",
+                host: process.env.DB_HOST,
+                port: 5432,
+                username: process.env.DB_USER,
+                password: process.env.DB_PASS,
+                database: process.env.DB_NAME,
+                entities: [User_1.User],
+                synchronize: true,
+            }),
             auth_module_1.AuthModule,
-            passport_1.PassportModule.register({ session: true }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
