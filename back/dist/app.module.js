@@ -14,7 +14,7 @@ const auth_module_1 = require("./auth/auth.module");
 const config_1 = require("@nestjs/config");
 const Joi = require("joi");
 const typeorm_1 = require("@nestjs/typeorm");
-const User_1 = require("./database/entities/User");
+const database_1 = require("./database");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -34,7 +34,7 @@ AppModule = __decorate([
                 username: process.env.DB_USER,
                 password: process.env.DB_PASS,
                 database: process.env.DB_NAME,
-                entities: [User_1.User],
+                entities: database_1.entities,
                 synchronize: true,
             }),
             auth_module_1.AuthModule,

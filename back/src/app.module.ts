@@ -5,7 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './database/entities/User';
+import { entities } from './database';
+import { Session } from 'express-session';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { User } from './database/entities/User';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: entities,
       synchronize: true,
     }),
     AuthModule,
