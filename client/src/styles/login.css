@@ -1,0 +1,42 @@
+.back {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #003566;
+}
+
+.titre {
+	background-color: #001d3d;
+	position: absolute;
+	top: 10%;
+	border-radius: 10px;
+	padding-top: 2%;
+	padding-bottom: 2%;
+	padding-left: 5%;
+	padding-right: 5%;
+	border: 1px solid #ffc300;
+}
+
+.titre p {
+	font-size: 24px;
+	color: #ffc300;
+	text-align: center;
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+.button-auth {
+	background-color: #001d3d;
+	color: #ffc300;
+	border-radius: 10px;
+	padding-top: 2%;
+	padding-bottom: 2%;
+	padding-left: 6%;
+	padding-right: 5%;
+	border: 1px solid #ffc300;
+}
