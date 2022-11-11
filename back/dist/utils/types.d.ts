@@ -1,4 +1,4 @@
 export declare type UserDetails = {
     username: string;
-    nickname: string;
+    id42: number;
 };

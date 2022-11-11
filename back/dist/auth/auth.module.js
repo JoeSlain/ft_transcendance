@@ -14,7 +14,6 @@ const passport_1 = require("@nestjs/passport");
 const jwt_1 = require("@nestjs/jwt");
 const constants_1 = require("./constants");
 const _42_strategy_1 = require("./42.strategy");
-const google_strategy_1 = require("./google.strategy");
 const auth_controller_1 = require("./auth.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const User_1 = require("../database/entities/User");
@@ -34,7 +33,6 @@ AuthModule = __decorate([
         providers: [
             jwt_strategy_1.JwtStrategy,
             _42_strategy_1.FortyTwoStrategy,
-            google_strategy_1.GoogleStrategy,
             Serializer_1.SessionSerializer,
             {
                 provide: 'AUTH_SERVICE',
