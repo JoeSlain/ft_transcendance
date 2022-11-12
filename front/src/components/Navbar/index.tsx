@@ -10,16 +10,16 @@ export default function Navbar()
           <div
           className="navigation-menu">
           <ul>
-              <li>
+              <li className="title">
                 <NavLink className="navlink" to="/">Home</NavLink>
               </li>
-              <li>
+              <li className="title">
                 <NavLink className="navlink" to="/play">Play</NavLink>
               </li>
-              <li>
+              <li className="title">
                 <NavLink className="navlink" to="/games">Games</NavLink>
               </li>
-              <li>
+              <li className="title">
                 <NavLink className="navlink" to="/chat">Chat</NavLink>
               </li>
               <li>

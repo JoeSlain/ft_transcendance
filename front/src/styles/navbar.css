@@ -6,9 +6,7 @@
     justify-content: center;
     position: relative;
     padding: 0.5rem 0rem;
-    background-color: #fff;
-    color: black;
-    box-shadow: 0 2px 2px 2px rgba(9, 9, 9, 0.23);
+    background-color: #003566;
   }
 
   .navigation-menu ul {
@@ -17,16 +15,26 @@
   }
   .navigation-menu li {
     list-style-type: none;
+    color: #ffc300;
+    font-size: 26px;
+    font-style: bold;
     margin: 0 1rem;
   }
+
+  .title {
+    border: 1px solid #ffc300;
+    padding-left: 2%;
+    padding-right: 2%;
+    border-radius: 5px;
+  }
+  .title:hover {
+    border-bottom: 2px solid #ffc300;
+  }
+
   .navigation-menu li a {
     text-decoration: none;
     display: block;
     width: 100%;
-  }
-
-  .navigation-menu li a:visited {
-    color: black;
   }
 
   .navigation-menu li a:hover {
@@ -34,7 +42,9 @@
   }
 
 .profile{
-    max-height: 30px;
-    max-width: 30px;
+    max-height: 42px;
+    max-width:  42px;
     margin-left: 100%;
+    border: 2px solid #ffc300;
+    border-radius: 50%;
 }

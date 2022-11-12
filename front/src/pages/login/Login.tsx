@@ -4,7 +4,7 @@ import React from "react";
 
 export function hasLogged()
 {
-    return false;
+    return true;
 }
 
 export default function Login() {
