@@ -23,19 +23,37 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
     }
-    async validateUser(username) {
-        const user = await this.userRepository.findOneBy({ username });
+    createUser(details) {
+        const user = {
+            username: details.username,
+            id42: details.id42,
+            winratio: 'no games played',
+            profile_pic: 'no avatar provided',
+            elo: 0,
+            n_win: 0,
+            n_lose: 0,
+            date_of_sign: new Date(),
+        };
+        return this.userRepository.create(user);
+    }
+    async validateUser(details) {
+        console.log(details.id42);
+        const user = await this.userRepository.findOneBy({ id42: details.id42 });
         console.log(user);
         if (user) {
             return user;
         }
-        const newUser = this.userRepository.create({ username });
+        const newUser = this.createUser(details);
         console.log('user not found. Creating...');
         console.log('newUser', newUser);
         return this.userRepository.save(newUser);
     }
     async findUser(id) {
-        const user = await this.userRepository.findOneBy({ id });
+        const user = await this.userRepository.findOneBy({ id42: id });
+        console.log('foundUser in db');
+        console.log(user ? 'found' : 'not found');
+        console.log('user');
+        console.log(user);
         return user;
     }
 };

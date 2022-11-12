@@ -23,10 +23,14 @@ let SessionSerializer = class SessionSerializer extends passport_1.PassportSeria
     }
     serializeUser(user, done) {
         console.log('Serialize User');
+        console.log('user');
+        console.log(user);
         done(null, user);
     }
     async deserializeUser(payload, done) {
         const user = await this.authService.findUser(payload.id);
+        console.log('payload');
+        console.log(payload.id);
         console.log('Deserialize user');
         console.log(user);
         return user ? done(null, user) : done(null, null);

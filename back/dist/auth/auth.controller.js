@@ -14,7 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
-const google_guard_1 = require("./google.guard");
+const _42_guard_1 = require("./42.guard");
+const _42_guard_2 = require("./42.guard");
 let AuthController = class AuthController {
     login() {
         console.log('login');
@@ -30,14 +31,14 @@ let AuthController = class AuthController {
 };
 __decorate([
     (0, common_1.Get)('login'),
-    (0, common_1.UseGuards)(google_guard_1.GoogleAuthGuard),
+    (0, common_1.UseGuards)(_42_guard_2.FortyTwoAuthGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('redirect'),
-    (0, common_1.UseGuards)(google_guard_1.GoogleAuthGuard),
+    (0, common_1.UseGuards)(_42_guard_2.FortyTwoAuthGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -46,7 +47,7 @@ __decorate([
 ], AuthController.prototype, "redirect", null);
 __decorate([
     (0, common_1.Get)('home'),
-    (0, common_1.UseGuards)(google_guard_1.AuthenticatedGuard),
+    (0, common_1.UseGuards)(_42_guard_1.AuthenticatedGuard),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

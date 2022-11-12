@@ -5,5 +5,5 @@
 // user details for db query
 export type UserDetails = {
     username: string;
-    nickname: string;
+    id42: number;
 }
