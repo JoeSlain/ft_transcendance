@@ -10,4 +10,3 @@ export function AuthRoute() {
 		!isLogged ? <Login /> : <Outlet/>
 	);
 }
-
