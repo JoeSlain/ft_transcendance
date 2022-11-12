@@ -1,21 +1,13 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, RouteProps, Outlet } from "react-router-dom";
 import Login from "./Login";
-import Auth from "./Auth";
+import Auth from "../../context/Auth";
 
-interface elementProps {
-	path: string;
-	element: JSX.Element;
+
+export function AuthRoute() {
+ 	const { isLogged } = React.useContext(Auth);
+	return (
+		!isLogged ? <Login /> : <Outlet/>
+	);
 }
 
-const AuthRoute = (props: elementProps) => {
-	const { isLogged } = React.useContext(Auth);
-
-	return isLogged ? (
-		<Route path={props.path} element={props.element} />
-	) : (
-		<Route path="/" element={<Login />} />
-	);
-};
-
-export default AuthRoute;
