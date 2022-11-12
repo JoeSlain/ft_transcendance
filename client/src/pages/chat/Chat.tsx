@@ -1,5 +1,0 @@
-
-export default function Chat ()
-{
-
-}
