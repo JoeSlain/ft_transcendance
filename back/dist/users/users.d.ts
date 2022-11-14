@@ -1,2 +1,2 @@
-export declare class Users {
+export declare class UsersService {
 }

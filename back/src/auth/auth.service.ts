@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/database/entities/User';
 import { UserDetails } from 'src/utils/types';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,
-    @InjectRepository(User) private readonly userRepository: Repository<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) { }
 
   createUser(details: UserDetails) {
     const user = {
       username: details.username,
       id42: details.id42,
+      email: details.email,
       winratio: 'no games played',
       profile_pic: 'no avatar provided',
       elo: 0,
@@ -49,5 +50,17 @@ export class AuthService {
     console.log(user);
 
     return user;
+  }
+
+  getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
+    const payload = {
+      userId, isSecondFactorAuthenticated
+    };
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.FT_SECRET,
+      expiresIn: process.env.COOKIE_EXPIRATION_TIME,
+    });
+
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
   }
 }

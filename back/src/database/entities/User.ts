@@ -9,6 +9,15 @@ export class User {
     username: string;
 
     @Column()
+    email: string;
+
+    @Column({ nullable: true })
+    twoFactorAuthenticationSecret?: string;
+
+    @Column({ default: false })
+    isTwoFactorAuthenticationEnabled: boolean;
+
+    @Column()
     id42: number;
 
     @Column()

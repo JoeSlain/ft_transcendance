@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,7 +14,7 @@ async function bootstrap() {
   });
   app.use(session({
     cookie: {
-      maxAge: 60000 * 60 * 24,
+      maxAge: 86400000,
     },
     secret: process.env.FT_SECRET,
     resave: false,
@@ -21,6 +22,7 @@ async function bootstrap() {
   }));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(cookieParser());
   await app.listen(3001);
 }
 bootstrap();

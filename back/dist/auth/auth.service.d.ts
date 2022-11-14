@@ -1,12 +1,13 @@
-import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { User } from 'src/database/entities/User';
 import { UserDetails } from 'src/utils/types';
+import { JwtService } from '@nestjs/jwt';
 export declare class AuthService {
-    private jwtService;
     private readonly userRepository;
-    constructor(jwtService: JwtService, userRepository: Repository<User>);
+    private readonly jwtService;
+    constructor(userRepository: Repository<User>, jwtService: JwtService);
     createUser(details: UserDetails): User;
     validateUser(details: UserDetails): Promise<User>;
     findUser(id: number): Promise<User>;
+    getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated?: boolean): string;
 }
