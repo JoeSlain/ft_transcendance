@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const _42_guard_1 = require("./42.guard");
-const _42_guard_2 = require("./42.guard");
 let AuthController = class AuthController {
     login() {
         console.log('login');
@@ -23,22 +22,23 @@ let AuthController = class AuthController {
     }
     async redirect(req, res) {
         console.log('redirect');
-        res.redirect('http://localhost:3000/home');
+        res.redirect(`http://localhost:3000/profile/${req.user.id}`);
     }
     getProfile(request) {
-        return 'ok home';
+        console.log();
+        return;
     }
 };
 __decorate([
     (0, common_1.Get)('login'),
-    (0, common_1.UseGuards)(_42_guard_2.FortyTwoAuthGuard),
+    (0, common_1.UseGuards)(_42_guard_1.FortyTwoAuthGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('redirect'),
-    (0, common_1.UseGuards)(_42_guard_2.FortyTwoAuthGuard),
+    (0, common_1.UseGuards)(_42_guard_1.FortyTwoAuthGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),

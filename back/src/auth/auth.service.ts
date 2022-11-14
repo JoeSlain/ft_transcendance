@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   async findUser(id: number) {
-    const user = await this.userRepository.findOneBy({ id42: id });
+    const user = await this.userRepository.findOneBy({ id: id });
     console.log('foundUser in db');
     console.log(user ? 'found' : 'not found');
     console.log('user');

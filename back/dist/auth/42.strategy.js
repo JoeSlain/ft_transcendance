@@ -36,7 +36,7 @@ let FortyTwoStrategy = class FortyTwoStrategy extends (0, passport_1.PassportStr
             username: profile.username,
         };
         const user = await this.authService.validateUser(details);
-        return profile;
+        return user;
     }
 };
 FortyTwoStrategy = __decorate([

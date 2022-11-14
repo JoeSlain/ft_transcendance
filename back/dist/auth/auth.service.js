@@ -49,7 +49,7 @@ let AuthService = class AuthService {
         return this.userRepository.save(newUser);
     }
     async findUser(id) {
-        const user = await this.userRepository.findOneBy({ id42: id });
+        const user = await this.userRepository.findOneBy({ id: id });
         console.log('foundUser in db');
         console.log(user ? 'found' : 'not found');
         console.log('user');
