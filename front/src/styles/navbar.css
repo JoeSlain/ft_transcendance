@@ -6,45 +6,63 @@
     justify-content: center;
     position: relative;
     padding: 0.5rem 0rem;
-    background-color: #003566;
+    padding-top: 2%;
   }
 
   .navigation-menu ul {
     display: flex;
     padding: 0;
   }
+
+  .navigation-menu2 ul {
+    display: flex;
+    padding: 0;
+  }
+
   .navigation-menu li {
-    list-style-type: none;
     color: #ffc300;
     font-size: 26px;
     font-style: bold;
     margin: 0 1rem;
+    padding-left: 3%;
+    padding-right: 3%;
+    border-radius: 5px;
+    background-color: #003566;
   }
 
-  .title {
-    border: 1px solid #ffc300;
-    padding-left: 2%;
-    padding-right: 2%;
+  .navigation-menu2 li {
+    color: #ffc300;
+    font-size: 20px;
+    font-style: bold;
+    margin: 0 1rem;
+ 
     border-radius: 5px;
   }
-  .title:hover {
+
+  .navigation-menu2 li a:hover {
+    opacity: 0.8;
     border-bottom: 2px solid #ffc300;
   }
 
-  .navigation-menu li a {
-    text-decoration: none;
-    display: block;
-    width: 100%;
+  .navigation-menu li:last-child {
+    border: none;
+    background-color: #010912;
+  }
+  .navigation-menu li:last-child a:hover {
+    border: none;
+    border-bottom:  none;
   }
 
   .navigation-menu li a:hover {
     opacity: 0.8;
+    border-bottom: 2px solid #ffc300;
   }
 
+  
 .profile{
     max-height: 42px;
     max-width:  42px;
     margin-left: 100%;
-    border: 2px solid #ffc300;
+    border: 3px solid #003566;
     border-radius: 50%;
 }

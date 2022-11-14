@@ -1,0 +1,10 @@
+.contact{
+	position: relative;
+	border: 1px solid #ccc;
+	color: aliceblue;
+	margin-right: 30%;
+	margin-top: 3%;
+	margin-left: 4%;
+	flex-direction: column;
+	border-radius: 10px;
+}

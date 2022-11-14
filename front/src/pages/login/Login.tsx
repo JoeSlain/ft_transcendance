@@ -2,7 +2,7 @@ import "../../styles/global.css";
 import "../../styles/login.css";
 import React from "react";
 
-export function hasLogged()
+export function VerifLogged()
 {
     return true;
 }

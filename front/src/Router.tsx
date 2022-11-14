@@ -10,19 +10,17 @@ import Play from "./pages/play/Play";
 import Games from "./pages/games/Games";
 import NavBar from "./pages/profil/Navbar";
 import Login from "./pages/login/Login";
-import { hasLogged } from "./pages/login/Login";
+import { VerifLogged } from "./pages/login/Login";
 import Auth from "./context/Auth";
 import { AuthRoute } from "./pages/login/AuthRoute";
 
 export default function Router() {
-
-    const [isLogged, setIsLogged] = React.useState(hasLogged);
+    const [isLogged, setIsLogged] = React.useState(VerifLogged);
     return (
         <Auth.Provider value={{ isLogged }}>
-            <>
+           <AuthRoute/>
                 <Navbar /> 
                 <Routes>
-                    <Route element={<AuthRoute />}>
                         <Route element={<Layout />}>
                             <Route path="/login" element={<Login />} />
                             <Route path="/home" element={<Home />} />
@@ -34,9 +32,7 @@ export default function Router() {
                             <Route path="/history" element={<History />} />
                             <Route path="/stats" element={<Stats />} />
                         </Route>
-                    </Route>
                 </Routes>
-            </>
         </Auth.Provider>
     );
 
