@@ -5,5 +5,6 @@ export declare class UsersService {
     constructor(usersRepository: Repository<User>);
     setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<import("typeorm").UpdateResult>;
     turnOnTwoFactorAuthentication(userId: number): Promise<import("typeorm").UpdateResult>;
+    turnOffTwoFactorAuthentication(userId: number): Promise<import("typeorm").UpdateResult>;
     getById(userId: number): Promise<User>;
 }

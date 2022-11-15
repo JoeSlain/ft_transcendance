@@ -18,6 +18,7 @@ const _42_guard_1 = require("./42auth/42.guard");
 const _2fa_service_1 = require("./2fa/2fa.service");
 const users_service_1 = require("../users/users.service");
 const auth_service_1 = require("./auth.service");
+const _2fa_guard_1 = require("./2fa/2fa.guard");
 let AuthController = class AuthController {
     constructor(twoFactorAuthenticationService, usersService, authService) {
         this.twoFactorAuthenticationService = twoFactorAuthenticationService;
@@ -30,7 +31,10 @@ let AuthController = class AuthController {
     }
     async redirect(req, res) {
         console.log('redirect');
-        res.redirect(`http://localhost:3000/profile/${req.user.id}`);
+        if (req.user.isTwoFactorAuthenticationEnabled)
+            res.redirect(`http://localhost:3000/login/2fa`);
+        else
+            res.redirect(`http://localhost:3000/profile/${req.user.id}`);
     }
     async register(res, req) {
         const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(req.user);
@@ -44,6 +48,9 @@ let AuthController = class AuthController {
             throw new common_1.UnauthorizedException('Wrong authentication code');
         }
         await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
+    }
+    async turnOffTwoFactorAuthentication(req) {
+        await this.usersService.turnOffTwoFactorAuthentication(req.user.id);
     }
     async authenticate(req, { twoFactorAuthenticationCode }) {
         const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user);
@@ -89,6 +96,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "turnOnTwoFactorAuthentication", null);
+__decorate([
+    (0, common_1.Post)('2fa/turn-off'),
+    (0, common_1.UseGuards)(_2fa_guard_1.TwoFactorGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "turnOffTwoFactorAuthentication", null);
 __decorate([
     (0, common_1.Post)('2fa/authenticate'),
     (0, common_1.UseGuards)(_42_guard_1.AuthenticatedGuard),

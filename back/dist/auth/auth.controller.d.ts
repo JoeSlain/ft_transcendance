@@ -12,6 +12,7 @@ export declare class AuthController {
     turnOnTwoFactorAuthentication(req: any, { twoFactorAuthenticationCode }: {
         twoFactorAuthenticationCode: any;
     }): Promise<void>;
+    turnOffTwoFactorAuthentication(req: any): Promise<void>;
     authenticate(req: any, { twoFactorAuthenticationCode }: {
         twoFactorAuthenticationCode: any;
     }): Promise<any>;

@@ -1,6 +1,3 @@
-import { useEffect } from "react"
-import axios from "axios"
-
 const LoginPage = () => {
     const handleClick = (event) => {
         event.preventDefault();

@@ -31,6 +31,11 @@ let UsersService = class UsersService {
             isTwoFactorAuthenticationEnabled: true
         });
     }
+    async turnOffTwoFactorAuthentication(userId) {
+        return this.usersRepository.update(userId, {
+            isTwoFactorAuthenticationEnabled: false
+        });
+    }
     async getById(userId) {
         const user = await this.usersRepository.findOneBy({ id: userId });
         return user;

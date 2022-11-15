@@ -3,6 +3,7 @@ import { FortyTwoAuthGuard, AuthenticatedGuard } from './42auth/42.guard';
 import { TwoFactorAuthenticationService } from './2fa/2fa.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
+import { TwoFactorGuard } from './2fa/2fa.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +25,10 @@ export class AuthController {
     async redirect(@Req() req, @Res() res) {
         console.log('redirect')
 
-        res.redirect(`http://localhost:3000/profile/${req.user.id}`);
+        if (req.user.isTwoFactorAuthenticationEnabled)
+            res.redirect(`http://localhost:3000/login/2fa`);
+        else
+            res.redirect(`http://localhost:3000/profile/${req.user.id}`);
     }
 
     @Post('2fa/generate')
@@ -52,6 +56,12 @@ export class AuthController {
             throw new UnauthorizedException('Wrong authentication code');
         }
         await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
+    }
+
+    @Post('2fa/turn-off')
+    @UseGuards(TwoFactorGuard)
+    async turnOffTwoFactorAuthentication(@Req() req) {
+        await this.usersService.turnOffTwoFactorAuthentication(req.user.id);
     }
 
     @Post('2fa/authenticate')

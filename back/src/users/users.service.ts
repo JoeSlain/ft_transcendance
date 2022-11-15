@@ -19,6 +19,12 @@ export class UsersService {
         });
     }
 
+    async turnOffTwoFactorAuthentication(userId: number) {
+        return this.usersRepository.update(userId, {
+            isTwoFactorAuthenticationEnabled: false
+        });
+    }
+
     async getById(userId: number) {
         const user = await this.usersRepository.findOneBy({ id: userId });
 
