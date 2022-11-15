@@ -38,6 +38,8 @@ let AuthController = class AuthController {
     }
     async turnOnTwoFactorAuthentication(req, { twoFactorAuthenticationCode }) {
         const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user);
+        console.log('2fa turn on');
+        console.log(isCodeValid);
         if (!isCodeValid) {
             throw new common_1.UnauthorizedException('Wrong authentication code');
         }

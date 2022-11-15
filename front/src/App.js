@@ -1,6 +1,6 @@
 import './App.css';
 import LoginPage from './pages/login'
-import HomePage from './pages/home'
+import ProfilePage from './pages/profile'
 import { useState } from 'react'
 import {
   BrowserRouter as Router,
@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="login" element={<LoginPage />} />
-        <Route path="profile/:id" element={<HomePage user={user} setUser={setUser} />} />
+        <Route path="profile/:id" element={<ProfilePage user={user} setUser={setUser} />} />
       </Routes>
     </div>
   );

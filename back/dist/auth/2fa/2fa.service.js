@@ -28,6 +28,9 @@ let TwoFactorAuthenticationService = class TwoFactorAuthenticationService {
         return (0, qrcode_1.toFileStream)(stream, otpauthUrl);
     }
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user) {
+        console.log('verify 2fa');
+        console.log(twoFactorAuthenticationCode);
+        console.log(user.twoFactorAuthenticationSecret);
         return otplib_1.authenticator.verify({
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret

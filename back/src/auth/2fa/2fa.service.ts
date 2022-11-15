@@ -3,7 +3,6 @@ import { User } from "src/database";
 import { authenticator } from 'otplib';
 import { UsersService } from "src/users/users.service";
 import { toFileStream } from 'qrcode';
-import { Response } from 'express';
 
 @Injectable()
 export class TwoFactorAuthenticationService {
@@ -24,6 +23,10 @@ export class TwoFactorAuthenticationService {
     }
 
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+        console.log('verify 2fa')
+        console.log(twoFactorAuthenticationCode)
+        console.log(user.twoFactorAuthenticationSecret)
+
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret

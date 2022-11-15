@@ -45,6 +45,9 @@ export class AuthController {
             twoFactorAuthenticationCode, req.user
         );
         
+        console.log('2fa turn on')
+        console.log(isCodeValid)
+
         if (!isCodeValid) {
             throw new UnauthorizedException('Wrong authentication code');
         }

@@ -5,7 +5,7 @@ import { AuthService } from "../auth.service";
 
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy) {    
-    constructor(@Inject('AUTH_SERVICE') private readonly authService: AuthService,) {        
+    constructor(private readonly authService: AuthService,) {        
         super({
             clientID: process.env.FT_ID,
             clientSecret: process.env.FT_SECRET,

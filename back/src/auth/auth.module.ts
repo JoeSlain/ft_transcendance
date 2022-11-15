@@ -10,12 +10,12 @@ import { UsersModule } from 'src/users/users.module';
 import { TwoFactorAuthenticationService } from './2fa/2fa.service';
 import { UsersService } from 'src/users/users.service';
 import { JwtModule } from '@nestjs/jwt';
+import { TwoFactorStrategy } from './2fa/2fa.strategy';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
-    UsersModule,
     JwtModule.register({
       secret: process.env.FT_SECRET,
       signOptions: {
@@ -25,15 +25,15 @@ import { JwtModule } from '@nestjs/jwt';
   ],
   providers: [
     FortyTwoStrategy,
+    TwoFactorStrategy,
     SessionSerializer,
     TwoFactorAuthenticationService,
     UsersService,
     AuthService,
-    {
-      provide: 'AUTH_SERVICE',
-      useClass: AuthService,
-    },
   ],
   controllers: [AuthController],
+  exports: [
+    AuthService,
+  ]
 })
 export class AuthModule {}
