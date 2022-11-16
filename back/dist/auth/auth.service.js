@@ -14,36 +14,65 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_1 = require("@nestjs/jwt");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const User_1 = require("../database/entities/User");
+const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
-    constructor(jwtService, userRepository) {
-        this.jwtService = jwtService;
+    constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
-    async validateUser(username) {
-        const user = await this.userRepository.findOneBy({ username });
+    createUser(details) {
+        const user = {
+            username: details.username,
+            id42: details.id42,
+            email: details.email,
+            winratio: 'no games played',
+            profile_pic: 'no avatar provided',
+            elo: 0,
+            n_win: 0,
+            n_lose: 0,
+            date_of_sign: new Date(),
+        };
+        return this.userRepository.create(user);
+    }
+    async validateUser(details) {
+        console.log(details.id42);
+        const user = await this.userRepository.findOneBy({ id42: details.id42 });
         console.log(user);
         if (user) {
             return user;
         }
-        const newUser = this.userRepository.create({ username });
+        const newUser = this.createUser(details);
         console.log('user not found. Creating...');
         console.log('newUser', newUser);
         return this.userRepository.save(newUser);
     }
     async findUser(id) {
-        const user = await this.userRepository.findOneBy({ id });
+        const user = await this.userRepository.findOneBy({ id: id });
+        console.log('foundUser in db');
+        console.log(user ? 'found' : 'not found');
+        console.log('user');
+        console.log(user);
         return user;
+    }
+    getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
+        const payload = {
+            userId, isSecondFactorAuthenticated
+        };
+        const token = this.jwtService.sign(payload, {
+            secret: process.env.FT_SECRET,
+            expiresIn: process.env.COOKIE_EXPIRATION_TIME,
+        });
+        return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
     }
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __param(1, (0, typeorm_1.InjectRepository)(User_1.User)),
-    __metadata("design:paramtypes", [jwt_1.JwtService,
-        typeorm_2.Repository])
+    __param(0, (0, typeorm_1.InjectRepository)(User_1.User)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        jwt_1.JwtService])
 ], AuthService);
 exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

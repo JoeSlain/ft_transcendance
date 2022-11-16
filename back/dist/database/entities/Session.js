@@ -27,7 +27,7 @@ __decorate([
     __metadata("design:type", String)
 ], TypeORMSession.prototype, "json", void 0);
 TypeORMSession = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)({ name: 'sessions' })
 ], TypeORMSession);
 exports.TypeORMSession = TypeORMSession;
 //# sourceMappingURL=Session.js.map

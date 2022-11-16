@@ -8,29 +8,41 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FortyTwoStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_42_1 = require("passport-42");
+const auth_service_1 = require("./auth.service");
 let FortyTwoStrategy = class FortyTwoStrategy extends (0, passport_1.PassportStrategy)(passport_42_1.Strategy) {
-    constructor() {
+    constructor(authService) {
         super({
             clientID: process.env.FT_ID,
             clientSecret: process.env.FT_SECRET,
             callbackURL: process.env.FT_CALLBACK_URL
         });
+        this.authService = authService;
     }
     async validate(accessToken, refreshToken, profile) {
         console.log('profile', profile);
         console.log('accessToken', accessToken);
         console.log('refreshToken', refreshToken);
-        return profile;
+        console.log('id', profile.id);
+        const details = {
+            id42: profile.id,
+            username: profile.username,
+        };
+        const user = await this.authService.validateUser(details);
+        return user;
     }
 };
 FortyTwoStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __param(0, (0, common_1.Inject)('AUTH_SERVICE')),
+    __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], FortyTwoStrategy);
 exports.FortyTwoStrategy = FortyTwoStrategy;
 //# sourceMappingURL=42.strategy.js.map

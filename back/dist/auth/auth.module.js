@@ -9,16 +9,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const jwt_strategy_1 = require("./jwt.strategy");
 const passport_1 = require("@nestjs/passport");
-const jwt_1 = require("@nestjs/jwt");
-const constants_1 = require("./constants");
-const _42_strategy_1 = require("./42.strategy");
-const google_strategy_1 = require("./google.strategy");
+const _42_strategy_1 = require("./42auth/42.strategy");
 const auth_controller_1 = require("./auth.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const User_1 = require("../database/entities/User");
 const Serializer_1 = require("./utils/Serializer");
+const _2fa_service_1 = require("./2fa/2fa.service");
+const users_service_1 = require("../users/users.service");
+const jwt_1 = require("@nestjs/jwt");
+const _2fa_strategy_1 = require("./2fa/2fa.strategy");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
@@ -27,21 +27,24 @@ AuthModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([User_1.User]),
             passport_1.PassportModule,
             jwt_1.JwtModule.register({
-                secret: constants_1.jwtConstants.secret,
-                signOptions: { expiresIn: '60s' },
-            }),
+                secret: process.env.FT_SECRET,
+                signOptions: {
+                    expiresIn: process.env.COOKIE_EXPIRATION_TIME,
+                }
+            })
         ],
         providers: [
-            jwt_strategy_1.JwtStrategy,
             _42_strategy_1.FortyTwoStrategy,
-            google_strategy_1.GoogleStrategy,
+            _2fa_strategy_1.TwoFactorStrategy,
             Serializer_1.SessionSerializer,
-            {
-                provide: 'AUTH_SERVICE',
-                useClass: auth_service_1.AuthService,
-            }
+            _2fa_service_1.TwoFactorAuthenticationService,
+            users_service_1.UsersService,
+            auth_service_1.AuthService,
         ],
         controllers: [auth_controller_1.AuthController],
+        exports: [
+            auth_service_1.AuthService,
+        ]
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

@@ -1,34 +1,86 @@
-import { Controller, UseGuards, Get, Req, Res } from '@nestjs/common';
-import { GoogleAuthGuard, AuthenticatedGuard } from './google.guard';
-import { Request } from 'express';
+import { Controller, UseGuards, Get, Req, Res, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { FortyTwoAuthGuard, AuthenticatedGuard } from './42auth/42.guard';
+import { TwoFactorAuthenticationService } from './2fa/2fa.service';
+import { UsersService } from 'src/users/users.service';
+import { AuthService } from './auth.service';
+import { TwoFactorGuard } from './2fa/2fa.guard';
 
 @Controller('auth')
 export class AuthController {
+    constructor(
+        private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
+    ) { }
+
     @Get('login')
-    @UseGuards(GoogleAuthGuard)
+    @UseGuards(FortyTwoAuthGuard)
     login() {
         console.log('login')
         return;
     }
 
     @Get('redirect')
-    @UseGuards(GoogleAuthGuard)
+    @UseGuards(FortyTwoAuthGuard)
     async redirect(@Req() req, @Res() res) {
         console.log('redirect')
-        /*const token = await this.authService.login(req.user);
-        const url = new URL('http://localhost');
-        
-        url.port = '3000';
-        url.pathname = 'login';
-        url.searchParams.set('code', token);
-        console.log('url', url.href);
-        res.redirect(url.href);*/
-        res.redirect('http://localhost:3000/home');
+
+        if (req.user.isTwoFactorAuthenticationEnabled)
+            res.redirect(`http://localhost:3000/login/2fa`);
+        else
+            res.redirect(`http://localhost:3000/profile/${req.user.id}`);
     }
 
-    @Get('home')
+    @Post('2fa/generate')
     @UseGuards(AuthenticatedGuard)
-    getProfile(@Req() request: Request) {
-        return 'ok home';
+    async register(@Res() res, @Req() req) {
+        const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(req.user);
+
+        return this.twoFactorAuthenticationService.pipeQrCodeStream(res, otpauthUrl);
+    }
+
+    @Post('2fa/turn-on')
+    @UseGuards(AuthenticatedGuard)
+    async turnOnTwoFactorAuthentication(
+        @Req() req,
+        @Body() { twoFactorAuthenticationCode }
+    ) {
+        const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+            twoFactorAuthenticationCode, req.user
+        );
+        
+        console.log('2fa turn on')
+        console.log(isCodeValid)
+
+        if (!isCodeValid) {
+            throw new UnauthorizedException('Wrong authentication code');
+        }
+        await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
+    }
+
+    @Post('2fa/turn-off')
+    @UseGuards(TwoFactorGuard)
+    async turnOffTwoFactorAuthentication(@Req() req) {
+        await this.usersService.turnOffTwoFactorAuthentication(req.user.id);
+    }
+
+    @Post('2fa/authenticate')
+    @UseGuards(AuthenticatedGuard)
+    async authenticate(
+        @Req() req,
+        @Body() { twoFactorAuthenticationCode }
+    ) {
+        const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+            twoFactorAuthenticationCode, req.user
+        );
+
+        if (!isCodeValid) {
+            throw new UnauthorizedException('Wrong authentication code');
+        }
+
+        const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
+        
+        req.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        return req.user;
     }
 }

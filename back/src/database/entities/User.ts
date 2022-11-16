@@ -8,14 +8,23 @@ export class User {
     @Column()
     username: string;
 
-   /* @Column()
-    nickname: string;
+    @Column()
+    email: string;
+
+    @Column({ nullable: true })
+    twoFactorAuthenticationSecret?: string;
+
+    @Column({ default: false })
+    isTwoFactorAuthenticationEnabled: boolean;
+
+    @Column()
+    id42: number;
 
     @Column()
     winratio: string;
 
     @Column()
-    profile_pic: any;
+    profile_pic: string;
 
     @Column()
     elo: number;
@@ -27,5 +36,5 @@ export class User {
     n_lose: number;
 
     @Column()
-    date_of_sign: Date;*/
+    date_of_sign: Date;
 }

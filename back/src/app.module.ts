@@ -6,7 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { entities } from './database';
-import { Session } from 'express-session';
+import { PassportModule } from '@nestjs/passport';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,8 @@ import { Session } from 'express-session';
         FT_CALLBACK_URL: Joi.string().required(),
       }),
     }),
+    AuthModule,
+    PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: process.env.DB_HOST,
@@ -27,7 +30,7 @@ import { Session } from 'express-session';
       entities: entities,
       synchronize: true,
     }),
-    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
