@@ -2,6 +2,8 @@ import "../styles/navbar.css";
 import { NavLink } from 'react-router-dom';
 
 const Navbar = () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
     return (
         <nav className="navigation">
             <div
@@ -20,7 +22,7 @@ const Navbar = () => {
                         <NavLink className="navlink" to="/chat">Chat</NavLink>
                     </li>
                     <li>
-                        <NavLink className="navlink" to="/profile">Profile</NavLink>
+                        <NavLink className="navlink" to="/profile/">Profile</NavLink>
                     </li>
                 </ul>
             </div>

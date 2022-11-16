@@ -24,8 +24,9 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="profile/:id" element={<ProfilePage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="login/2fa" element={<TwoFa />} />
-          <Route path="profile" element={<Params />} />
+          <Route path="params" element={<Params />} />
           <Route path="play" element={<Play />} />
           <Route path="games" element={<Games />} />
           <Route path="chat" element={<Chat />} />

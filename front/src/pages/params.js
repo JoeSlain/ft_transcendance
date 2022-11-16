@@ -39,7 +39,7 @@ const Params = () => {
         setCode(code)
     }
 
-    const get2faCode = (event) => {
+    const turnOn2fa = (event) => {
         event.preventDefault()
         axios
             .post('http://localhost:3001/api/auth/2fa/turn-on', {
@@ -60,7 +60,7 @@ const Params = () => {
             <p>
                 <img src={qrcode} />
             </p>
-            <form onSubmit={get2faCode}>
+            <form onSubmit={turnOn2fa}>
                 <ReactCodeInput type='text' fields={6} onChange={getCode} />
                 <button type="submit"> confirm </button>
             </form>

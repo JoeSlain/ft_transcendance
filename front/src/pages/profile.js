@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Navigate } from 'react-router-dom'
 
 const ProfilePage = () => {
+    const [url, setUrl] = useState('')
     const [user, setUser] = useState(() => {
         const saved = localStorage.getItem('user');
         const initialValue = JSON.parse(saved);
@@ -25,6 +26,9 @@ const ProfilePage = () => {
 
     return (
         <div>
+            { url && <Navigate to="/params" replace='true' /> }
+            
+            <button onClick={() => setUrl('http://localhost:3000/params')}> Params </button>
             <h1>
                 Welcome {user.username} !
             </h1>
