@@ -7,7 +7,7 @@ import History from './pages/profil/History';
 import Stats from "./pages/stats/Stats"
 import Play from "./pages/play/Play";
 import Games from "./pages/games/Games";
-import NavBar from "./pages/profil/Navbar";
+//import NavbarProfil from "./pages/profil/Navbar";
 import Login from "./pages/login/Login";
 
 
@@ -23,8 +23,8 @@ export default function Router()
                 <Route path="/play" element={<Play />} />
                 <Route path="/games" element={<Games />} />
             </Route>
-            <Route element={<NavBar />}>
-                <Route path="/profil" element={<Profil id={1}/>} />
+            <Route>
+                <Route path="/profil" element={<Profil id="1"/>} />
                 <Route path="/history" element={<History />} />
                 <Route path="/stats" element={<Stats />} />
             </Route>
