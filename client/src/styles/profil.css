@@ -1,0 +1,16 @@
+.profil {
+    display: flex;
+    justify-content: center;
+    min-height: 50%;
+}
+
+.avatar {
+    padding-top: 10rem;
+    min-width: 100px;
+    min-height: 100px;
+}
+
+.avatar:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}

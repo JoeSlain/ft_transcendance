@@ -1,8 +1,10 @@
-import { createAvatar } from '@dicebear/avatars';
-import * as style from '@dicebear/avatars-identicon-sprites';
+import axios from "axios";
 
 
-export default function avatarGenerator() : string
+
+export default function avatarGenerator(seed : string) : any
 {
-    return createAvatar(style, {});
+    let avatar : any;
+    axios.get<string>(`https://avatars.dicebear.com/api/adventurer-neutral/:${seed}.svg`, avatar);
+    return (avatar);
 }
