@@ -27,11 +27,6 @@ export default function Router() {
                             <Route path="/play" element={<Play />} />
                             <Route path="/games" element={<Games />} />
                         </Route>
-                        <Route element={<NavBar />}>
-                            <Route path="/profil" element={<Profil id={1} />} />
-                            <Route path="/history" element={<History />} />
-                            <Route path="/stats" element={<Stats />} />
-                        </Route>
                 </Routes>
         </Auth.Provider>
     );
