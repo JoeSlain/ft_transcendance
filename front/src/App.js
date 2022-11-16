@@ -3,6 +3,10 @@ import LoginPage from './pages/login'
 import ProfilePage from './pages/profile'
 import TwoFa from './pages/2fa'
 import Params from './pages/params'
+import Navbar from './components/navbar'
+import Play from './pages/play'
+import Games from './pages/games'
+import Chat from './pages/chat'
 import { useState } from 'react'
 import {
   BrowserRouter as Router,
@@ -15,12 +19,16 @@ function App() {
 
   return (
     <div id="main">
+      <Navbar />
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="profile/:id" element={<ProfilePage user={user} setUser={setUser} />} />
-        <Route path="login/2fa" element={<TwoFa />} />
-        <Route path="profile/:id/params" element={<Params />} />
+          <Route path="/" element={<LoginPage />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="profile/:id" element={<ProfilePage />} />
+          <Route path="login/2fa" element={<TwoFa />} />
+          <Route path="profile" element={<Params />} />
+          <Route path="play" element={<Play />} />
+          <Route path="games" element={<Games />} />
+          <Route path="chat" element={<Chat />} />
       </Routes>
     </div>
   );

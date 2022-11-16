@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from "react"
 import { Navigate } from 'react-router-dom'
 
-const ProfilePage = ({ user, setUser }) => {
-    const [url, setUrl] = useState('')
+const ProfilePage = () => {
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('user');
+        const initialValue = JSON.parse(saved);
+        return initialValue || {};
+    })
     const params = useParams();
-
-    const handleParamClick = () => {
-        setUrl(`/profile/${params.id}/params`)
-    }
 
     useEffect(() => {
         axios
@@ -19,14 +19,12 @@ const ProfilePage = ({ user, setUser }) => {
             .then(response => {
                 console.log(response.data)
                 setUser(response.data)
+                localStorage.setItem('user', JSON.stringify(user))
             })
     }, [])
 
     return (
         <div>
-            { url && <Navigate to={url} replace={true}/>
-}
-            <button onClick={handleParamClick} > Params </button>
             <h1>
                 Welcome {user.username} !
             </h1>

@@ -25,6 +25,7 @@ let UsersController = class UsersController {
     async findOne(params) {
         const user = await this.userRepository.findOneBy({ id: params.id });
         console.log('get profile', params.id);
+        console.log(user);
         return user;
     }
 };
