@@ -2,6 +2,11 @@ import "../../styles/global.css";
 import "../../styles/login.css";
 import React from "react";
 
+export function VerifLogged()
+{
+    return true;
+}
+
 export default function Login() {
   const buttonAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
