@@ -17,10 +17,16 @@ const common_1 = require("@nestjs/common");
 const database_1 = require("../database");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("@nestjs/typeorm");
-const _2fa_guard_1 = require("../auth/2fa/2fa.guard");
+const _42_guard_1 = require("../auth/42auth/42.guard");
 let UsersController = class UsersController {
     constructor(userRepository) {
         this.userRepository = userRepository;
+    }
+    async findMe(req) {
+        const user = await this.userRepository.findOneBy({ id: req.user.id });
+        console.log('get profile', req.user.id);
+        console.log(user);
+        return user;
     }
     async findOne(params) {
         const user = await this.userRepository.findOneBy({ id: params.id });
@@ -30,8 +36,16 @@ let UsersController = class UsersController {
     }
 };
 __decorate([
+    (0, common_1.Get)(''),
+    (0, common_1.UseGuards)(_42_guard_1.AuthenticatedGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "findMe", null);
+__decorate([
     (0, common_1.Get)(':id'),
-    (0, common_1.UseGuards)(_2fa_guard_1.TwoFactorGuard),
+    (0, common_1.UseGuards)(_42_guard_1.AuthenticatedGuard),
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

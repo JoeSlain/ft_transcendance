@@ -7,7 +7,7 @@ import Navbar from './components/navbar'
 import Play from './pages/play'
 import Games from './pages/games'
 import Chat from './pages/chat'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Route,

@@ -14,7 +14,7 @@ const ProfilePage = () => {
 
     useEffect(() => {
         axios
-            .get(`http://localhost:3001/api/users/${params.id}`, {
+            .get(`http://localhost:3001/api/users`, {
                 withCredentials: true
             })
             .then(response => {

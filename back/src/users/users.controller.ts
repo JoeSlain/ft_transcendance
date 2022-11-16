@@ -1,15 +1,25 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { User } from 'src/database';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TwoFactorGuard } from 'src/auth/2fa/2fa.guard';
+import { AuthenticatedGuard } from 'src/auth/42auth/42.guard';
 
 @Controller('users')
 export class UsersController {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
    
+    @Get('')
+    @UseGuards(AuthenticatedGuard)
+    async findMe(@Req() req): Promise<User> {
+        const user = await this.userRepository.findOneBy({ id: req.user.id });
+
+        console.log('get profile', req.user.id);
+        console.log(user);
+        return user;
+    }
+
     @Get(':id')
-    @UseGuards(TwoFactorGuard)
+    @UseGuards(AuthenticatedGuard)
     async findOne(@Param() params): Promise<User> {
         const user = await this.userRepository.findOneBy({ id: params.id });
 

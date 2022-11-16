@@ -28,6 +28,9 @@ export class UsersService {
     async getById(userId: number) {
         const user = await this.usersRepository.findOneBy({ id: userId });
 
+        console.log('getById');
+        console.log(userId);
+        console.log(user);
         return user;
     }
 }
