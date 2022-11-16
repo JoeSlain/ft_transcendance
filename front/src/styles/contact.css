@@ -1,10 +1,11 @@
 .contact{
-	position: relative;
-	border: 1px solid #ccc;
+	border: 2px solid #ffc300;
 	color: aliceblue;
-	margin-right: 30%;
-	margin-top: 3%;
-	margin-left: 4%;
-	flex-direction: column;
 	border-radius: 10px;
+	flex-direction: column;
+	margin-left: 30px;
+	min-width: 300px;
+	position: relative;
+	height: 720px;
+	background-color: #003566;
 }
