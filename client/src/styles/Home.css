@@ -17,8 +17,22 @@
 	min-width: 600px;
 	width:25%;
 	vertical-align: baseline;
-  background-color: #003566;
+ 	 background-color: #003566;
 	flex-grow: 1;
-  display: flex;
-  border-right: 2%;
+  	display: flex;
+  	border-right: 2%;
+}
+
+.second	{
+	border: 2px solid #ffc300;
+	color: aliceblue;
+	border-radius: 10px;
+	flex-direction: column;
+	margin-left: 30px;
+	width: 300px;
+	position: relative;
+	height: 720px;
+	background-color: #003566;
+	/*padding-top: 1%;
+	padding-left: 9%;*/
 }
