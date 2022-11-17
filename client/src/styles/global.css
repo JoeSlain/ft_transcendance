@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.heightMinusNav {
+    height: calc(100vh - 60px);
+}

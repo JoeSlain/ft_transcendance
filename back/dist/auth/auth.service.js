@@ -18,18 +18,20 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const User_1 = require("../database/entities/User");
 const jwt_1 = require("@nestjs/jwt");
+const avatarGenerator_1 = require("../utils/avatarGenerator");
 let AuthService = class AuthService {
     constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
     }
     createUser(details) {
+        (0, avatarGenerator_1.default)(details.id42);
         const user = {
             username: details.username,
             id42: details.id42,
             email: details.email,
             winratio: 'no games played',
-            profile_pic: 'no avatar provided',
+            profile_pic: ` no avatar `,
             elo: 0,
             n_win: 0,
             n_lose: 0,

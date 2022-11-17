@@ -13,6 +13,7 @@ import Login from "./pages/login/Login";
 import { VerifLogged } from "./pages/login/Login";
 import Auth from "./hooks/Auth";
 import { AuthRoute } from "./pages/login/AuthRoute";
+import PageNotFound from "./pages/404/404";
 
 export default function Router() {
     const [isLogged, setIsLogged] = React.useState(VerifLogged);
@@ -26,6 +27,7 @@ export default function Router() {
                             <Route path="/home" element={<Home />} />
                             <Route path="/play" element={<Play />} />
                             <Route path="/games" element={<Games />} />
+                            <Route path="*" element={<PageNotFound />} />
                         </Route>
                 </Routes>
         </Auth.Provider>
