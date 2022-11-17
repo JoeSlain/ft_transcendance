@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   createUser(details: UserDetails) {
-    avatarGenerator(details.id42);
+    //avatarGenerator(details.id42);
     const user = {
       username: details.username,
       id42: details.id42,
