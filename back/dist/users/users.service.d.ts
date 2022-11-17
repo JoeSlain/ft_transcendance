@@ -7,4 +7,7 @@ export declare class UsersService {
     turnOnTwoFactorAuthentication(userId: number): Promise<import("typeorm").UpdateResult>;
     turnOffTwoFactorAuthentication(userId: number): Promise<import("typeorm").UpdateResult>;
     getById(userId: number): Promise<User>;
+    getByUsername(userName: string): Promise<User | null>;
+    addFriend(me: User, userName: string): Promise<User>;
+    getFriends(user: User): Promise<User[]>;
 }

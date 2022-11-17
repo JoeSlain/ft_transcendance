@@ -57,6 +57,14 @@ let AuthService = class AuthService {
         console.log(user);
         return user;
     }
+    getCookieWithJwtToken(userId) {
+        const payload = { userId };
+        const token = this.jwtService.sign(payload, {
+            secret: process.env.FT_SECRET,
+            expiresIn: process.env.COOKIE_EXPIRATION_TIME,
+        });
+        return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
+    }
     getCookieWithJwtAccessToken(userId, isSecondFactorAuthenticated = false) {
         const payload = {
             userId, isSecondFactorAuthenticated

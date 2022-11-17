@@ -9,5 +9,6 @@ export declare class AuthService {
     createUser(details: UserDetails): User;
     validateUser(details: UserDetails): Promise<User>;
     findUser(id: number): Promise<User>;
+    getCookieWithJwtToken(userId: number): string;
     getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated?: boolean): string;
 }

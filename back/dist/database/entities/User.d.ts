@@ -11,4 +11,5 @@ export declare class User {
     n_win: number;
     n_lose: number;
     date_of_sign: Date;
+    friends: User[];
 }

@@ -8,10 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var User_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
-let User = class User {
+let User = User_1 = class User {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
@@ -61,7 +62,12 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Date)
 ], User.prototype, "date_of_sign", void 0);
-User = __decorate([
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => User_1),
+    (0, typeorm_1.JoinTable)(),
+    __metadata("design:type", Array)
+], User.prototype, "friends", void 0);
+User = User_1 = __decorate([
     (0, typeorm_1.Entity)({ name: 'users' })
 ], User);
 exports.User = User;

@@ -30,7 +30,9 @@ let AuthController = class AuthController {
         return;
     }
     async redirect(req, res) {
+        const accessTokenCookie = this.authService.getCookieWithJwtToken(req.user.id);
         console.log('redirect');
+        req.res.setHeader('Set-Cookie', [accessTokenCookie]);
         if (req.user.isTwoFactorAuthenticationEnabled)
             res.redirect(`http://localhost:3000/login/2fa`);
         else

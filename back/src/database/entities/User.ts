@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
@@ -37,4 +37,8 @@ export class User {
 
     @Column()
     date_of_sign: Date;
+
+    @ManyToMany(() => User)
+    @JoinTable()
+    friends: User[]
 }

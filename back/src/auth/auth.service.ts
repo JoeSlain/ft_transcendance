@@ -52,6 +52,18 @@ export class AuthService {
     return user;
   }
 
+  // 42 cookie token
+  getCookieWithJwtToken(userId: number) {
+    const payload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.FT_SECRET,
+      expiresIn: process.env.COOKIE_EXPIRATION_TIME,
+    });
+
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
+  }
+
+  // 2fa cookie token
   getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
     const payload = {
       userId, isSecondFactorAuthenticated

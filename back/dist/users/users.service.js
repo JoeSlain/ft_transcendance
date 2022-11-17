@@ -43,6 +43,40 @@ let UsersService = class UsersService {
         console.log(user);
         return user;
     }
+    async getByUsername(userName) {
+        const user = await this.usersRepository.findOneBy({ username: userName });
+        console.log('getByUsername');
+        console.log(user);
+        return user;
+    }
+    async addFriend(me, userName) {
+        const user = await this.getByUsername(userName);
+        console.log('addFriend');
+        console.log(user);
+        if (user) {
+            try {
+                await this.usersRepository
+                    .createQueryBuilder()
+                    .relation(database_1.User, "friends")
+                    .of(me)
+                    .add(user);
+            }
+            catch (error) {
+                console.log(`friend ${userName} already added`);
+            }
+        }
+        return me;
+    }
+    async getFriends(user) {
+        const users = await this.usersRepository.find({
+            relations: {
+                friends: true,
+            },
+        });
+        console.log('getFriends');
+        console.log(users);
+        return users;
+    }
 };
 UsersService = __decorate([
     (0, common_1.Injectable)(),
