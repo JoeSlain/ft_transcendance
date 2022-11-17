@@ -1,6 +1,6 @@
 import "../../styles/Home.css";
 import "../../styles/global.css";
-import Contact from "../../components/contact/contact";
+import Contact from "../../components/tabs/tab_contatc";
 
 export default function Home() {
   return (

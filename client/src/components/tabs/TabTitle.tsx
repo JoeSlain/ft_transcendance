@@ -1,4 +1,5 @@
 import React from "react";
+import "../../styles/tab.css";
 
 type Props = {
 	title: string;
@@ -9,7 +10,7 @@ type Props = {
 const TabTitle: React.FC<Props> = ({ title, setSelectedTab, index }) => {
 
 	return (
-	  <li>
+	  <li className="tab">
 		<button onClick={() => setSelectedTab(index)}>{title}</button>
 	  </li>
 	);

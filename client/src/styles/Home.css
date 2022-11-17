@@ -10,7 +10,7 @@
 }
 
 .main {
-  border: 2px solid #ffc300;
+  	border: 2px solid #ffc300;
 	color: aliceblue;
 	flex-direction: column;
 	border-radius: 10px;
@@ -29,7 +29,8 @@
 	border-radius: 10px;
 	flex-direction: column;
 	margin-left: 30px;
-	width: 300px;
+	min-width: 300px;
+	max-width: 300px;
 	position: relative;
 	height: 720px;
 	background-color: #003566;
