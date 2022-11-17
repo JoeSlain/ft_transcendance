@@ -4,21 +4,23 @@ import { Repository } from 'typeorm';
 import { User } from 'src/database/entities/User';
 import { UserDetails } from 'src/utils/types';
 import { JwtService } from '@nestjs/jwt';
+import avatarGenerator from 'src/utils/avatarGenerator';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   createUser(details: UserDetails) {
+    //avatarGenerator(details.id42);
     const user = {
       username: details.username,
       id42: details.id42,
       email: details.email,
       winratio: 'no games played',
-      profile_pic: 'no avatar provided',
+      profile_pic: ` no avatar `,
       elo: 0,
       n_win: 0,
       n_lose: 0,
