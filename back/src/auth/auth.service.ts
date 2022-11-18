@@ -14,13 +14,13 @@ export class AuthService {
   ) {}
 
   createUser(details: UserDetails) {
-    //avatarGenerator(details.id42);
+    avatarGenerator(details.id42);
     const user = {
       username: details.username,
       id42: details.id42,
       email: details.email,
       winratio: 'no games played',
-      profile_pic: ` no avatar `,
+      profile_pic: details.img_url,
       elo: 0,
       n_win: 0,
       n_lose: 0,
