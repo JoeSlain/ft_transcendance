@@ -1,10 +1,16 @@
+import "../../styles/tab.css";
+
 const Channel = () => {
 	return (
 		<div className="">
-		<h1>Channel</h1>
-	</div>
-	
+			<ul>
+				<li className="channel">
+					<h1>Channel</h1>
+
+				</li>
+			</ul>
+		</div>
 	);
-};
+}
 
 export default Channel;

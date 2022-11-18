@@ -27,12 +27,12 @@
 	border: 2px solid #ffc300;
 	color: aliceblue;
 	border-radius: 10px;
-	flex-direction: column;
 	margin-left: 30px;
 	min-width: 300px;
 	max-width: 300px;
 	position: relative;
 	height: 720px;
+	display: flex;
 	background-color: #003566;
 	/*padding-top: 1%;
 	padding-left: 9%;*/

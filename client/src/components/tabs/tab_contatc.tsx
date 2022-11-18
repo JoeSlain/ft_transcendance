@@ -3,17 +3,18 @@ import "../../styles/tab.css";
 import Tabs from "./tabs";
 import Tab from "./tab";
 import Channel from "../channel/channel";
+import Contact from "../contact/contact";
 
-export default function Contact() {
+export default function TabContact() {
 	return (
-		<div className="container">
+		<div className="containers">
 			<div className="tabs">
 				<Tabs>
 					<Tab title="Contact">
-						ici les contact
+						<Contact/>
 					</Tab>
 					<Tab title="Channel">
-					ici les chqnnel
+						<Channel/>
 					</Tab>
 				</Tabs>
 			</div>

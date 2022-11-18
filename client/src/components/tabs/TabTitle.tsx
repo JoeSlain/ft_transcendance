@@ -12,7 +12,7 @@ const TabTitle: React.FC<Props> = ({ title, setSelectedTab, index }) => {
 	return (
 	  <li className="tab">
 		<button onClick={() => setSelectedTab(index)}>{title}</button>
-	  </li>
+	 </li>
 	);
 }
 export default TabTitle;
