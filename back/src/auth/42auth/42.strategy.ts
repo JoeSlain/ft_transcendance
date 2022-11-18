@@ -22,6 +22,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
             id42: profile.id,
             username: profile.username,
             email: profile._json.email,
+            img_url: profile._json.image_url
         }
 
         const user = await this.authService.validateUser(details);

@@ -1,5 +1,7 @@
 import '../styles/play.css'
 import '../styles/popup.css'
+import { useState } from 'react'
+import Friend from './friend'
 
 const Play = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -14,21 +16,15 @@ const Play = () => {
 
     return (
         <div className='play'>
-            <div className='main'>
-                <div className='main-content'>
-                    <h1>PLAYERS</h1>
-                    <p>
-                        {user.username}
-                    </p>
-                </div>
-                <div className='footer'>
-                    <button onClick={searchOpponent}> Play </button>
-                </div>
+            <h1>PLAYERS</h1>
+            <p>
+                {user.username}
+            </p>
+
+            <div className='footer'>
+                <button onClick={searchOpponent}> Play </button>
             </div>
-            <div className='aside'>
-                <h2> Friends </h2>
-            </div>
-        </div>
+        </div >
     )
 }
 

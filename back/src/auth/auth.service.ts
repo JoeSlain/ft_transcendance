@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   createUser(details: UserDetails) {
     const user = {
@@ -18,7 +18,7 @@ export class AuthService {
       id42: details.id42,
       email: details.email,
       winratio: 'no games played',
-      profile_pic: 'no avatar provided',
+      profile_pic: details.img_url,
       elo: 0,
       n_win: 0,
       n_lose: 0,
@@ -52,6 +52,18 @@ export class AuthService {
     return user;
   }
 
+  // 42 cookie token
+  getCookieWithJwtToken(userId: number) {
+    const payload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.FT_SECRET,
+      expiresIn: process.env.COOKIE_EXPIRATION_TIME,
+    });
+
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
+  }
+
+  // 2fa cookie token
   getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
     const payload = {
       userId, isSecondFactorAuthenticated
