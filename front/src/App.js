@@ -1,4 +1,5 @@
 import './App.css';
+import './styles/pages.css'
 import LoginPage from './pages/login'
 import ProfilePage from './pages/profile'
 import TwoFa from './pages/2fa'
@@ -7,7 +8,8 @@ import Navbar from './components/navbar'
 import Play from './pages/play'
 import Games from './pages/games'
 import Chat from './pages/chat'
-import { useState } from 'react'
+import Friend from './pages/friend'
+import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Route,
@@ -20,17 +22,25 @@ function App() {
   return (
     <div id="main">
       <Navbar />
-      <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="profile/:id" element={<ProfilePage />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="login/2fa" element={<TwoFa />} />
-          <Route path="params" element={<Params />} />
-          <Route path="play" element={<Play />} />
-          <Route path="games" element={<Games />} />
-          <Route path="chat" element={<Chat />} />
-      </Routes>
+
+      <div className='main'>
+        <div className='main-content'>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="profile/:id" element={<ProfilePage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="login/2fa" element={<TwoFa />} />
+            <Route path="params" element={<Params />} />
+            <Route path="play" element={<Play />} />
+            <Route path="games" element={<Games />} />
+            <Route path="chat" element={<Chat />} />
+          </Routes>
+        </div>
+        <div className='aside'>
+          <Friend />
+        </div>
+      </div>
     </div>
   );
 }

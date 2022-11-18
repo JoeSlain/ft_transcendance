@@ -27,6 +27,9 @@ export class TwoFactorStrategy extends PassportStrategy(
         const user = await this.usersService.getById(payload.userId);
         
         console.log('validate 2fa');
+        console.log('payload id');
+        console.log(payload.userId);
+        console.log(user);
         if (!user.isTwoFactorAuthenticationEnabled) {
             console.log('validate 2fa if1');
             console.log(user);
