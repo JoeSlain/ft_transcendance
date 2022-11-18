@@ -9,5 +9,5 @@ export declare class UsersService {
     getById(userId: number): Promise<User>;
     getByUsername(userName: string): Promise<User | null>;
     addFriend(me: User, userName: string): Promise<User>;
-    getFriends(user: User): Promise<User[]>;
+    getFriends(user: User): Promise<any[]>;
 }

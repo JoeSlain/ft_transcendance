@@ -63,7 +63,7 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "date_of_sign", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => User_1),
+    (0, typeorm_1.ManyToMany)((type) => User_1, (user) => user.friends),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], User.prototype, "friends", void 0);

@@ -58,15 +58,15 @@ export class UsersService {
                 console.log(`friend ${userName} already added`);
             }
         } 
-        return me;
+        return user;
     }
 
     async getFriends(user: User) {
-        const users = await this.usersRepository.find({
-            relations: {
-                friends: true,
-            },
-        })
+        const users = await this.usersRepository
+            .createQueryBuilder()
+            .relation(User, "friends")
+            .of(user)
+            .loadMany()
 
         console.log('getFriends');
         console.log(users);

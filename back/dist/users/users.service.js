@@ -65,14 +65,14 @@ let UsersService = class UsersService {
                 console.log(`friend ${userName} already added`);
             }
         }
-        return me;
+        return user;
     }
     async getFriends(user) {
-        const users = await this.usersRepository.find({
-            relations: {
-                friends: true,
-            },
-        });
+        const users = await this.usersRepository
+            .createQueryBuilder()
+            .relation(database_1.User, "friends")
+            .of(user)
+            .loadMany();
         console.log('getFriends');
         console.log(users);
         return users;

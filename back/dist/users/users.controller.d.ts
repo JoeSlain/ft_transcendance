@@ -11,5 +11,5 @@ export declare class UsersController {
     addFriend(req: any, { username }: {
         username: any;
     }): Promise<User>;
-    getFriends(req: any): Promise<User[]>;
+    getFriends(req: any): Promise<any[]>;
 }

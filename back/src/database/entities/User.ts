@@ -38,7 +38,7 @@ export class User {
     @Column()
     date_of_sign: Date;
 
-    @ManyToMany(() => User)
+    @ManyToMany((type) => User, (user) => user.friends)
     @JoinTable()
     friends: User[]
 }

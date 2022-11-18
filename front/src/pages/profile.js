@@ -18,6 +18,7 @@ const ProfilePage = () => {
                 withCredentials: true
             })
             .then(response => {
+                console.log('getting profile from api')
                 console.log(response.data)
                 setUser(response.data)
                 localStorage.setItem('user', JSON.stringify(user))
