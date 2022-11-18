@@ -1,0 +1,41 @@
+.tab {
+	display: inline-block;
+	padding-left: 32px;
+}
+
+.tab button{
+	background-color: #001D3D;
+	border-radius: 10px;
+	padding: 10px;
+	font-size: 20px;
+	color: #ffc300;
+}
+
+.tab button:hover{
+	background-color: #ffc300;
+	color: #001D3D;
+}
+
+.tabs {
+	align-content: center;
+	padding:5px 20px 0px 5px;
+}
+
+
+.contact{
+	padding: 7px;
+	margin: 10px;
+	flex-direction: column;
+	background-color: #001D3D;
+	border-radius: 10px;
+	align-content: center;
+}
+
+.channel{
+	padding: 7px;
+	margin: 10px;
+	flex-direction: column;
+	background-color: #001D3D;
+	border-radius: 10px;
+	align-content: center;
+}

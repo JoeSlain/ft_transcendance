@@ -1,7 +1,6 @@
 import "../../styles/Home.css";
 import "../../styles/global.css";
-import "../../styles/contact.css";
-import Contact from "../../components/contact/contact";
+import TabContact from "../../components/tabs/tab_contatc";
 
 export default function Home() {
   return (
@@ -10,8 +9,8 @@ export default function Home() {
         <div className="main">
           <p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero optio, quam blanditiis commodi neque ipsum laborum dolore, quaerat et animi cum nulla hic magnam dolorum rem dicta inventore. Soluta, voluptate!</p>
         </div>
-        <div className="contact">
-          <Contact/>
+        <div className="second">
+          <TabContact/>
         </div>
       </div>
     </div>
