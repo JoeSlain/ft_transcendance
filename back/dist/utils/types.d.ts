@@ -4,4 +4,5 @@ export declare type UserDetails = {
     username: string;
     email: string;
     id42: number;
+    img_url: string;
 };

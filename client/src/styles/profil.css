@@ -1,16 +1,27 @@
 .profil {
     display: flex;
     justify-content: center;
+    padding-top: 10rem;
     min-height: 50%;
 }
 
-.avatar {
-    padding-top: 10rem;
-    min-width: 100px;
-    min-height: 100px;
-}
+
 
 .avatar:hover {
     opacity: 0.8;
     cursor: pointer;
+    filter: grayscale(0.5);
+    filter: blur(2px);
+}
+
+.avatar-txt{
+    display: none;
+    position: absolute;
+    color:aliceblue;
+    font-weight: bold;
+
+}
+
+.avatar:hover + .avatar-txt{
+    display:block;
 }
