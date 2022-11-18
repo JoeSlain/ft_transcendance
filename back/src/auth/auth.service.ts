@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { User } from 'src/database/entities/User';
 import { UserDetails } from 'src/utils/types';
 import { JwtService } from '@nestjs/jwt';
-import avatarGenerator from 'src/utils/avatarGenerator';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +13,6 @@ export class AuthService {
   ) {}
 
   createUser(details: UserDetails) {
-    avatarGenerator(details.id42);
     const user = {
       username: details.username,
       id42: details.id42,
