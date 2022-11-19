@@ -27,7 +27,7 @@ export default function Navbar()
                     <NavLink to="/chat">Chat</NavLink>
                   </li>
                   <li>
-                    <NavLink to="/profil"><img className="profile" src={profile} alt="Profil"/></NavLink>
+                    <NavLink to="/profile"><img className="profile" src={profile} alt="Profile"/></NavLink>
                   </li>
               </ul>
               </div>

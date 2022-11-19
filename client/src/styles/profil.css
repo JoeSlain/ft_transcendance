@@ -5,8 +5,6 @@
     min-height: 50%;
 }
 
-
-
 .avatar:hover {
     opacity: 0.8;
     cursor: pointer;
@@ -22,6 +20,16 @@
 
 }
 
+.avatar-txt:hover {
+    cursor: pointer;
+}
+
+.avatar-txt:hover + .avatar
+{
+    filter: blur(2px); 
+}
+
 .avatar:hover + .avatar-txt{
     display:block;
+    cursor: pointer;
 }
