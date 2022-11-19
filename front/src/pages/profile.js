@@ -3,13 +3,8 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from "react"
 import { Navigate } from 'react-router-dom'
 
-const ProfilePage = () => {
+const ProfilePage = ({user, setUser}) => {
     const [url, setUrl] = useState('')
-    const [user, setUser] = useState(() => {
-        const saved = localStorage.getItem('user');
-        const initialValue = JSON.parse(saved);
-        return initialValue || {};
-    })
     const params = useParams();
 
     useEffect(() => {

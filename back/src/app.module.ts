@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { entities } from './database';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from './users/users.module';
+import { GameModule } from './game/game.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { UsersModule } from './users/users.module';
       synchronize: true,
     }),
     UsersModule,
+    GameModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
