@@ -9,13 +9,15 @@ import Play from './pages/play'
 import Games from './pages/games'
 import Chat from './pages/chat'
 import Friend from './pages/friend'
+import ProtectedRoute from './components/protectedRoute'
 
 import { io } from 'socket.io-client'
 import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Route,
-  Routes
+  Routes,
+  Navigate
 } from "react-router-dom";
 
 const CHAT_GW = 'http://localhost:3002/chat'
@@ -24,10 +26,10 @@ function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user');
     const initialValue = JSON.parse(saved);
-    return initialValue || {};
+    return initialValue || null;
   })
 
-  useEffect(() => {
+  /*useEffect(() => {
     const socket = io(CHAT_GW)
 
     socket.emit('update_status', user)
@@ -36,31 +38,34 @@ function App() {
     })
 
     return () => socket.disconnect()
-  }, [])
+  }, [])*/
 
   return (
     <div id="main">
-      <Navbar />
+      <Navbar user={user} setUser={setUser} />
 
       <div className='main'>
         <div className='main-content'>
           <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="profile/:id" element={<ProfilePage user={user} setUser={setUser} />} />
-            <Route path="profile" element={<ProfilePage user={user} setUser={setUser} />} />
-            <Route path="login/2fa" element={<TwoFa />} />
-            <Route path="params" element={<Params />} />
-            <Route path="play" element={<Play />} />
-            <Route path="games" element={<Games />} />
-            <Route path="chat" element={<Chat />} />
+            <Route path="/" element={<LoginPage user={user} setUser={setUser} />} />
+            <Route path="login" element={<LoginPage user={user} setUser={setUser} />} />
+            <Route path="login/2fa" element={<TwoFa user={user} setUser={setUser}/>} />
+
+            <Route element={<ProtectedRoute user={user} />} >
+              <Route path="profile/:id" element={<ProfilePage user={user} setUser={setUser} />} />
+              <Route path="profile" element={<ProfilePage user={user} setUser={setUser} />} />
+              <Route path="params" element={<Params />} />
+              <Route path="play" element={<Play />} />
+              <Route path="games" element={<Games />} />
+              <Route path="chat" element={<Chat />} />
+            </Route>
           </Routes>
         </div>
-        <div className='aside'>
-          <Friend />
-        </div>
+        {
+          user && <div className='aside'> <Friend /> </div>
+        }
       </div>
-    </div>
+    </div >
   );
 }
 

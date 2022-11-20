@@ -72,4 +72,14 @@ export class UsersService {
         console.log(users);
         return users;
     }
+
+    async updateStatus(userId: number, newStatus: string) {
+        const user = await this.usersRepository.update(userId, {
+            status: newStatus
+        })
+
+        console.log('update status');
+        console.log(user);
+        return (user);
+    }
 }

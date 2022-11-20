@@ -1,8 +1,22 @@
 import "../styles/navbar.css";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
+import axios from "axios";
+import { useState } from 'react';
 
-const Navbar = () => {
-    const user = JSON.parse(localStorage.getItem('user'));
+const Navbar = ({user, setUser}) => {
+    //const user = JSON.parse(localStorage.getItem('user'));
+
+    const handleLogout = () => {
+        localStorage.setItem('user', null)
+        axios
+            .post('http://localhost:3001/api/auth/logout', {}, {
+                withCredentials: true
+            })
+            .then(response => {
+                console.log(response.data)
+                setUser(null)
+            })
+    }
 
     return (
         <nav className="navigation">
@@ -23,6 +37,9 @@ const Navbar = () => {
                     </li>
                     <li>
                         <NavLink className="navlink" to="/profile">Profile</NavLink>
+                    </li>
+                    <li>
+                        <button onClick={handleLogout} > LogOut </button>
                     </li>
                 </ul>
             </div>

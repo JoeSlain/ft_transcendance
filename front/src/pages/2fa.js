@@ -1,11 +1,11 @@
 import axios from 'axios'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactCodeInput from 'react-code-input'
 import { Navigate } from 'react-router-dom'
 
-const TwoFa = () => {
-    const [code, setCode] = useState('');
+const AuthCode = () => {
     const [url, setUrl] = useState('');
+    const [code, setCode] = useState('');
 
     const getCode = (code) => {
         console.log(code)
@@ -31,13 +31,38 @@ const TwoFa = () => {
             {
                 url && <Navigate to={url} replace={true} />
             }
-            <p> Enter code from GoogleAuthenticator app </p>
-            <form onSubmit={send2faCode}>
-                <ReactCodeInput type='text' fields={6} onChange={getCode} />
-                <button type="submit"> confirm </button>
-            </form>
+            {
+                <div>
+                    <p> Enter code from GoogleAuthenticator app </p>
+                    <form onSubmit={send2faCode}>
+                        <ReactCodeInput type='text' fields={6} onChange={getCode} />
+                        <button type="submit"> confirm </button>
+                    </form>
+                </div>
+            }
         </div>
     )
+}
+
+const TwoFa = ({ user, setUser }) => {
+    useEffect(() => {
+        axios
+            .get(`http://localhost:3001/api/users`, {
+                withCredentials: true
+            })
+            .then(response => {
+                console.log('getting profile from api')
+                setUser(response.data)
+                localStorage.setItem('user', JSON.stringify(user))
+            })
+    }, [])
+
+    console.log('2fa user', user)
+
+    if (user && user.isTwoFactorAuthenticationEnabled)
+        return (<AuthCode />)
+    if (user)
+        return ( <Navigate to='/profile' replace /> )
 }
 
 export default TwoFa

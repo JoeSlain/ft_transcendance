@@ -38,6 +38,9 @@ export class User {
     @Column()
     date_of_sign: Date;
 
+    @Column({ default: 'offline'})
+    status: string;
+
     @ManyToMany((type) => User, (user) => user.friends)
     @JoinTable()
     friends: User[]

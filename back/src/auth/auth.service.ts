@@ -52,6 +52,12 @@ export class AuthService {
     return user;
   }
 
+  async getAuthenticatedUser(username: string) {
+    const user = await this.userRepository.findOneBy({ username: username });
+
+    return user;
+  }
+
   // 42 cookie token
   getCookieWithJwtToken(userId: number) {
     const payload = { userId };
@@ -74,5 +80,9 @@ export class AuthService {
     });
 
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
+  }
+
+  getLogoutCookie() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 }

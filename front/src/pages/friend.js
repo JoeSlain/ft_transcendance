@@ -5,7 +5,7 @@ import UserEntry from '../components/userEntry'
 
 const Friend = () => {
     const [name, setName] = useState('')
-    const [users, setUsers] = useState([])
+    const [friends, setFriends] = useState([])
     const [show, setShow] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [clicked, setClicked] = useState({})
@@ -19,9 +19,11 @@ const Friend = () => {
                 withCredentials: true
             })
             .then(response => {
-                console.log(response.data)
-                setUsers(users.concat(response.data))
-            })
+                console.log('response', response.data)
+                console.log('friends', friends)
+                if (friends !== response.data)
+                    setFriends(friends.concat(response.data))
+            }, [friends])
 
         return () => window.removeEventListener('click', handleClick)
     }, [])
@@ -29,7 +31,7 @@ const Friend = () => {
     const addFriend = (e) => {
         e.preventDefault()
 
-        if (name === '' || users.find(user => user.username === name)) {
+        if (name === '' || friends.find(user => user.username === name)) {
             console.log('invalid username')
             setName('')
             return;
@@ -40,7 +42,7 @@ const Friend = () => {
             })
             .then(response => {
                 if (response.data) {
-                    setUsers(users.concat(response.data))
+                    setFriends(friends.concat(response.data))
                     console.log('response', response.data)
                 }
                 else
@@ -71,9 +73,9 @@ const Friend = () => {
                     <button type="submit"> + </button>
                 </div>
             </form>
-            {users &&
+            {friends &&
                 <div className='userList'>
-                    {users.map(user =>
+                    {friends.map(user =>
                         <div key={user.username} onContextMenu={(e) => {
                             e.preventDefault();
                             console.log(`${user.username} clicked`)

@@ -1,9 +1,10 @@
-import { Controller, UseGuards, Get, Req, Res, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, UseGuards, Get, Req, Res, Post, Body, UnauthorizedException, HttpCode } from '@nestjs/common';
 import { FortyTwoAuthGuard, AuthenticatedGuard } from './42auth/42.guard';
 import { TwoFactorAuthenticationService } from './2fa/2fa.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { TwoFactorGuard } from './2fa/2fa.guard';
+import { LocalAuthenticationGuard } from './local.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +21,15 @@ export class AuthController {
         return;
     }
 
+    @Post('logout')
+    @UseGuards(TwoFactorGuard)
+    logout(@Req() req) {
+        const cookie = this.authService.getLogoutCookie();
+        
+        req.res.setHeader('Set-Cookie', cookie);
+        return ;
+    }
+
     @Get('redirect')
     @UseGuards(FortyTwoAuthGuard)
     async redirect(@Req() req, @Res() res) {
@@ -27,11 +37,22 @@ export class AuthController {
         console.log('redirect')
 
         req.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        res.redirect(`http://localhost:3000/login/2fa`);
+    }
 
-        if (req.user.isTwoFactorAuthenticationEnabled)
-            res.redirect(`http://localhost:3000/login/2fa`);
-        else
-            res.redirect(`http://localhost:3000/profile/${req.user.id}`);
+    // test for devs only
+    @UseGuards(LocalAuthenticationGuard)
+    @Post('devlog')
+    async devLogin(@Req() req) {
+        const user = await this.usersService.getByUsername(req.user.username);
+
+        console.log('devlogin')
+        console.log(user)
+        if (user) {
+            const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);
+            req.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        }
+        return user;
     }
 
     @Post('2fa/generate')
