@@ -10,7 +10,7 @@ import Play from "./pages/play/Play";
 import Games from "./pages/games/Games";
 import NavBar from "./pages/profil/Navbar";
 import Login from "./pages/login/Login";
-import { VerifLogged } from "./pages/login/Login";
+import VerifLogged from "./pages/login/VerifLogged";
 import Auth from "./hooks/Auth";
 import { AuthRoute } from "./pages/login/AuthRoute";
 import PageNotFound from "./pages/404/404";
