@@ -1,7 +1,12 @@
 import axios from "axios";
-import { Navigate } from 'react-router-dom'
+import { useContext } from "react";
+import { useNavigate } from 'react-router-dom'
+import { SocketContext } from "../context/socketContext";
 
 const LoginPage = ({ user, setUser }) => {
+    const navigate = useNavigate();
+    const socket = useContext(SocketContext);
+
     const handleClick = (event) => {
         event.preventDefault();
         window.top.location = 'http://localhost:3001/api/auth/login'
@@ -15,15 +20,18 @@ const LoginPage = ({ user, setUser }) => {
             }, {withCredentials: true})
             .then(response => {
                 setUser(response.data)
-                localStorage.setItem('user', JSON.stringify(user))
+                localStorage.setItem('user', JSON.stringify(response.data))
                 console.log('devlog user', user)
+                socket.emit('updateStatus', {
+                    userId: response.data.id,
+                    status: 'online'
+                })
+                navigate('/profile')
             })
     }
-    console.log('logged user', user)
 
     return (
         <div className='LoginPage' >
-            {user && <Navigate to="/profile" replace='true' />}
             <p> Welcome to 42Pong ! </p>
             <button onClick={handleClick} > 42 auth </button>
             <button onClick={handleDevLogin}> Dev login </button>

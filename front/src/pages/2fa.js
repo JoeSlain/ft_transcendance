@@ -1,11 +1,13 @@
 import axios from 'axios'
-import { useState, useEffect } from 'react'
+import { useContext, useState } from 'react'
 import ReactCodeInput from 'react-code-input'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { SocketContext } from '../context/socketContext'
 
-const AuthCode = () => {
-    const [url, setUrl] = useState('');
+const TwoFa = ({user, setUser}) => {
     const [code, setCode] = useState('');
+    const navigate = useNavigate();
+    const socket = useContext(SocketContext);
 
     const getCode = (code) => {
         console.log(code)
@@ -22,15 +24,19 @@ const AuthCode = () => {
             })
             .then(response => {
                 console.log(response.data)
-                setUrl(`/profile/${response.data.id}`)
+                setUser(response.data)
+                console.log('2fa user', user)
+                localStorage.setItem('user', JSON.stringify(response.data))
+                socket.emit('updateStatus', {
+                    userId: response.data.id,
+                    status: 'online'
+                })
+                navigate(`/profile`)
             })
     }
 
     return (
         <div>
-            {
-                url && <Navigate to={url} replace={true} />
-            }
             {
                 <div>
                     <p> Enter code from GoogleAuthenticator app </p>
@@ -42,27 +48,6 @@ const AuthCode = () => {
             }
         </div>
     )
-}
-
-const TwoFa = ({ user, setUser }) => {
-    useEffect(() => {
-        axios
-            .get(`http://localhost:3001/api/users`, {
-                withCredentials: true
-            })
-            .then(response => {
-                console.log('getting profile from api')
-                setUser(response.data)
-                localStorage.setItem('user', JSON.stringify(user))
-            })
-    }, [])
-
-    console.log('2fa user', user)
-
-    if (user && user.isTwoFactorAuthenticationEnabled)
-        return (<AuthCode />)
-    if (user)
-        return ( <Navigate to='/profile' replace /> )
 }
 
 export default TwoFa

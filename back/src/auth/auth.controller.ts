@@ -25,19 +25,22 @@ export class AuthController {
     @UseGuards(TwoFactorGuard)
     logout(@Req() req) {
         const cookie = this.authService.getLogoutCookie();
-        
+
         req.res.setHeader('Set-Cookie', cookie);
-        return ;
+        return;
     }
 
     @Get('redirect')
     @UseGuards(FortyTwoAuthGuard)
     async redirect(@Req() req, @Res() res) {
         const accessTokenCookie = this.authService.getCookieWithJwtToken(req.user.id);
-        console.log('redirect')
 
+        console.log('redirect')
         req.res.setHeader('Set-Cookie', [accessTokenCookie]);
-        res.redirect(`http://localhost:3000/login/2fa`);
+        if (req.user.isTwoFactorAuthenticationEnabled)
+            res.redirect(`http://localhost:3000/login/2fa`);
+        else
+            res.redirect('http://localhost:3000/login/redirect');
     }
 
     // test for devs only
@@ -72,7 +75,7 @@ export class AuthController {
         const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
             twoFactorAuthenticationCode, req.user
         );
-        
+
         console.log('2fa turn on')
         console.log(isCodeValid)
 
@@ -80,6 +83,8 @@ export class AuthController {
             throw new UnauthorizedException('Wrong authentication code');
         }
         await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
+        const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
+        req.res.setHeader('Set-Cookie', [accessTokenCookie]);
     }
 
     @Post('2fa/turn-off')
@@ -103,7 +108,7 @@ export class AuthController {
         }
 
         const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
-        
+
         req.res.setHeader('Set-Cookie', [accessTokenCookie]);
         return req.user;
     }

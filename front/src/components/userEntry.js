@@ -1,6 +1,5 @@
 import '../styles/userEntries.css'
 import { StatusStyle } from '../styles/menus'
-import { isRouteErrorResponse } from 'react-router'
 
 const UserEntry = ({ user }) => {
     const colors = {

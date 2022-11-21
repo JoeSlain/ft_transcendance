@@ -1,5 +1,5 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Socket, Namespace } from 'socket.io';
 import { User } from 'src/database';
 import { UsersService } from 'src/users/users.service';
 
@@ -10,15 +10,20 @@ import { UsersService } from 'src/users/users.service';
   namespace: 'chat',
 })
 export class ChatGateway {
-  @WebSocketServer() server: any;
-
   constructor (
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
   ) {}
 
-  @SubscribeMessage('update_status')
-  async connect(client: Socket, user: User) {
-    client.emit('new_client', user);
+  @WebSocketServer() server: Namespace;
+
+  @SubscribeMessage('updateStatus')
+  async connect(client: Socket, data: any) {
+    console.log('chat websocket on update datas')
+    console.log(data.userId);
+    console.log(data.status);
+    await this.usersService.updateStatus(data.userId, data.status);
+
+    this.server.emit('new_client', data);
   }
 
   @SubscribeMessage('message')
