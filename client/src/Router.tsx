@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router";
 import React from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/home/Home";
-import Profil from "./pages/profil/Profil";
+import MyProfile from "./pages/profil/MyProfile";
 import History from './pages/profil/History';
 import Stats from "./pages/stats/Stats"
 import Play from "./pages/play/Play";
@@ -21,19 +21,19 @@ export default function Router() {
            <AuthRoute/>
                 <Navbar /> 
                 <Routes>
-                            <Route path="/" element={<Home />}/>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/home" element={<Home />} />
-                            <Route path="/play" element={<Play />} />
-                            <Route path="/games" element={<Games />} />
-                            <Route element={<ProfileNavbar/>}>
-                                <Route path="/profile">
-                                    <Route path=":id" element={<Profil />}/> 
-                                </Route>
-                                <Route path="/stats" element={<Stats />} />
-                                <Route path="/history" element={<History/>} /> 
-                            </Route>
-                            <Route path="*" element={<PageNotFound />} />
+                    <Route path="/" element={<Home />}/>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/play" element={<Play />} />
+                    <Route path="/games" element={<Games />} />
+{/*                 <Route element={<ProfileNavbar/>}>
+*/}                     <Route path="/profile" element={<MyProfile />}>
+                            <Route path=":id" element={<MyProfile />}/>
+                        </Route>
+                        <Route path="/stats" element={<Stats />} />
+                        <Route path="/history" element={<History/>} />
+{/*                             </Route>
+*/}                 <Route path="*" element={<PageNotFound />} />
 
                 </Routes>
         </Auth.Provider>

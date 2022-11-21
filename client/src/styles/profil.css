@@ -33,3 +33,9 @@
     display:block;
     cursor: pointer;
 }
+
+::placeholder
+{ 
+    color: black;
+    opacity: 1; /* Firefox */
+  }
