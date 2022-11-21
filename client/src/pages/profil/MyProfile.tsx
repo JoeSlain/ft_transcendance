@@ -4,23 +4,15 @@ import "../../styles/global.css";
 import "../../styles/profil.css";
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { userType } from '../../types/userType';
 
-export default function MyProfile(): JSX.Element
+export default function MyProfile(user : userType): JSX.Element
 {
   const { id } = useParams();
-  const [user, setUser] = useState<any>(undefined);
  /*  function fileChangeHandler(event : React.ChangeEvent<HTMLInputElement> ): void{
     console.log(event!.target!.files![0]);
   } */
-  useEffect(() => {
-    axios(`http://localhost:3001/api/users`, {withCredentials: true})
-    .then((res) =>
-    {
-      console.log("User found: " + res.data.profile_pic);
-      setUser(res.data);
-    })
-    .catch((e) => {console.log("User not found " + e);});
-  }, [id]);
+
   return (
     <>
       {user !== undefined &&
