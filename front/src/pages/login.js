@@ -21,9 +21,10 @@ const LoginPage = ({ user, setUser }) => {
             .then(response => {
                 setUser(response.data)
                 localStorage.setItem('user', JSON.stringify(response.data))
-                console.log('devlog user', user)
+                console.log('devlog user', response.data)
                 socket.emit('updateStatus', {
                     userId: response.data.id,
+                    socketId: socket.id,
                     status: 'online'
                 })
                 navigate('/profile')

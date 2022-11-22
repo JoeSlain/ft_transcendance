@@ -16,18 +16,23 @@ export class ChatGateway {
 
   @WebSocketServer() server: Namespace;
 
+  // on connect new client
   @SubscribeMessage('updateStatus')
   async connect(client: Socket, data: any) {
-    console.log('chat websocket on update datas')
+    console.log('chat websocket updateStatus')
     console.log(data.userId);
     console.log(data.status);
-    await this.usersService.updateStatus(data.userId, data.status);
+    await this.usersService.updateStatus(data.userId, data.status, client.id);
 
-    this.server.emit('new_client', data);
+    client.broadcast.emit('new_client', data);
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: Socket, payload: any): string {
-    return 'Hello world!';
+  @SubscribeMessage('invite')
+  handleMessage(client: Socket, data: any) {
+    console.log('chat websocket invite');
+    
+    console.log('to', data.to);
+    console.log('data', data);
+    this.server.to(data.to).emit('invited', data);
   }
 }

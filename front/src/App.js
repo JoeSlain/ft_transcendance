@@ -20,6 +20,7 @@ import {
   Routes,
   Navigate
 } from "react-router-dom";
+import Notif from './components/notif';
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -27,6 +28,7 @@ function App() {
     const initialValue = JSON.parse(saved);
     return initialValue || null;
   })
+  const [notif, setNotif] = useState('')
 
   return (
     <div id="main">
@@ -34,6 +36,8 @@ function App() {
         <Navbar user={user} setUser={setUser} />
 
         <div className='main'>
+          {notif && <Notif notif={notif} />}
+
           <div className='main-content'>
             <Routes>
               <Route path="/" element={<LoginPage user={user} setUser={setUser} />} />
@@ -52,7 +56,9 @@ function App() {
             </Routes>
           </div>
           {
-            user && <div className='aside'> <Friend /> </div>
+            user && <div className='aside'>
+              <Friend me={user} setNotif={setNotif} />
+            </div>
           }
         </div>
       </SocketContext.Provider>

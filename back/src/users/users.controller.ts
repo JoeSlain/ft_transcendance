@@ -65,4 +65,13 @@ export class UsersController {
 
         return (users);
     }
+
+    @Post('deleteFriend')
+    @UseGuards(TwoFactorGuard)
+    async deleteFriend(@Req() req, @Body() { userId }) {
+        console.log('delete friend')
+        const users = await this.usersService.deleteFriend(req.user, userId);
+
+        return users;
+    }
 }

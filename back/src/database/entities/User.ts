@@ -41,6 +41,9 @@ export class User {
     @Column({ default: 'offline'})
     status: string;
 
+    @Column({ nullable: true })
+    socketId?: string;
+
     @ManyToMany((type) => User, (user) => user.friends)
     @JoinTable()
     friends: User[]

@@ -47,7 +47,7 @@ export class UsersService {
 
         console.log('addFriend');
         console.log(user);
-        if (user) {
+        if (user && user.id !== me.id) {
             try {
                 await this.usersRepository
                     .createQueryBuilder()
@@ -56,9 +56,11 @@ export class UsersService {
                     .add(user);
             } catch (error) {
                 console.log(`friend ${userName} already added`);
+                return null;
             }
-        } 
-        return user;
+            return user;
+        }
+        return null;
     }
 
     async getFriends(user: User) {
@@ -73,9 +75,24 @@ export class UsersService {
         return users;
     }
 
-    async updateStatus(userId: number, newStatus: string) {
+    async deleteFriend(user: User, toDelId: number) {
+        const toDel = await this.getById(toDelId);
+
+        if (toDel) {
+            await this.usersRepository
+                .createQueryBuilder()
+                .relation(User, "friends")
+                .of(user)
+                .remove(toDel);
+            return (this.getFriends(user));
+        }
+        return null;
+    }
+
+    async updateStatus(userId: number, newStatus: string, socketId: string) {
         await this.usersRepository.update(userId, {
-            status: newStatus
+            status: newStatus,
+            socketId
         })
 
         console.log('update status');

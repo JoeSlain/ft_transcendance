@@ -29,6 +29,7 @@ const TwoFa = ({user, setUser}) => {
                 localStorage.setItem('user', JSON.stringify(response.data))
                 socket.emit('updateStatus', {
                     userId: response.data.id,
+                    socketId: socket.id,
                     status: 'online'
                 })
                 navigate(`/profile`)

@@ -20,6 +20,7 @@ const Redirect = ({ user, setUser }) => {
                 console.log('2fa ls user', JSON.parse(localStorage.getItem('user')))
                 socket.emit('updateStatus', {
                     userId: response.data.id,
+                    socketId: socket.id,
                     status: 'online'
                 })
                 navigate('/profile')
