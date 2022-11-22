@@ -34,7 +34,7 @@
     cursor: pointer;
 }
 
-::placeholder
+input::placeholder
 { 
     color: black;
     opacity: 1; /* Firefox */
