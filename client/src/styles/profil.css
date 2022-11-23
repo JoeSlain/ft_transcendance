@@ -37,5 +37,6 @@
 input::placeholder
 { 
     color: black;
+    text-align: center;
     opacity: 1; /* Firefox */
   }
