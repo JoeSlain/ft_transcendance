@@ -43,27 +43,34 @@ export default function Router() {
         })
         .catch((e) => {console.log("User not found " + e);});
       }, []);
-    return (
-        <Auth.Provider value={{ isLogged }}>
-           <AuthRoute/>
-                <Navbar />
-                <Routes>
-                    <Route path="/" element={<Home />}/>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/play" element={<Play />} />
-                    <Route path="/games" element={<Games />} />
-                    <Route path="profile" element={<ProfileNavbar/>}>   
-                        <Route index element={<MyProfile {...user}/>}/>
-                        <Route path="stats" element={<Stats />} />
-                        <Route path="history" element={<History/>} />
-                        <Route path=":id" element={<Profile {...user}/>}/>
+    if (user.id === 0)
+    {
+        return (<></>);
+    }
+    else
+    {
+        return (
+            <Auth.Provider value={{ isLogged }}>
+               <AuthRoute/>
+                    <Navbar />
+                    <Routes>
+                        <Route path="/" element={<Home />}/>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/play" element={<Play />} />
+                        <Route path="/games" element={<Games />} />
+                        <Route path="profile" element={<ProfileNavbar/>}>   
+                            <Route index element={<MyProfile {...user}/>}/>
+                            <Route path="stats" element={<Stats />} />
+                            <Route path="history" element={<History/>} />
+                            <Route path=":id" element={<Profile {...user}/>}/>
+                            <Route path="*" element={<PageNotFound />} />
+                        </Route>
                         <Route path="*" element={<PageNotFound />} />
-                    </Route>
-                    <Route path="*" element={<PageNotFound />} />
-
-                </Routes>
-        </Auth.Provider>
-    );
+    
+                    </Routes>
+            </Auth.Provider>
+        );
+    }
 
 }
