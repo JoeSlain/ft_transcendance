@@ -22,7 +22,7 @@ import { LocalStrategy } from './local.strategy';
       signOptions: {
         expiresIn: process.env.COOKIE_EXPIRATION_TIME,
       }
-    })
+    }),
   ],
   providers: [
     FortyTwoStrategy,

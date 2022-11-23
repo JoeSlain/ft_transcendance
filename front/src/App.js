@@ -1,5 +1,17 @@
 import './App.css';
 import './styles/pages.css'
+//import './styles/notif.css'
+
+import { SocketContext, socket } from './context/socketContext'
+import ProtectedRoute from './components/protectedRoute'
+import { useState, useEffect } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate
+} from "react-router-dom";
+
 import LoginPage from './pages/login'
 import ProfilePage from './pages/profile'
 import TwoFa from './pages/2fa'
@@ -10,16 +22,6 @@ import Games from './pages/games'
 import Chat from './pages/chat'
 import Friend from './pages/friend'
 import Redirect from './pages/redirect'
-import { SocketContext, socket } from './context/socketContext'
-import ProtectedRoute from './components/protectedRoute'
-
-import { useState, useEffect } from 'react'
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate
-} from "react-router-dom";
 import Notif from './components/notif';
 
 function App() {
@@ -28,16 +30,15 @@ function App() {
     const initialValue = JSON.parse(saved);
     return initialValue || null;
   })
-  const [notif, setNotif] = useState('')
+  const [notif, setNotif] = useState(null)
 
   return (
     <div id="main">
       <SocketContext.Provider value={socket}>
         <Navbar user={user} setUser={setUser} />
+        {notif && <Notif notif={notif} setNotif={setNotif} />}
 
         <div className='main'>
-          {notif && <Notif notif={notif} />}
-
           <div className='main-content'>
             <Routes>
               <Route path="/" element={<LoginPage user={user} setUser={setUser} />} />

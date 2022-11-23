@@ -1,11 +1,15 @@
 import axios from "axios"
 import { useParams } from 'react-router-dom'
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Navigate } from 'react-router-dom'
+import { SocketContext } from "../context/socketContext"
 
 const ProfilePage = ({ user, setUser }) => {
     const [url, setUrl] = useState('')
+    const socket = useContext(SocketContext);
     const params = useParams();
+
+    console.log('socket id', socket.id)
 
     return (
         <div>

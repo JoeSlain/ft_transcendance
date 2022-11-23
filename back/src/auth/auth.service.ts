@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { User } from 'src/database/entities/User';
 import { UserDetails } from 'src/utils/types';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
   createUser(details: UserDetails) {
@@ -84,5 +86,15 @@ export class AuthService {
 
   getLogoutCookie() {
     return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+  }
+
+  async getUserFromAuthenticationToken(token: string) {
+    const payload = this.jwtService.verify(token, {
+      secret: process.env.FT_SECRET,
+    });
+
+    if (payload.userId) {
+      return this.usersService.getById(payload.userId);
+    }
   }
 }

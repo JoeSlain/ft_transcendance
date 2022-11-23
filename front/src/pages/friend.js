@@ -40,6 +40,7 @@ const Friend = ({ me, setNotif }) => {
         })
 
         socket.on('invited', data => {
+            console.log('invitation received')
             if (data.from.id !== me.id) {
                 console.log(`${data.from.username} invited you to play`)
                 setNotif(data)
@@ -56,7 +57,7 @@ const Friend = ({ me, setNotif }) => {
     const handleInvite = (user) => {
         const msg = {
             header: 'Game Invite',
-            content: `${me.username} invited you to play a game`,
+            body: `${me.username} invited you to play a game`,
             acceptEvent: 'acceptInvite',
             declineEvent: 'declineInvite',
         }
@@ -65,7 +66,7 @@ const Friend = ({ me, setNotif }) => {
             from: me,
             to: user.socketId,
         }
-        console.log('to', data.to)
+        console.log('data', data)
         socket.emit('invite', data)
     }
 
