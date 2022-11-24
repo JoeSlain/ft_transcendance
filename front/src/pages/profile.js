@@ -9,8 +9,6 @@ const ProfilePage = ({ user, setUser }) => {
     const socket = useContext(SocketContext);
     const params = useParams();
 
-    console.log('socket id', socket.id)
-
     return (
         <div>
             {url && <Navigate to="/params" replace='true' />}

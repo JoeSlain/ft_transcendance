@@ -3,6 +3,7 @@ import { useContext, useState } from 'react'
 import ReactCodeInput from 'react-code-input'
 import { useNavigate } from 'react-router-dom'
 import { SocketContext } from '../context/socketContext'
+import { getStorageItem, getUserId, saveStorageItem } from '../storage/localStorage'
 
 const TwoFa = ({user, setUser}) => {
     const [code, setCode] = useState('');
@@ -27,11 +28,13 @@ const TwoFa = ({user, setUser}) => {
                 setUser(response.data)
                 console.log('2fa user', user)
                 localStorage.setItem('user', JSON.stringify(response.data))
+                socket.connect()
                 socket.emit('updateStatus', {
                     userId: response.data.id,
                     socketId: socket.id,
                     status: 'online'
                 })
+                saveStorageItem('socketId', {socketId: socket.id})
                 navigate(`/profile`)
             })
     }

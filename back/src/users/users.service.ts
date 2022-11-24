@@ -28,25 +28,25 @@ export class UsersService {
     async getById(userId: number) {
         const user = await this.usersRepository.findOneBy({ id: userId });
 
-        console.log('getById');
+        /*console.log('getById');
         console.log(userId);
-        console.log(user);
+        console.log(user);*/
         return user;
     }
 
     async getByUsername(userName: string): Promise<User | null> {
         const user = await this.usersRepository.findOneBy({ username: userName });
 
-        console.log('getByUsername');
-        console.log(user);
+        /*console.log('getByUsername');
+        console.log(user);*/
         return user;
     }
 
     async addFriend(me: User, userName: string) {
         const user = await this.getByUsername(userName);
 
-        console.log('addFriend');
-        console.log(user);
+        /*console.log('addFriend');
+        console.log(user);*/
         if (user && user.id !== me.id) {
             try {
                 await this.usersRepository
@@ -70,8 +70,8 @@ export class UsersService {
             .of(user)
             .loadMany()
 
-        console.log('getFriends');
-        console.log(users);
+        /*console.log('getFriends');
+        console.log(users);*/
         return users;
     }
 
@@ -95,6 +95,6 @@ export class UsersService {
             socketId
         })
 
-        console.log('update status');
+        console.log('update status', newStatus);
     }
 }

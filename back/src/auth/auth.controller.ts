@@ -50,7 +50,7 @@ export class AuthController {
         const user = await this.usersService.getByUsername(req.user.username);
 
         console.log('devlogin')
-        console.log(user)
+        //console.log(user)
         if (user) {
             const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);
             req.res.setHeader('Set-Cookie', [accessTokenCookie]);
@@ -76,8 +76,8 @@ export class AuthController {
             twoFactorAuthenticationCode, req.user
         );
 
-        console.log('2fa turn on')
-        console.log(isCodeValid)
+        /*console.log('2fa turn on')
+        console.log(isCodeValid)*/
 
         if (!isCodeValid) {
             throw new UnauthorizedException('Wrong authentication code');

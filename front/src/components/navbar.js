@@ -3,17 +3,17 @@ import { NavLink, Navigate } from 'react-router-dom';
 import axios from "axios";
 import { useContext, useState } from 'react';
 import { SocketContext } from "../context/socketContext";
+import { saveStorageItem } from "../storage/localStorage";
 
-const Navbar = ({user, setUser}) => {
-    //const user = JSON.parse(localStorage.getItem('user'));
+const Navbar = ({ user, setUser }) => {
     const socket = useContext(SocketContext)
 
     const handleLogout = () => {
-        localStorage.setItem('user', null)
-        socket.emit('updateStatus', {
-            userId: user.id,
+        socket.emit('logout', {
+            user: user,
+            socketId: socket.id,
             status: 'offline'
-        })
+          })
         axios
             .post('http://localhost:3001/api/auth/logout', {}, {
                 withCredentials: true
@@ -22,6 +22,7 @@ const Navbar = ({user, setUser}) => {
                 console.log(response.data)
                 setUser(null)
             })
+        saveStorageItem('user', null)
     }
 
     return (
@@ -45,7 +46,7 @@ const Navbar = ({user, setUser}) => {
                         <NavLink className="navlink" to="/profile">Profile</NavLink>
                     </li>
                     <li>
-                        <button onClick={handleLogout} > LogOut </button>
+                        {user && <button onClick={handleLogout} > LogOut </button>}
                     </li>
                 </ul>
             </div>

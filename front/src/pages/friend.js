@@ -28,11 +28,15 @@ const Friend = ({ me, setNotif }) => {
             })
 
         // socket listener
-        socket.on('new_client', data => {
+        socket.on('updateStatus', data => {
+            console.log('friend', data.user)
             const newArr = friends.map(friend => {
-                if (friend.id === data.userId && friend.status !== data.status) {
+                if (friend.id === data.user.id && friend.status !== data.status) {
                     return { ...friend, status: data.status }
                 }
+            /*    if (friend.id === data.user.id && friend !== data.user) {
+                    return { ...friend, status: data.status }
+                }*/
                 return friend
             })
             if (newArr !== friends)
@@ -50,7 +54,8 @@ const Friend = ({ me, setNotif }) => {
         // unmount
         return () => {
             window.removeEventListener('click', handleClick)
-            socket.off('new_client')
+            socket.off('updateStatus')
+            socket.off('invited')
         }
     }, [friends])
 
@@ -64,7 +69,7 @@ const Friend = ({ me, setNotif }) => {
         const data = {
             content: msg,
             from: me,
-            to: user.socketId,
+            to: user,
         }
         console.log('data', data)
         socket.emit('invite', data)

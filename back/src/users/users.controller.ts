@@ -22,8 +22,8 @@ export class UsersController {
     async findMe(@Req() req): Promise<User> {
         const user = await this.userRepository.findOneBy({ id: req.user.id });
 
-        console.log('get profile', req.user.id);
-        console.log(user);
+        /*console.log('get profile', req.user.id);
+        console.log(user);*/
         return user;
     }
 
@@ -32,8 +32,8 @@ export class UsersController {
     async findOneById(@Param() params): Promise<User> {
         const user = await this.userRepository.findOneBy({ id: params.id });
 
-        console.log('get profile', params.id);
-        console.log(user);
+        /*console.log('get profile', params.id);
+        console.log(user);*/
         return user;
     }
 
@@ -42,16 +42,16 @@ export class UsersController {
     async findOneByUsername(@Param() params): Promise<User> {
         const user = await this.userRepository.findOneBy({ username: params.username});
 
-        console.log('find by username')
-        console.log(user);
+        /*console.log('find by username')
+        console.log(user);*/
         return user;
     }
 
     @Post('friend')
     @UseGuards(TwoFactorGuard)
     async addFriend(@Req() req, @Body() { username } ){
-        console.log(username);
-        console.log('me', req.user.username);
+        /*console.log(username);
+        console.log('me', req.user.username);*/
         const user = this.usersService.addFriend(req.user, username);
 
         return (user);
@@ -60,7 +60,7 @@ export class UsersController {
     @Get('friends')
     @UseGuards(TwoFactorGuard)
     async getFriends(@Req() req) {
-        console.log('get friends')
+        //console.log('get friends')
         const users = await this.usersService.getFriends(req.user);
 
         return (users);
@@ -69,7 +69,7 @@ export class UsersController {
     @Post('deleteFriend')
     @UseGuards(TwoFactorGuard)
     async deleteFriend(@Req() req, @Body() { userId }) {
-        console.log('delete friend')
+        //console.log('delete friend')
         const users = await this.usersService.deleteFriend(req.user, userId);
 
         return users;

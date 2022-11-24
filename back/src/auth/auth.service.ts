@@ -31,7 +31,7 @@ export class AuthService {
   }
 
   async validateUser(details: UserDetails) {
-    console.log(details.id42);
+    //console.log(details.id42);
     const user = await this.userRepository.findOneBy({ id42: details.id42 });
 
     console.log(user);
@@ -39,17 +39,17 @@ export class AuthService {
       return user;
     }
     const newUser = this.createUser(details);
-    console.log('user not found. Creating...')
-    console.log('newUser', newUser);
+    /*console.log('user not found. Creating...')
+    console.log('newUser', newUser);*/
     return this.userRepository.save(newUser);
   }
 
   async findUser(id: number) {
     const user = await this.userRepository.findOneBy({ id: id });
-    console.log('foundUser in db');
+    /*console.log('foundUser in db');
     console.log(user ? 'found' : 'not found');
     console.log('user');
-    console.log(user);
+    console.log(user);*/
 
     return user;
   }
