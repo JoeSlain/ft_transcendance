@@ -42,11 +42,11 @@ export class UsersService {
         return user;
     }
 
-    async addFriend(me: User, userName: string) {
+    async addFriend(me: User, userName: string) : Promise<User | null> {
         const user = await this.getByUsername(userName);
 
-        /*console.log('addFriend');
-        console.log(user);*/
+        console.log('addFriend');
+        console.log(user);
         if (user && user.id !== me.id) {
             try {
                 await this.usersRepository
@@ -58,17 +58,28 @@ export class UsersService {
                 console.log(`friend ${userName} already added`);
                 return null;
             }
+            console.log('friend added')
             return user;
         }
+        console.log('userid', user.id)
+        console.log('me.id', me.id)
         return null;
     }
 
     async getFriends(user: User) {
         const users = await this.usersRepository
-            .createQueryBuilder()
-            .relation(User, "friends")
-            .of(user)
-            .loadMany()
+        .query(
+            ` SELECT * 
+              FROM users U
+              WHERE U.id <> $1
+                AND EXISTS(
+                  SELECT 1
+                  FROM users_friends_users F
+                  WHERE (F."usersId_1" = $1 AND F."usersId_2" = U.id )
+                  OR (F."usersId_2" = $1 AND F."usersId_1" = U.id )
+                  );  `,
+            [user.id],
+          )
 
         /*console.log('getFriends');
         console.log(users);*/

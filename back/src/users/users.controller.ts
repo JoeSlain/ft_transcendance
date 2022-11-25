@@ -19,7 +19,7 @@ export class UsersController {
    
     @Get('')
     @UseGuards(TwoFactorGuard)
-    async findMe(@Req() req): Promise<User> {
+    async findMe(@Req() req): Promise<User | null> {
         const user = await this.userRepository.findOneBy({ id: req.user.id });
 
         /*console.log('get profile', req.user.id);
@@ -29,7 +29,7 @@ export class UsersController {
 
     @Get('userid/:id')
     @UseGuards(TwoFactorGuard)
-    async findOneById(@Param() params): Promise<User> {
+    async findOneById(@Param() params): Promise<User | null> {
         const user = await this.userRepository.findOneBy({ id: params.id });
 
         /*console.log('get profile', params.id);
@@ -39,7 +39,7 @@ export class UsersController {
 
     @Get('username/:username')
     @UseGuards(TwoFactorGuard)
-    async findOneByUsername(@Param() params): Promise<User> {
+    async findOneByUsername(@Param() params): Promise<User | null> {
         const user = await this.userRepository.findOneBy({ username: params.username});
 
         /*console.log('find by username')
@@ -47,12 +47,12 @@ export class UsersController {
         return user;
     }
 
-    @Post('friend')
+    @Post('addFriend')
     @UseGuards(TwoFactorGuard)
     async addFriend(@Req() req, @Body() { username } ){
         /*console.log(username);
         console.log('me', req.user.username);*/
-        const user = this.usersService.addFriend(req.user, username);
+        const user = await this.usersService.addFriend(req.user, username);
 
         return (user);
     }
@@ -60,9 +60,10 @@ export class UsersController {
     @Get('friends')
     @UseGuards(TwoFactorGuard)
     async getFriends(@Req() req) {
-        //console.log('get friends')
+        console.log('get friends')
         const users = await this.usersService.getFriends(req.user);
 
+        console.log('friends', users)
         return (users);
     }
 

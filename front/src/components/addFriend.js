@@ -1,22 +1,63 @@
 import axios from 'axios'
-import {useState} from 'react'
+import {useContext, useEffect, useState} from 'react'
+import { SocketContext } from '../context/socketContext'
 
-const AddFriend = ({friends, setFriends}) => {
+const AddFriend = ({me, friends, setFriends}) => {
     const [name, setName] = useState('')
+    const socket = useContext(SocketContext)
+
+    console.log('friends in addfriend', friends)
+
+    /*useEffect(() => {
+        socket.on('newFriend', friend => {
+            console.log('newFriendEvent')
+            console.log('friends b4', friends)
+            setFriends(friends.concat(friend))
+            console.log('friends af', friends)
+        })
+        return () => {
+            socket.off('newFriend')
+        }
+    }, [])*/
+
+    const notify = (user) => {
+        const msg = {
+            header: 'Friend Request',
+            body: `${me.username} wants to be your friend`,
+            accept: 'Accept',
+            decline: 'Decline'
+        }
+        const data = {
+            msg,
+            from: me,
+            to: user,
+            acceptEvent: 'acceptFriendRequest',
+        }
+        console.log('data', data)
+        socket.emit('notif', data)
+    }
 
     const addFriend = (e) => {
         e.preventDefault()
 
         if (name === '' 
-        || name === (JSON.parse(localStorage.getItem('user'))).username
-        || friends.find(user => user.username === name)
+        || name === me.username
+        || friends.find(friend => friend.username === name)
         ) {
             console.log('invalid username')
             setName('')
             return;
         }
         axios
-            .post('http://localhost:3001/api/users/friend', { username: name }, {
+            .get(`http://localhost:3001/api/users/username/${name}`, {
+                withCredentials: true
+            })
+            .then(response => {
+                if (response.data && response.data.status === 'online')
+                    notify(response.data)
+            })
+        /*axios
+            .post('http://localhost:3001/api/users/addFriend', { username: name }, {
                 withCredentials: true
             })
             .then(response => {
@@ -26,7 +67,7 @@ const AddFriend = ({friends, setFriends}) => {
                 }
                 else
                     console.log('user not found')
-            })
+            })*/
         setName('')
     }
 

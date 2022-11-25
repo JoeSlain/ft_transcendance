@@ -18,80 +18,114 @@ const Friend = ({ me, setNotif }) => {
 
         // window listener
         window.addEventListener('click', handleClick)
+
+        // get friends
+        console.log('get friends axios')
         axios
             .get('http://localhost:3001/api/users/friends', {
                 withCredentials: true
             })
             .then(response => {
-                if (friends.toString() !== response.data.toString())
-                    setFriends(friends.concat(response.data))
+                setFriends(friends.concat(response.data))
+                console.log('friends in axios', response.data)
             })
 
-        // socket listener
+        // new friend
+        socket.on('newFriend', data => {
+            console.log('data in new friend event', data)
+            console.log('newFriendEvent')
+            console.log('friends b4', friends)
+            setFriends(friends.concat(data))
+            console.log('friends af', friends)
+        })
+
+        // update friend status
         socket.on('updateStatus', data => {
-            console.log('friend', data.user)
+            console.log('friend update', data.user)
             const newArr = friends.map(friend => {
                 if (friend.id === data.user.id && friend.status !== data.status) {
                     return { ...friend, status: data.status }
                 }
-            /*    if (friend.id === data.user.id && friend !== data.user) {
-                    return { ...friend, status: data.status }
-                }*/
+                /*    if (friend.id === data.user.id && friend !== data.user) {
+                        return { ...friend, status: data.status }
+                    }*/
                 return friend
             })
-            if (newArr !== friends)
+            if (JSON.stringify(newArr) !== JSON.stringify(friends)) {
+                console.log('friend status ok')
                 setFriends(newArr)
+            }
         })
 
-        socket.on('invited', data => {
+        // notif received
+        socket.on('notified', data => {
             console.log('invitation received')
             if (data.from.id !== me.id) {
-                console.log(`${data.from.username} invited you to play`)
+                console.log(`${data.from.username} invited you`)
+                console.log('accept event', data.acceptEvent)
+                console.log('decline event', data.declineEvent)
                 setNotif(data)
             }
+        })
+
+        // friend deleted
+        socket.on('friendDeleted', data => {
+            console.log(`deleting ${data.username}`)
+            setFriends(friends.filter(friend => friend.id !== data.id))
         })
 
         // unmount
         return () => {
             window.removeEventListener('click', handleClick)
+            socket.off('newFriend')
             socket.off('updateStatus')
-            socket.off('invited')
+            socket.off('notified')
+            socket.off('friendDeleted')
         }
-    }, [friends])
+    }, [])
 
     const handleInvite = (user) => {
         const msg = {
             header: 'Game Invite',
             body: `${me.username} invited you to play a game`,
+            accept: 'Accept',
+            decline: 'Decline'
+        }
+        const data = {
+            msg,
+            from: me,
+            to: user,
             acceptEvent: 'acceptInvite',
             declineEvent: 'declineInvite',
         }
-        const data = {
-            content: msg,
-            from: me,
-            to: user,
-        }
         console.log('data', data)
-        socket.emit('invite', data)
+        socket.emit('notif', data)
     }
 
     const handleDelete = (user) => {
-        axios
-            .post('http://localhost:3001/api/users/deleteFriend', {
-                userId: user.id,
-            }, {
-                withCredentials: true,
-            })
-            .then(response => {
-                console.log('friends after delete', response.data)
-                if (response.data)
-                    setFriends(response.data)
-            })        
+        const msg = {
+            header: 'Delete friend',
+            body: `Remove ${user.username} from your friendlist ?`,
+            accept: 'Yes',
+            decline: 'No'
+        }
+        const data = {
+            msg,
+            from: me,
+            to: user,
+            acceptEvent: 'deleteFriend'
+        }
+        setNotif(data)
     }
 
     return (
         <div>
-            <AddFriend friends={friends} setFriends={setFriends} />
+            <AddFriend
+                friends={friends}
+                setFriends={setFriends}
+                me={me}
+                setNotif={setNotif}
+            />
             {friends &&
                 <div className='userList'>
                     {friends.map(user =>

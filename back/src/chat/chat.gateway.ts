@@ -41,14 +41,40 @@ export class ChatGateway implements OnGatewayConnection {
     client.broadcast.emit('updateStatus', data);
   }
 
-  @SubscribeMessage('invite')
-  handleMessage(client: Socket, data: any) {
+  @SubscribeMessage('notif')
+  notify(client: Socket, data: any) {
     console.log('chat websocket invite');
     
     console.log('to', data.to);
     console.log('data', data);
     console.log('client', client);
     console.log('userId', data.to.id)
-    this.server.to(data.to.id).to(data.to.socketId).emit('invited', data);
+    this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
+  }
+
+  @SubscribeMessage('acceptFriendRequest')
+  async addFriend(client: Socket, data: any) {
+    console.log('addFriend event');
+
+    const newFriend = await this.usersService.addFriend(data.from, data.to.username);
+    if (newFriend) {
+      this.server.to(data.from.id).to(data.from.socketId).emit('newFriend', data.to)
+      this.server.to(data.to.id).to(data.to.socketId).emit('newFriend', data.from)
+    }
+    else
+      console.log('error adding friend')
+  }
+
+  @SubscribeMessage('deleteFriend')
+  async deleteFriend(client: Socket, data: any) {
+    console.log('deleteFriend event');
+
+    const user = await this.usersService.deleteFriend(data.from, data.to.id);
+    if (user) {
+      this.server.to(data.from.id).to(data.from.socketId).emit('friendDeleted', data.to)
+      this.server.to(data.to.id).to(data.to.socketId).emit('friendDeleted', data.from)
+    }
+    else
+      console.log('error deleting friend')
   }
 }
