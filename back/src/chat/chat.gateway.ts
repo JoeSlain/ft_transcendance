@@ -69,8 +69,9 @@ export class ChatGateway implements OnGatewayConnection {
   async deleteFriend(client: Socket, data: any) {
     console.log('deleteFriend event');
 
-    const user = await this.usersService.deleteFriend(data.from, data.to.id);
-    if (user) {
+    const user1 = await this.usersService.deleteFriend(data.from, data.to.id);
+    const user2 = await this.usersService.deleteFriend(data.to, data.from.id)
+    if (user1 && user2) {
       this.server.to(data.from.id).to(data.from.socketId).emit('friendDeleted', data.to)
       this.server.to(data.to.id).to(data.to.socketId).emit('friendDeleted', data.from)
     }
