@@ -13,10 +13,10 @@ export default function ProfileNavbar()
               <NavLink className="navlink" to="/profile">Account</NavLink>
             </li>
             <li>
-              <NavLink className="navlink" to="stats">Statistics</NavLink>
+              <NavLink className="navlink" to="/stats">Statistics</NavLink>
             </li>
             <li>
-              <NavLink className="navlink" to="history">Match history</NavLink>
+              <NavLink className="navlink" to="/history">Match history</NavLink>
             </li>
         </ul>
         </div>

@@ -16,6 +16,7 @@ import PageNotFound from "./pages/404/404";
 import axios from "axios";
 import { userType } from "./types/userType";
 import Profile from "./pages/profil/Profile";
+import { Navigate } from "react-router-dom";
 
 export default function Router() {
     const [isLogged, setIsLogged] = React.useState(VerifLogged);
@@ -43,28 +44,25 @@ export default function Router() {
         })
         .catch((e) => {console.log("User not found " + e);});
       }, []);
-    if (user.id === 0)
-    {
-        return (<></>);
-    }
-    else
+
+    
     {
         return (
             <Auth.Provider value={{ isLogged }}>
                <AuthRoute/>
                     <Navbar />
                     <Routes>
-                        <Route path="/" element={<Home />}/>
+                        <Route path="/" element={ isLogged ? <Home /> : <Navigate to='/login' />}/>
                         <Route path="/login" element={<Login />} />
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/play" element={<Play />} />
-                        <Route path="/games" element={<Games />} />
-                        <Route path="profile" element={<ProfileNavbar/>}>   
-                            <Route index element={<MyProfile {...user}/>}/>
-                            <Route path="stats" element={<Stats />} />
-                            <Route path="history" element={<History/>} />
-                            <Route path=":id" element={<Profile {...user}/>}/>
-                            <Route path="*" element={<PageNotFound />} />
+                        <Route path="/home" element={ isLogged ? <Home />: <Navigate to='/login' />} />
+                        <Route path="/play" element={ isLogged ? <Play />: <Navigate to='/login' />} />
+                        <Route path="/games" element={ isLogged ? <Games />: <Navigate to='/login' />} />
+                        <Route path="profile" element={ isLogged ? <ProfileNavbar/>: <Navigate to='/login' />}>   
+                            <Route index element={ isLogged ? <MyProfile {...user}/>: <Navigate to='/login' />}/>
+                            <Route path="stats" element={ isLogged ? <Stats />: <Navigate to='/login' />} />
+                            <Route path="history" element={ isLogged ? <History/>: <Navigate to='/login' />} />
+                            <Route path=":id" element={ isLogged ? <Profile {...user}/>: <Navigate to='/login' />}/>
+                            <Route path="*" element={ isLogged ? <PageNotFound /> : <Navigate to='/login' />} />
                         </Route>
                         <Route path="*" element={<PageNotFound />} />
     
