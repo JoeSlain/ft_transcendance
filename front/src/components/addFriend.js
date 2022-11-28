@@ -21,14 +21,11 @@ const AddFriend = ({me, friends, setFriends}) => {
     }, [])*/
 
     const notify = (user) => {
-        const msg = {
+        const data = {
             header: 'Friend Request',
             body: `${me.username} wants to be your friend`,
             accept: 'Accept',
-            decline: 'Decline'
-        }
-        const data = {
-            msg,
+            decline: 'Decline',
             from: me,
             to: user,
             acceptEvent: 'acceptFriendRequest',
@@ -53,7 +50,7 @@ const AddFriend = ({me, friends, setFriends}) => {
                 withCredentials: true
             })
             .then(response => {
-                if (response.data && response.data.status === 'online')
+                if (response.data)
                     notify(response.data)
             })
         /*axios

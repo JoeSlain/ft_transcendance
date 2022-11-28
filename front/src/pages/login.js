@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { SocketContext } from "../context/socketContext";
 import { getSocketId, getStorageItem, getUserId, saveStorageItem } from "../storage/localStorage";
@@ -24,22 +24,13 @@ const LoginPage = ({ user, setUser }) => {
                 password: 'password'
             }, { withCredentials: true })
             .then(response => {
-                setUser(response.data)
-                localStorage.setItem('user', JSON.stringify(response.data))
-                console.log('devlog user', response.data)
-                //socket.connect()
+                console.log('dev login')
                 socket.userId = response.data.id
-                console.log('userSocketId', socket.id)
                 socket.emit('login', {
                     user: response.data,
                     socketId: socket.id,
                     status: 'online'
                 })
-                console.log('saved socket id', socket.id)
-                /*console.log('myid', socket.id)
-
-                console.log('login id', socket.id)*/
-                navigate('/profile')
             })
     }
 

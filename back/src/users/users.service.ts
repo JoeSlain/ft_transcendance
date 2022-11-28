@@ -42,9 +42,7 @@ export class UsersService {
         return user;
     }
 
-    async addFriend(me: User, userName: string) : Promise<User | null> {
-        const user = await this.getByUsername(userName);
-
+    async addFriend(me: User, user: User) : Promise<User | null> {
         console.log('addFriend');
         console.log(user);
         if (user && user.id !== me.id) {
@@ -55,14 +53,13 @@ export class UsersService {
                     .of(me)
                     .add(user);
             } catch (error) {
-                console.log(`friend ${userName} already added`);
+                console.log(`friend ${user.username} already added`);
                 return null;
             }
             console.log('friend added')
             return user;
         }
-        console.log('userid', user.id)
-        console.log('me.id', me.id)
+        console.log(`could'nt add user ${user.username}`)
         return null;
     }
 
@@ -105,7 +102,5 @@ export class UsersService {
             status: newStatus,
             socketId
         })
-
-        console.log('update status', newStatus);
     }
 }

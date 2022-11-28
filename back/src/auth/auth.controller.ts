@@ -50,6 +50,8 @@ export class AuthController {
         const user = await this.usersService.getByUsername(username);
 
         console.log('devlogin')
+        console.log('username', username)
+        console.log('user in dev log', user)
         //console.log(user)
         if (user) {
             const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);

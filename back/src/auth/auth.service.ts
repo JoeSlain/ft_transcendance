@@ -14,7 +14,7 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  createUser(details: UserDetails) {
+  async createUser(details: UserDetails) {
     const user = {
       username: details.username,
       id42: details.id42,
@@ -38,7 +38,7 @@ export class AuthService {
     if (user) {
       return user;
     }
-    const newUser = this.createUser(details);
+    const newUser = await this.createUser(details);
     /*console.log('user not found. Creating...')
     console.log('newUser', newUser);*/
     return this.userRepository.save(newUser);
@@ -57,6 +57,16 @@ export class AuthService {
   async getAuthenticatedUser(username: string) {
     const user = await this.userRepository.findOneBy({ username: username });
 
+    if (!user) {
+      const details : UserDetails = {
+        username: username,
+        email: `${username}@test.test`,
+        id42: null,
+        img_url: 'none',
+      }
+      const newUser = await this.createUser(details);
+      return (this.userRepository.save(newUser))
+    }
     return user;
   }
 

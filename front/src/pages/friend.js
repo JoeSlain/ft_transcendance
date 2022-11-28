@@ -32,29 +32,20 @@ const Friend = ({ me, setNotif }) => {
 
         // new friend
         socket.on('newFriend', data => {
-            console.log('data in new friend event', data)
             console.log('newFriendEvent')
-            console.log('friends b4', friends)
-            setFriends(friends.concat(data))
-            console.log('friends af', friends)
+            console.log(`adding friend ${data}`)
+            setFriends(prev => [...prev, data])
         })
 
         // update friend status
         socket.on('updateStatus', data => {
             console.log('friend update', data.user)
-            const newArr = friends.map(friend => {
+            setFriends(prev => prev.map(friend => {
                 if (friend.id === data.user.id && friend.status !== data.status) {
                     return { ...friend, status: data.status }
                 }
-                /*    if (friend.id === data.user.id && friend !== data.user) {
-                        return { ...friend, status: data.status }
-                    }*/
                 return friend
-            })
-            if (JSON.stringify(newArr) !== JSON.stringify(friends)) {
-                console.log('friend status ok')
-                setFriends(newArr)
-            }
+            }))
         })
 
         // notif received
@@ -71,7 +62,7 @@ const Friend = ({ me, setNotif }) => {
         // friend deleted
         socket.on('friendDeleted', data => {
             console.log(`deleting ${data.username}`)
-            setFriends(friends.filter(friend => friend.id !== data.id))
+            setFriends(prev => prev.filter(friend => friend.id !== data.id))
         })
 
         // unmount
@@ -85,14 +76,11 @@ const Friend = ({ me, setNotif }) => {
     }, [])
 
     const handleInvite = (user) => {
-        const msg = {
+        const data = {
             header: 'Game Invite',
             body: `${me.username} invited you to play a game`,
             accept: 'Accept',
-            decline: 'Decline'
-        }
-        const data = {
-            msg,
+            decline: 'Decline',
             from: me,
             to: user,
             acceptEvent: 'acceptInvite',
@@ -103,14 +91,11 @@ const Friend = ({ me, setNotif }) => {
     }
 
     const handleDelete = (user) => {
-        const msg = {
+        const data = {
             header: 'Delete friend',
             body: `Remove ${user.username} from your friendlist ?`,
             accept: 'Yes',
-            decline: 'No'
-        }
-        const data = {
-            msg,
+            decline: 'No',
             from: me,
             to: user,
             acceptEvent: 'deleteFriend'

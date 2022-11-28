@@ -1,14 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
-import { UsersService } from 'src/users/users.service';
 import { Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
 import { parse } from 'cookie';
+import { Notif } from 'src/database';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ChatService {
     constructor(
         private readonly authService: AuthService,
+        @InjectRepository(Notif) private notifRepository: Repository<Notif>,
       ) {}
      
       async getUserFromSocket(socket: Socket) {
@@ -21,5 +24,13 @@ export class ChatService {
           throw new WsException('Invalid credentials.');
         }
         return user;
+      }
+
+      async createNotif(data: any) {
+        const notif = new Notif();
+
+        notif.data = data;
+        notif.user = data.to;
+        return this.notifRepository.create(notif);
       }
 }

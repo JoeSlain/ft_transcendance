@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { Notif } from './Notif';
 
 @Entity({ name: 'users' })
 export class User {
@@ -17,8 +18,8 @@ export class User {
     @Column({ default: false })
     isTwoFactorAuthenticationEnabled: boolean;
 
-    @Column()
-    id42: number;
+    @Column({ nullable: true })
+    id42?: number;
 
     @Column()
     winratio: string;
@@ -47,4 +48,7 @@ export class User {
     @ManyToMany((type) => User, (user) => user.friends)
     @JoinTable()
     friends: User[]
+
+    @OneToMany(() => Notif, (notif) => notif.user)
+    notifs: Notif[]
 }

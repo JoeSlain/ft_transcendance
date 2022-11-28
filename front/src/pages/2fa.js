@@ -24,18 +24,13 @@ const TwoFa = ({user, setUser}) => {
                 withCredentials: true
             })
             .then(response => {
-                console.log(response.data)
-                setUser(response.data)
-                console.log('2fa user', user)
-                localStorage.setItem('user', JSON.stringify(response.data))
-                socket.connect()
-                socket.emit('updateStatus', {
-                    userId: response.data.id,
+                console.log('2fa login')
+                socket.userId = response.data.id
+                socket.emit('login', {
+                    user: response.data,
                     socketId: socket.id,
                     status: 'online'
                 })
-                saveStorageItem('socketId', {socketId: socket.id})
-                navigate(`/profile`)
             })
     }
 

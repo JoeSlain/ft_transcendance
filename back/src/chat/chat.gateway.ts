@@ -2,6 +2,7 @@ import { MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, W
 import { Socket, Namespace } from 'socket.io';
 import { User } from 'src/database';
 import { UsersService } from 'src/users/users.service';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway(3002, {
   cors: {
@@ -12,6 +13,7 @@ import { UsersService } from 'src/users/users.service';
 export class ChatGateway implements OnGatewayConnection {
   constructor (
     private readonly usersService: UsersService,
+    private readonly chatService: ChatService,
   ) {}
 
   @WebSocketServer() server: Namespace;
@@ -24,13 +26,15 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('login')
   async connect(client: Socket, data: any) {
     console.log('chat ws login')
-    console.log('userId', data.user.id);
-    console.log(data.status);
-    console.log('socketId', client.id);
-    await this.usersService.updateStatus(data.user.id, data.status, client.id);
 
     client.join(data.user.id);
-    client.broadcast.emit('updateStatus', data);
+    if (data.user.status !== data.status) {
+      console.log('updating status')
+      await this.usersService.updateStatus(data.user.id, data.status, client.id);
+      data.user.status = 'online';
+      client.broadcast.emit('updateStatus', data);
+      this.server.to(data.user.id).to(data.user.socketId).emit('loggedIn', data.user);
+    }
   }
 
   @SubscribeMessage('logout')
@@ -38,26 +42,27 @@ export class ChatGateway implements OnGatewayConnection {
     console.log('chat ws logout')
     await this.usersService.updateStatus(data.user.id, data.status, client.id);
 
+    data.user.status = 'offline';
     client.broadcast.emit('updateStatus', data);
   }
 
   @SubscribeMessage('notif')
-  notify(client: Socket, data: any) {
+  async notify(client: Socket, data: any) {
     console.log('chat websocket invite');
     
-    console.log('to', data.to);
-    console.log('data', data);
-    console.log('client', client);
-    console.log('userId', data.to.id)
-    this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
+    await this.chatService.createNotif(data);
+    if (data.to.status === 'online')
+      this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
   }
 
   @SubscribeMessage('acceptFriendRequest')
   async addFriend(client: Socket, data: any) {
     console.log('addFriend event');
 
-    const newFriend = await this.usersService.addFriend(data.from, data.to.username);
+    const newFriend = await this.usersService.addFriend(data.from, data.to);
     if (newFriend) {
+      console.log('from', data.from)
+      console.log('to', data.to)
       this.server.to(data.from.id).to(data.from.socketId).emit('newFriend', data.to)
       this.server.to(data.to.id).to(data.to.socketId).emit('newFriend', data.from)
     }

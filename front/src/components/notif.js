@@ -39,15 +39,15 @@ const Notif = ({ notif, setNotif }) => {
             <div className='notif'>
                 <div className='header'>
                     <Modal.Title id='contained-modal-title-vcenter'>
-                        {notif.msg.header}
+                        {notif.header}
                     </Modal.Title>
                 </div>
                 <div className='body'>
-                    {notif.msg.body}
+                    {notif.body}
                 </div>
                 <div className='buttons'>
-                    <Button variant='primary' onClick={handleAccept} > {notif.msg.accept} </Button>
-                    <Button variant='secondary' onClick={handleDecline} > {notif.msg.decline} </Button>
+                    <Button variant='primary' onClick={handleAccept} > {notif.accept} </Button>
+                    <Button variant='secondary' onClick={handleDecline} > {notif.decline} </Button>
                 </div>
             </div>
         </Modal>
