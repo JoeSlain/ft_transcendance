@@ -1,27 +1,31 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { User } from './User';
 
-type NotifData = {
-    header: string,
-    body: string, 
-    accept: string,
-    decline: string,
-    from: User,
-    to: User,
-    acceptEvent: string,
-    declineEvent: string,
-}
-
 @Entity({ name: 'notif' })
 export class Notif {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    data: NotifData;
+    header: string;
 
     @Column()
-    status: string;
+    body: string;
+
+    @Column()
+    accept: string;
+
+    @Column()
+    decline: string;
+
+    @Column()
+    from: User;
+
+    @Column()
+    acceptEvent: string;
+
+    @Column({nullable: true})
+    declineEvent: string;
 
     @ManyToOne(() => User, (user) => user.notifs)
     user: User

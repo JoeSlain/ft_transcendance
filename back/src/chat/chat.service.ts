@@ -27,10 +27,17 @@ export class ChatService {
       }
 
       async createNotif(data: any) {
-        const notif = new Notif();
+        const notif = {
+          header: data.header,
+          body: data.body,
+          accept: data.accept,
+          decline: data.decline,
+          from: data.from,
+          acceptEvent: data.acceptEvent,
+          declineEvent: data.declineEvent,
+          user: data.to,
+        }
 
-        notif.data = data;
-        notif.user = data.to;
         return this.notifRepository.create(notif);
       }
 }
