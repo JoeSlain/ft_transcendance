@@ -5,3 +5,7 @@
 .heightMinusNav {
     height: calc(100vh - 60px);
 }
+
+.heightMinusNavProfile {
+    height: calc(100vh - 80px);
+}

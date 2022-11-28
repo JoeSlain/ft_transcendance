@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 
 
 export default function ProfileNavbar()
@@ -21,6 +21,7 @@ export default function ProfileNavbar()
         </ul>
         </div>
       </nav>
+      <Outlet />
     </>
     );
 }

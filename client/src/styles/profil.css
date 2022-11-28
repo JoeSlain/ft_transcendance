@@ -34,8 +34,10 @@
     cursor: pointer;
 }
 
-::placeholder
+input
 { 
     color: black;
+    text-align: center;
+    font-size: large;
     opacity: 1; /* Firefox */
   }
