@@ -20,6 +20,15 @@ export class AuthController {
         return;
     }
 
+    @Post('logout')
+    @UseGuards(TwoFactorGuard)
+    logout(@Req() req) {
+        const cookie = this.authService.getLogoutCookie();
+
+        req.res.setHeader('Set-Cookie', cookie);
+        return;
+    }
+
     @Get('redirect')
     @UseGuards(FortyTwoAuthGuard)
     async redirect(@Req() req, @Res() res) {

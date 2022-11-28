@@ -75,4 +75,9 @@ export class AuthService {
 
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.COOKIE_EXPIRATION_TIME}`;
   }
+
+  // logout cookie
+  getLogoutCookie() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+  }
 }
