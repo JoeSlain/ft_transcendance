@@ -28,26 +28,24 @@ export class UsersService {
     async getById(userId: number) {
         const user = await this.usersRepository.findOneBy({ id: userId });
 
-        console.log('getById');
+        /*console.log('getById');
         console.log(userId);
-        console.log(user);
+        console.log(user);*/
         return user;
     }
 
     async getByUsername(userName: string): Promise<User | null> {
         const user = await this.usersRepository.findOneBy({ username: userName });
 
-        console.log('getByUsername');
-        console.log(user);
+        /*console.log('getByUsername');
+        console.log(user);*/
         return user;
     }
 
-    async addFriend(me: User, userName: string) {
-        const user = await this.getByUsername(userName);
-
+    async addFriend(me: User, user: User) : Promise<User | null> {
         console.log('addFriend');
         console.log(user);
-        if (user) {
+        if (user && user.id !== me.id) {
             try {
                 await this.usersRepository
                     .createQueryBuilder()
@@ -55,21 +53,56 @@ export class UsersService {
                     .of(me)
                     .add(user);
             } catch (error) {
-                console.log(`friend ${userName} already added`);
+                console.log(`friend ${user.username} already added`);
+                return null;
             }
-        } 
-        return user;
+            console.log('friend added')
+            return user;
+        }
+        console.log(`could'nt add user ${user.username}`)
+        return null;
     }
 
     async getFriends(user: User) {
         const users = await this.usersRepository
-            .createQueryBuilder()
-            .relation(User, "friends")
-            .of(user)
-            .loadMany()
+        .query(
+            ` SELECT * 
+              FROM users U
+              WHERE U.id <> $1
+                AND EXISTS(
+                  SELECT 1
+                  FROM users_friends_users F
+                  WHERE (F."usersId_1" = $1 AND F."usersId_2" = U.id )
+                  OR (F."usersId_2" = $1 AND F."usersId_1" = U.id )
+                  );  `,
+            [user.id],
+          )
 
-        console.log('getFriends');
-        console.log(users);
+        /*console.log('getFriends');
+        console.log(users);*/
         return users;
+    }
+
+    async deleteFriend(user: User, toDelId: number) {
+        const toDel = await this.getById(toDelId);
+
+        if (toDel) {
+            await this.usersRepository
+                .createQueryBuilder()
+                .relation(User, "friends")
+                .of(user)
+                .remove(toDel);
+            return (this.getFriends(user));
+        }
+        return null;
+    }
+
+    async updateStatus(userId: number, newStatus: string, socketId: string) {
+        await this.usersRepository.update(userId, {
+            status: newStatus,
+            socketId
+        })
+        const modifiedUser = await this.getById(userId);
+        return modifiedUser;
     }
 }

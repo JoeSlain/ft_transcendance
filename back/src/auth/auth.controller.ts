@@ -1,9 +1,10 @@
-import { Controller, UseGuards, Get, Req, Res, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, UseGuards, Get, Req, Res, Post, Body, UnauthorizedException, HttpCode } from '@nestjs/common';
 import { FortyTwoAuthGuard, AuthenticatedGuard } from './42auth/42.guard';
 import { TwoFactorAuthenticationService } from './2fa/2fa.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { TwoFactorGuard } from './2fa/2fa.guard';
+import { LocalAuthenticationGuard } from './local.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,14 +34,30 @@ export class AuthController {
     @UseGuards(FortyTwoAuthGuard)
     async redirect(@Req() req, @Res() res) {
         const accessTokenCookie = this.authService.getCookieWithJwtToken(req.user.id);
+
         console.log('redirect')
-
         req.res.setHeader('Set-Cookie', [accessTokenCookie]);
-
         if (req.user.isTwoFactorAuthenticationEnabled)
             res.redirect(`http://localhost:3000/login/2fa`);
         else
-            res.redirect(`http://localhost:3000/profile/${req.user.id}`);
+            res.redirect('http://localhost:3000/login/redirect');
+    }
+
+    // test for devs only
+    @UseGuards(LocalAuthenticationGuard)
+    @Post('devlog')
+    async devLogin(@Req() req, @Body() { username }) {
+        const user = await this.usersService.getByUsername(username);
+
+        console.log('devlogin')
+        console.log('username', username)
+        console.log('user in dev log', user)
+        //console.log(user)
+        if (user) {
+            const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);
+            req.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        }
+        return user;
     }
 
     @Post('2fa/generate')
@@ -60,14 +77,16 @@ export class AuthController {
         const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
             twoFactorAuthenticationCode, req.user
         );
-        
-        console.log('2fa turn on')
-        console.log(isCodeValid)
+
+        /*console.log('2fa turn on')
+        console.log(isCodeValid)*/
 
         if (!isCodeValid) {
             throw new UnauthorizedException('Wrong authentication code');
         }
         await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
+        const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
+        req.res.setHeader('Set-Cookie', [accessTokenCookie]);
     }
 
     @Post('2fa/turn-off')
@@ -91,7 +110,7 @@ export class AuthController {
         }
 
         const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
-        
+
         req.res.setHeader('Set-Cookie', [accessTokenCookie]);
         return req.user;
     }

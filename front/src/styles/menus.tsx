@@ -1,15 +1,24 @@
-import styled, {css} from 'styled-components'
-
-export const EntryStyles = styled.div`
-    box-shadow: 2px 2px 2px 2px rgba(9, 9, 9, 0.23);
-    margin-top: 5px;
-    height: 20px;
-`;
+import styled, { css } from 'styled-components'
 
 type ContextMenuProps = {
     top: number;
     left: number;
 };
+
+type StatusProps = {
+    color: string;
+}
+
+export const StatusStyle = styled.div<StatusProps>`
+    width: 10px;
+    height: 10px;
+    margin: 5px 0px 0px 5px;
+    border-radius: 50%;
+    ${({color}) => css`
+        color: ${color};
+        background-color: ${color};
+    `}
+`
 
 export const ContextMenu = styled.div<ContextMenuProps>`
     border-radius: 4px;
@@ -17,7 +26,7 @@ export const ContextMenu = styled.div<ContextMenuProps>`
     position: absolute;
     background-color: white;
     box-shadow: 0px 1px 8px 0px grey;
-    ${({top, left}) => css `
+    ${({ top, left }) => css`
         top: ${top}px;
         left: ${left}px;
     `}

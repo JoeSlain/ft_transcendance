@@ -11,6 +11,7 @@ import { TwoFactorAuthenticationService } from './2fa/2fa.service';
 import { UsersService } from 'src/users/users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { TwoFactorStrategy } from './2fa/2fa.strategy';
+import { LocalStrategy } from './local.strategy';
 
 @Module({
   imports: [
@@ -21,11 +22,12 @@ import { TwoFactorStrategy } from './2fa/2fa.strategy';
       signOptions: {
         expiresIn: process.env.COOKIE_EXPIRATION_TIME,
       }
-    })
+    }),
   ],
   providers: [
     FortyTwoStrategy,
     TwoFactorStrategy,
+    LocalStrategy,
     SessionSerializer,
     TwoFactorAuthenticationService,
     UsersService,

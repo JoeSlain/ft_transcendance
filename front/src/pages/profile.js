@@ -1,34 +1,18 @@
 import axios from "axios"
 import { useParams } from 'react-router-dom'
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Navigate } from 'react-router-dom'
+import { SocketContext } from "../context/socketContext"
 
-const ProfilePage = () => {
+const ProfilePage = ({ user, setUser }) => {
     const [url, setUrl] = useState('')
-    const [user, setUser] = useState(() => {
-        const saved = localStorage.getItem('user');
-        const initialValue = JSON.parse(saved);
-        return initialValue || {};
-    })
+    const socket = useContext(SocketContext);
     const params = useParams();
-
-    useEffect(() => {
-        axios
-            .get(`http://localhost:3001/api/users`, {
-                withCredentials: true
-            })
-            .then(response => {
-                console.log('getting profile from api')
-                console.log(response.data)
-                setUser(response.data)
-                localStorage.setItem('user', JSON.stringify(user))
-            })
-    }, [])
 
     return (
         <div>
-            { url && <Navigate to="/params" replace='true' /> }
-            
+            {url && <Navigate to="/params" replace='true' />}
+
             <button onClick={() => setUrl('http://localhost:3000/params')}> Params </button>
             <h1>
                 Welcome {user.username} !

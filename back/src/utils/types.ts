@@ -10,3 +10,14 @@ export type UserDetails = {
     id42: number;
     img_url: string;
 }
+
+export type NotifData = {
+    header: string,
+    body: string, 
+    accept: string,
+    decline: string,
+    from: User,
+    to: User,
+    acceptEvent: string,
+    declineEvent?: string,
+}

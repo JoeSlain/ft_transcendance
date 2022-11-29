@@ -4,7 +4,7 @@ import ReactCodeInput from 'react-code-input'
 import { Navigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 
-const Params = () => {
+const Params = ({user, setUser}) => {
     const [qrcode, setQrCode] = useState('');
     const [code, setCode] = useState('');
     const [url, setUrl] = useState('');
@@ -47,7 +47,7 @@ const Params = () => {
             }, {
                 withCredentials: true
             })
-            .then(response => console.log(response))
+            .then(response => console.log('2fa turned on'))
     }
 
     return (

@@ -1,8 +1,29 @@
 import "../styles/navbar.css";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
+import axios from "axios";
+import { useContext, useState } from 'react';
+import { SocketContext } from "../context/socketContext";
+import { saveStorageItem } from "../storage/localStorage";
 
-const Navbar = () => {
-    const user = JSON.parse(localStorage.getItem('user'));
+const Navbar = ({ user, setUser }) => {
+    const socket = useContext(SocketContext)
+
+    const handleLogout = () => {
+        socket.emit('logout', {
+            user: user,
+            socketId: socket.id,
+            status: 'offline'
+          })
+        axios
+            .post('http://localhost:3001/api/auth/logout', {}, {
+                withCredentials: true
+            })
+            .then(response => {
+                console.log(response.data)
+                setUser(null)
+            })
+        saveStorageItem('user', null)
+    }
 
     return (
         <nav className="navigation">
@@ -23,6 +44,9 @@ const Navbar = () => {
                     </li>
                     <li>
                         <NavLink className="navlink" to="/profile">Profile</NavLink>
+                    </li>
+                    <li>
+                        {user && <button onClick={handleLogout} > LogOut </button>}
                     </li>
                 </ul>
             </div>

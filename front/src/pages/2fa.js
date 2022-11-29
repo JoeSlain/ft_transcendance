@@ -1,11 +1,14 @@
 import axios from 'axios'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import ReactCodeInput from 'react-code-input'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { SocketContext } from '../context/socketContext'
+import { getStorageItem, getUserId, saveStorageItem } from '../storage/localStorage'
 
-const TwoFa = () => {
+const TwoFa = ({user, setUser}) => {
     const [code, setCode] = useState('');
-    const [url, setUrl] = useState('');
+    const navigate = useNavigate();
+    const socket = useContext(SocketContext);
 
     const getCode = (code) => {
         console.log(code)
@@ -21,21 +24,27 @@ const TwoFa = () => {
                 withCredentials: true
             })
             .then(response => {
-                console.log(response.data)
-                setUrl(`/profile/${response.data.id}`)
+                console.log('2fa login')
+                socket.userId = response.data.id
+                socket.emit('login', {
+                    user: response.data,
+                    socketId: socket.id,
+                    status: 'online'
+                })
             })
     }
 
     return (
         <div>
             {
-                url && <Navigate to={url} replace={true} />
+                <div>
+                    <p> Enter code from GoogleAuthenticator app </p>
+                    <form onSubmit={send2faCode}>
+                        <ReactCodeInput type='text' fields={6} onChange={getCode} />
+                        <button type="submit"> confirm </button>
+                    </form>
+                </div>
             }
-            <p> Enter code from GoogleAuthenticator app </p>
-            <form onSubmit={send2faCode}>
-                <ReactCodeInput type='text' fields={6} onChange={getCode} />
-                <button type="submit"> confirm </button>
-            </form>
         </div>
     )
 }

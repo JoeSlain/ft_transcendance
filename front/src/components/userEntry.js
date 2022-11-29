@@ -1,10 +1,23 @@
-import { EntryStyles } from "../styles/menus"
+import '../styles/userEntries.css'
+import { StatusStyle } from '../styles/menus'
 
 const UserEntry = ({ user }) => {
+    const colors = {
+        offline: 'grey',
+        online: 'green',
+        ingame: 'yellow',
+        away: 'red',
+    }
+
     return (
-        <EntryStyles >
-            {user.username}
-        </EntryStyles>
+        <div className='userEntry' >
+            <div className='username'>
+                {user.username}
+            </div>
+            <div className='status'>
+                <StatusStyle color={colors[user.status]}> `` </StatusStyle>
+            </div>
+        </div>
     )
 }
 
