@@ -54,7 +54,8 @@ function App() {
     })
 
     return () => {
-      socket.off('login')
+      socket.off('connected')
+      socket.off('loggedIn')
     }
   }, [])
 

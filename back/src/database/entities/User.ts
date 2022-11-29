@@ -45,10 +45,14 @@ export class User {
     @Column({ nullable: true })
     socketId?: string;
 
+    // relations
     @ManyToMany((type) => User, (user) => user.friends)
     @JoinTable()
     friends: User[]
 
-    @OneToMany(() => Notif, (notif) => notif.user)
-    notifs: Notif[]
+    @OneToMany(() => Notif, (notif) => notif.from)
+    received: Notif[]
+
+    @OneToMany(() => Notif, (notif) => notif.to)
+    sent: Notif[]
 }

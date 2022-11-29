@@ -19,14 +19,14 @@ export class Notif {
     decline: string;
 
     @Column()
-    from: User;
-
-    @Column()
     acceptEvent: string;
 
     @Column({nullable: true})
     declineEvent: string;
 
-    @ManyToOne(() => User, (user) => user.notifs)
-    user: User
+    @ManyToOne(() => User, (user) => user.sent)
+    from: User;
+
+    @ManyToOne(() => User, (user) => user.received)
+    to: User;
 }

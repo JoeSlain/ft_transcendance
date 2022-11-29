@@ -102,5 +102,7 @@ export class UsersService {
             status: newStatus,
             socketId
         })
+        const modifiedUser = await this.getById(userId);
+        return modifiedUser;
     }
 }

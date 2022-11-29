@@ -11,10 +11,10 @@ import { ChatService } from './chat.service';
   namespace: 'chat',
 })
 export class ChatGateway implements OnGatewayConnection {
-  constructor (
+  constructor(
     private readonly usersService: UsersService,
     private readonly chatService: ChatService,
-  ) {}
+  ) { }
 
   @WebSocketServer() server: Namespace;
 
@@ -28,29 +28,31 @@ export class ChatGateway implements OnGatewayConnection {
     console.log('chat ws login')
 
     client.join(data.user.id);
-    if (data.user.status !== data.status) {
-      console.log('updating status')
-      await this.usersService.updateStatus(data.user.id, data.status, client.id);
-      data.user.status = 'online';
+    data.user = await this.usersService.updateStatus(data.user.id, data.status, client.id);
+    if (data.user) {
       client.broadcast.emit('updateStatus', data);
       this.server.to(data.user.id).to(data.user.socketId).emit('loggedIn', data.user);
     }
+    else
+      console.log('error updating user status')
   }
 
   @SubscribeMessage('logout')
   async disconnect(client: Socket, data: any) {
     console.log('chat ws logout')
-    await this.usersService.updateStatus(data.user.id, data.status, client.id);
+    data.user = await this.usersService.updateStatus(data.user.id, data.status, client.id);
 
-    data.user.status = 'offline';
-    client.broadcast.emit('updateStatus', data);
+    if (data.user)
+      client.broadcast.emit('updateStatus', data);
+    else
+      console.log('error logging out')
   }
 
   @SubscribeMessage('notif')
   async notify(client: Socket, data: any) {
     console.log('chat websocket invite');
-    
-    await this.chatService.createNotif(data);
+
+    //await this.chatService.createNotif(data);
     if (data.to.status === 'online')
       this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
   }

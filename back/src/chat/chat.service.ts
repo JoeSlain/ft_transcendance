@@ -40,4 +40,8 @@ export class ChatService {
 
         return this.notifRepository.create(notif);
       }
+
+      /*async findNotif(from: User, to: User) {
+        return this.notifRepository.findBy
+      }*/
 }
