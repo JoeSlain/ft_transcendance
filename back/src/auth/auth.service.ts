@@ -34,7 +34,7 @@ export class AuthService {
     //console.log(details.id42);
     const user = await this.userRepository.findOneBy({ id42: details.id42 });
 
-    console.log(user);
+    //console.log(user);
     if (user) {
       return user;
     }

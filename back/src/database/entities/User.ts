@@ -50,9 +50,9 @@ export class User {
     @JoinTable()
     friends: User[]
 
-    @OneToMany(() => Notif, (notif) => notif.from)
+/*    @OneToMany(() => Notif, (notif) => notif.from)
     received: Notif[]
 
     @OneToMany(() => Notif, (notif) => notif.to)
-    sent: Notif[]
+    sent: Notif[]*/
 }

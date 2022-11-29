@@ -24,9 +24,9 @@ export class Notif {
     @Column({nullable: true})
     declineEvent: string;
 
-    @ManyToOne(() => User, (user) => user.sent)
+    @ManyToOne(() => User)
     from: User;
 
-    @ManyToOne(() => User, (user) => user.received)
+    @ManyToOne(() => User)
     to: User;
 }

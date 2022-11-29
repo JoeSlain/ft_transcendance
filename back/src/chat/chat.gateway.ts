@@ -1,6 +1,7 @@
 import { MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
 import { User } from 'src/database';
+import { NotifService } from 'src/users/notifs.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 
@@ -14,6 +15,7 @@ export class ChatGateway implements OnGatewayConnection {
   constructor(
     private readonly usersService: UsersService,
     private readonly chatService: ChatService,
+    private readonly notifService: NotifService,
   ) { }
 
   @WebSocketServer() server: Namespace;
@@ -52,7 +54,7 @@ export class ChatGateway implements OnGatewayConnection {
   async notify(client: Socket, data: any) {
     console.log('chat websocket invite');
 
-    //await this.chatService.createNotif(data);
+    await this.notifService.createNotif(data);
     if (data.to.status === 'online')
       this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
   }
@@ -63,8 +65,8 @@ export class ChatGateway implements OnGatewayConnection {
 
     const newFriend = await this.usersService.addFriend(data.from, data.to);
     if (newFriend) {
-      console.log('from', data.from)
-      console.log('to', data.to)
+      //console.log('from', data.from)
+      //console.log('to', data.to)
       this.server.to(data.from.id).to(data.from.socketId).emit('newFriend', data.to)
       this.server.to(data.to.id).to(data.to.socketId).emit('newFriend', data.from)
     }

@@ -23,10 +23,12 @@ import Friend from './pages/friend'
 import Redirect from './pages/redirect'
 import Notif from './components/notif';
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
+import axios from 'axios';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
   const [notif, setNotif] = useState(null)
+  const [notifArray, setNotifArray] = useState([])
   const navigate = useNavigate()
   const socket = useContext(SocketContext)
 
@@ -48,6 +50,14 @@ function App() {
 
     socket.on('loggedIn', data => {
       console.log('loggedIn')
+      axios
+        .get('http://localhost:3001/api/users/notifs', {
+          withCredentials: true
+        })
+        .then(response => {
+          setNotifArray(prev => prev.concat(response.data))
+          console.log('notif', response.data)
+        })
       setUser(data)
       saveStorageItem('user', data)
       navigate('/profile')
@@ -62,7 +72,8 @@ function App() {
   return (
     <div id="main">
       <Navbar user={user} setUser={setUser} />
-      {notif && <Notif notif={notif} setNotif={setNotif} />}
+      {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
+      {notifArray[0] && <Notif notifs={notifArray} setNotifs={setNotifArray} />}
 
       <div className='main'>
         <div className='main-content'>

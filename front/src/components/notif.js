@@ -5,8 +5,9 @@ import { SocketContext } from '../context/socketContext';
 import { Modal } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 
-const Notif = ({ notif, setNotif }) => {
+const Notif = ({ notifs, setNotifs }) => {
     const socket = useContext(SocketContext);
+    const notif = notifs[0];
 
     const handleAccept = () => {
         if (notif.acceptEvent !== undefined) {
@@ -18,7 +19,7 @@ const Notif = ({ notif, setNotif }) => {
         }
         else
             console.log('accept event undefined')
-        setNotif(null)
+        setNotifs(notifs.filter(n => n.id !== notif.id))
     }
 
     const handleDecline = () => {
@@ -31,7 +32,7 @@ const Notif = ({ notif, setNotif }) => {
         }
         else
             console.log('decline event undefined')
-        setNotif(null)
+        setNotifs(notifs.filter(n => n.id !== notif.id))
     }
 
     return (

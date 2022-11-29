@@ -49,10 +49,10 @@ export class AuthController {
     async devLogin(@Req() req, @Body() { username }) {
         const user = await this.usersService.getByUsername(username);
 
-        console.log('devlogin')
+        /*console.log('devlogin')
         console.log('username', username)
         console.log('user in dev log', user)
-        //console.log(user)
+        console.log(user)*/
         if (user) {
             const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);
             req.res.setHeader('Set-Cookie', [accessTokenCookie]);
@@ -108,9 +108,7 @@ export class AuthController {
         if (!isCodeValid) {
             throw new UnauthorizedException('Wrong authentication code');
         }
-
         const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
-
         req.res.setHeader('Set-Cookie', [accessTokenCookie]);
         return req.user;
     }

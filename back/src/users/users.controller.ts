@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthenticatedGuard } from 'src/auth/42auth/42.guard';
 import { TwoFactorGuard } from 'src/auth/2fa/2fa.guard';
 import { UsersService } from './users.service';
+import { NotifService } from './notifs.service';
 
 class PostDTO {
     content: string;
@@ -14,7 +15,8 @@ class PostDTO {
 export class UsersController {
     constructor(
         @InjectRepository(User) private readonly userRepository: Repository<User>,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
+        private readonly notifService: NotifService,
     ) {}
    
     @Get('')
@@ -63,7 +65,7 @@ export class UsersController {
         console.log('get friends')
         const users = await this.usersService.getFriends(req.user);
 
-        console.log('friends', users)
+        //console.log('friends', users)
         return (users);
     }
 
@@ -74,5 +76,14 @@ export class UsersController {
         const users = await this.usersService.deleteFriend(req.user, userId);
 
         return users;
+    }
+
+    @Get('notifs')
+    @UseGuards(TwoFactorGuard)
+    async getNotifs(@Req() req) {
+        const notifs = await this.notifService.getNotifs(req.user.id)
+
+        console.log('notifs', notifs);
+        return notifs;
     }
 }

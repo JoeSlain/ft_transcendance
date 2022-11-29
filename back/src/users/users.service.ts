@@ -44,7 +44,7 @@ export class UsersService {
 
     async addFriend(me: User, user: User) : Promise<User | null> {
         console.log('addFriend');
-        console.log(user);
+        //console.log(user);
         if (user && user.id !== me.id) {
             try {
                 await this.usersRepository
