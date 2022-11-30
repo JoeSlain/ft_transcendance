@@ -29,6 +29,7 @@ const AddFriend = ({me, friends, setFriends}) => {
             from: me,
             to: user,
             acceptEvent: 'acceptFriendRequest',
+            declineEvent: 'declineFriendRequest',
         }
         console.log('data', data)
         socket.emit('notif', data)
@@ -39,7 +40,7 @@ const AddFriend = ({me, friends, setFriends}) => {
 
         if (name === '' 
         || name === me.username
-        || friends.find(friend => friend.username === name)
+        //|| friends.find(friend => friend.username === name)
         ) {
             console.log('invalid username')
             setName('')

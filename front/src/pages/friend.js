@@ -6,7 +6,7 @@ import axios from 'axios'
 import UserEntry from '../components/userEntry'
 import AddFriend from '../components/addFriend'
 
-const Friend = ({ me, setNotif }) => {
+const Friend = ({ me, setNotifs }) => {
     const [friends, setFriends] = useState([])
     const [show, setShow] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
@@ -55,7 +55,7 @@ const Friend = ({ me, setNotif }) => {
                 console.log(`${data.from.username} invited you`)
                 console.log('accept event', data.acceptEvent)
                 console.log('decline event', data.declineEvent)
-                setNotif(data)
+                setNotifs(prev => [...prev, data])
             }
         })
 
@@ -100,7 +100,7 @@ const Friend = ({ me, setNotif }) => {
             to: user,
             acceptEvent: 'deleteFriend'
         }
-        setNotif(data)
+        setNotifs(prev => [...prev, data])
     }
 
     return (
@@ -109,7 +109,6 @@ const Friend = ({ me, setNotif }) => {
                 friends={friends}
                 setFriends={setFriends}
                 me={me}
-                setNotif={setNotif}
             />
             {friends &&
                 <div className='userList'>

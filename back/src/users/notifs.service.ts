@@ -1,34 +1,32 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Notif } from "src/database";
+import { Notif, User } from "src/database";
 import { NotifData } from "src/utils/types";
 import { Repository } from "typeorm";
+import { UsersService } from "./users.service";
 
 @Injectable()
 export class NotifService {
     constructor(
         @InjectRepository(Notif) private notifRepository: Repository<Notif>,
+        private readonly userService: UsersService
     ) { }
 
 
     async createNotif(data: NotifData) {
-        if (data.header === 'Friend Request') {
-            const notif = await this.findOne(data);
+        const notifs = await this.findOne(data);
 
-            if (notif === undefined) {
-                console.log('no notif found, creating notif');
-                return this.notifRepository.create(data);
-            }
-            console.log('notif already exists')
-            console.log('notif found', notif)
-            return null;
+        if (notifs.length === 0) {
+            console.log('notif not found, creating new')
+            const newNotif = this.notifRepository.create(data);
+            return this.notifRepository.save(newNotif);
         }
+        console.log('notif not created')
+        return null;
     }
 
     async findOne(data: NotifData) {
         console.log('find one notif');
-        if (data.header !== 'Friend Request')
-            return null;
         return this.notifRepository.find({
             relations: {
                 to: true,
@@ -50,6 +48,7 @@ export class NotifService {
         return this.notifRepository.find({
             relations: {
                 to: true,
+                from: true,
             },
             where: {
                 to: {
@@ -59,7 +58,10 @@ export class NotifService {
         })
     }
 
-    async deleteNotif(notif: Notif) {
-        await this.notifRepository.remove(notif);
+    async deleteNotif(data: NotifData) {
+        const notif = await this.findOne(data);
+
+        if (notif.length)
+            await this.notifRepository.remove(notif);
     }
 }

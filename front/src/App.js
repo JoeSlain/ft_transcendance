@@ -28,7 +28,7 @@ import axios from 'axios';
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
   const [notif, setNotif] = useState(null)
-  const [notifArray, setNotifArray] = useState([])
+  const [notifs, setNotifs] = useState([])
   const navigate = useNavigate()
   const socket = useContext(SocketContext)
 
@@ -55,7 +55,7 @@ function App() {
           withCredentials: true
         })
         .then(response => {
-          setNotifArray(prev => prev.concat(response.data))
+          setNotifs(response.data)
           console.log('notif', response.data)
         })
       setUser(data)
@@ -73,7 +73,8 @@ function App() {
     <div id="main">
       <Navbar user={user} setUser={setUser} />
       {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
-      {notifArray[0] && <Notif notifs={notifArray} setNotifs={setNotifArray} />}
+      {console.log('notifs', notifs)}
+      {notifs[0] && <Notif notifs={notifs} setNotifs={setNotifs} />}
 
       <div className='main'>
         <div className='main-content'>
@@ -95,7 +96,7 @@ function App() {
         </div>
         {
           user && <div className='aside'>
-            <Friend me={user} setNotif={setNotif} />
+            <Friend me={user} setNotifs={setNotifs} />
           </div>
         }
       </div>

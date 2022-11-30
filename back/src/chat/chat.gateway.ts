@@ -1,6 +1,6 @@
 import { MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
-import { User } from 'src/database';
+import { Notif, User } from 'src/database';
 import { NotifService } from 'src/users/notifs.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
@@ -54,6 +54,11 @@ export class ChatGateway implements OnGatewayConnection {
   async notify(client: Socket, data: any) {
     console.log('chat websocket invite');
 
+    if (data.header === 'Friend Request') {
+      const friend = await this.usersService.findFriend(data.from.id, data.to.id);
+      if (friend.length)
+        return;
+    }
     await this.notifService.createNotif(data);
     if (data.to.status === 'online')
       this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
@@ -62,16 +67,26 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('acceptFriendRequest')
   async addFriend(client: Socket, data: any) {
     console.log('addFriend event');
+    console.log('from', data.from)
+    console.log('to', data.to)
 
     const newFriend = await this.usersService.addFriend(data.from, data.to);
     if (newFriend) {
-      //console.log('from', data.from)
-      //console.log('to', data.to)
+      await this.notifService.deleteNotif(data);
       this.server.to(data.from.id).to(data.from.socketId).emit('newFriend', data.to)
       this.server.to(data.to.id).to(data.to.socketId).emit('newFriend', data.from)
     }
     else
       console.log('error adding friend')
+  }
+
+  @SubscribeMessage('declineFriendRequest')
+  async deleteNotif(client: Socket, data: Notif) {
+    console.log('decline friend event')
+    /*console.log('from', data.from)
+    console.log('to', data.to)*/
+
+    await this.notifService.deleteNotif(data);
   }
 
   @SubscribeMessage('deleteFriend')
