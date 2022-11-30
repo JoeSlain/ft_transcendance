@@ -1,8 +1,8 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 
-@WebSocketGateway({
+@WebSocketGateway(3003, {
   cors: {
-    origin: process.env.FRONT_URL,
+    origin: 'http://localhost:3000',
   },
   namespace: 'game',
 })
