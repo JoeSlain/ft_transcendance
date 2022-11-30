@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 import Popup from 'reactjs-popup';
 import '../styles/notif.css';
-import { SocketContext } from '../context/socketContext';
+import { ChatContext } from '../context/socketContext';
 import { Modal } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 
 const Notif = ({ notifs, setNotifs }) => {
-    const socket = useContext(SocketContext);
+    const socket = useContext(ChatContext);
     const notif = notifs[0];
 
     const handleAccept = () => {

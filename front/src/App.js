@@ -2,7 +2,7 @@ import './App.css';
 import './styles/pages.css'
 //import './styles/notif.css'
 
-import { SocketContext } from './context/socketContext'
+import { ChatContext, GameContext } from './context/socketContext'
 import ProtectedRoute from './components/protectedRoute'
 import { useState, useEffect, useContext } from 'react'
 import {
@@ -30,25 +30,21 @@ function App() {
   const [notif, setNotif] = useState(null)
   const [notifs, setNotifs] = useState([])
   const navigate = useNavigate()
-  const socket = useContext(SocketContext)
+  const chatSocket = useContext(ChatContext)
+  const gameSocket = useContext(GameContext)
 
   useEffect(() => {
-    socket.on('connected', () => {
+    chatSocket.on('connected', () => {
       if (user) {
-        console.log('emiting login')
-        socket.emit('login', {
+        chatSocket.emit('login', {
           user: user,
-          socketId: socket.id,
+          socketId: chatSocket.id,
           status: 'online'
         })
-        console.log('emit new client')
-        console.log(user)
       }
-      console.log('on connected')
-      console.log('socket id', socket.id)
     })
 
-    socket.on('loggedIn', data => {
+    chatSocket.on('loggedIn', data => {
       console.log('loggedIn')
       axios
         .get('http://localhost:3001/api/users/notifs', {
@@ -64,8 +60,8 @@ function App() {
     })
 
     return () => {
-      socket.off('connected')
-      socket.off('loggedIn')
+      chatSocket.off('connected')
+      chatSocket.off('loggedIn')
     }
   }, [])
 

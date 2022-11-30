@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom'
-import { SocketContext } from "../context/socketContext";
+import { ChatContext } from "../context/socketContext";
 import { getSocketId, getStorageItem, getUserId, saveStorageItem } from "../storage/localStorage";
 
 const LoginPage = ({ user, setUser }) => {
     const navigate = useNavigate();
-    const socket = useContext(SocketContext);
+    const socket = useContext(ChatContext);
     const [devlog, setDevLog] = useState(false)
     const [username, setUsername] = useState('')
 

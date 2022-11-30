@@ -1,6 +1,8 @@
 import { createContext } from 'react'
 import socketio from 'socket.io-client'
-import { getStorageItem } from '../storage/localStorage';
 
-export const socket = socketio('http://localhost:3002/chat')
-export const SocketContext = createContext();
+export const chatSocket = socketio('http://localhost:3002/chat')
+export const gameSocket = socketio('http://localhost:3003/game')
+
+export const ChatContext = createContext();
+export const GameContext = createContext();

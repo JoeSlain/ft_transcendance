@@ -2,13 +2,13 @@ import axios from 'axios'
 import { useContext, useState } from 'react'
 import ReactCodeInput from 'react-code-input'
 import { useNavigate } from 'react-router-dom'
-import { SocketContext } from '../context/socketContext'
+import { ChatContext } from '../context/socketContext'
 import { getStorageItem, getUserId, saveStorageItem } from '../storage/localStorage'
 
 const TwoFa = ({user, setUser}) => {
     const [code, setCode] = useState('');
     const navigate = useNavigate();
-    const socket = useContext(SocketContext);
+    const socket = useContext(ChatContext);
 
     const getCode = (code) => {
         console.log(code)

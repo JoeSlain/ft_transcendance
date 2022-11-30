@@ -2,11 +2,11 @@ import axios from "axios"
 import { useParams } from 'react-router-dom'
 import { useContext, useEffect, useState } from "react"
 import { Navigate } from 'react-router-dom'
-import { SocketContext } from "../context/socketContext"
+import { ChatContext } from "../context/socketContext"
 
 const ProfilePage = ({ user, setUser }) => {
     const [url, setUrl] = useState('')
-    const socket = useContext(SocketContext);
+    const socket = useContext(ChatContext);
     const params = useParams();
 
     return (

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { ContextMenu } from '../styles/menus'
-import { SocketContext } from '../context/socketContext'
+import { ChatContext } from '../context/socketContext'
 import axios from 'axios'
 
 import UserEntry from '../components/userEntry'
@@ -11,7 +11,7 @@ const Friend = ({ me, setNotifs }) => {
     const [show, setShow] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [clicked, setClicked] = useState({})
-    const socket = useContext(SocketContext);
+    const socket = useContext(ChatContext);
 
     useEffect(() => {
         const handleClick = () => setShow(false)

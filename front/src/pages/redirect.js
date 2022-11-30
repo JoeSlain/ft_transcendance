@@ -1,12 +1,12 @@
 import {useContext, useEffect} from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router'
-import { SocketContext } from '../context/socketContext'
+import { ChatContext } from '../context/socketContext'
 import { getUserId, saveStorageItem } from '../storage/localStorage'
 
 const Redirect = ({ user, setUser }) => {
     const navigate = useNavigate()
-    const socket = useContext(SocketContext)
+    const socket = useContext(ChatContext)
 
     useEffect(() => {
         axios

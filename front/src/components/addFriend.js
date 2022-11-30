@@ -1,10 +1,10 @@
 import axios from 'axios'
 import {useContext, useEffect, useState} from 'react'
-import { SocketContext } from '../context/socketContext'
+import { ChatContext } from '../context/socketContext'
 
 const AddFriend = ({me, friends, setFriends}) => {
     const [name, setName] = useState('')
-    const socket = useContext(SocketContext)
+    const socket = useContext(ChatContext)
 
     console.log('friends in addfriend', friends)
 

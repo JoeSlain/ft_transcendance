@@ -2,11 +2,11 @@ import "../styles/navbar.css";
 import { NavLink, Navigate } from 'react-router-dom';
 import axios from "axios";
 import { useContext, useState } from 'react';
-import { SocketContext } from "../context/socketContext";
+import { ChatContext } from "../context/socketContext";
 import { saveStorageItem } from "../storage/localStorage";
 
 const Navbar = ({ user, setUser }) => {
-    const socket = useContext(SocketContext)
+    const socket = useContext(ChatContext)
 
     const handleLogout = () => {
         socket.emit('logout', {
