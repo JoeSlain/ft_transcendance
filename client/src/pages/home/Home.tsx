@@ -2,8 +2,13 @@ import "../../styles/Home.css";
 import "../../styles/global.css";
 import "../../styles/contact.css";
 import Contact from "../../components/contact/contact";
+import React from "react";
+import Auth from "../../hooks/Auth";
 
 export default function Home() {
+  const isLogged = React.useContext(Auth)
+  console.log('isLogged', isLogged)
+  
   return (
     <div className="center">
       <div className="container">

@@ -17,6 +17,7 @@ import axios from "axios";
 import { userType } from "./types/userType";
 import Profile from "./pages/profil/Profile";
 import { Navigate } from "react-router-dom";
+import Redirect from "./pages/login/Redirect";
 
 export default function Router() {
     const [isLogged, setIsLogged] = React.useState(VerifLogged);
@@ -35,6 +36,8 @@ export default function Router() {
             n_lose: 0,
             date_of_sign: new Date()
         });
+
+        /*
     useEffect(() => {
         axios(`http://localhost:3001/api/users`, {withCredentials: true})
         .then((res) =>
@@ -43,7 +46,7 @@ export default function Router() {
           setUser(res.data);
         })
         .catch((e) => {console.log("User not found " + e);});
-      }, []);
+      }, []);*/
 
     
     {
@@ -54,6 +57,7 @@ export default function Router() {
                     <Routes>
                         <Route path="/" element={ isLogged ? <Home /> : <Navigate to='/login' />}/>
                         <Route path="/login" element={<Login />} />
+                        <Route path="/login/redirect" element={<Redirect setIsLogged={setIsLogged}/> } />
                         <Route path="/home" element={ isLogged ? <Home />: <Navigate to='/login' />} />
                         <Route path="/play" element={ isLogged ? <Play />: <Navigate to='/login' />} />
                         <Route path="/games" element={ isLogged ? <Games />: <Navigate to='/login' />} />
