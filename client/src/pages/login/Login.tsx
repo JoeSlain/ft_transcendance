@@ -4,7 +4,7 @@ import React from "react";
 
 export function VerifLogged()
 {
-    return true;
+    return false;
 }
 
 export default function Login() {

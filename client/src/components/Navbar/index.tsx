@@ -6,8 +6,6 @@ import Login, { VerifLogged } from "../../pages/login/Login";
 
 export default function Navbar()
 {
-  const [isLogged] = React.useState(VerifLogged);
-  if(isLogged){
       return (
           <>
           <nav className="navigation">
@@ -33,10 +31,5 @@ export default function Navbar()
               </div>
           </nav>
         </>
-      );}
-      else{
-          return (
-            <Login />
-          );
-  }
+      );
 }

@@ -8,7 +8,7 @@ import { userType } from '../../types/userType';
 
 export default function MyProfile(): JSX.Element
 {
-  const {user} = useContext(User)
+  const user = useContext(User)
   const [qrcode, setQrCode] = useState('');
   const [code, setCode] = useState();
   const [enabled, setEnabled] = useState(user.isTwoFactorAuthenticationEnabled);

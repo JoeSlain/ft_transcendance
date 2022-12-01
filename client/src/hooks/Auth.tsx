@@ -1,7 +1,5 @@
 import React from "react";
 
 
-export default React.createContext({
-	  isLogged: false
-});
+export default React.createContext(false);
 

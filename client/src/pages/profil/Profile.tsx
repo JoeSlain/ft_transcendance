@@ -10,7 +10,7 @@ import User from "../../hooks/User";
 
 export default function Profile()
 {
-    const {user} = useContext(User)
+    const user = useContext(User)
     const { id } = useParams();
     console.log('id is ' + id);
     const [userProfile, setUserProfile] = useState<userType>({
