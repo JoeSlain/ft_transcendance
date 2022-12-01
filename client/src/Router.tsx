@@ -18,59 +18,48 @@ import { userType } from "./types/userType";
 import Profile from "./pages/profil/Profile";
 import { Navigate } from "react-router-dom";
 import Redirect from "./pages/login/Redirect";
+import User from "./hooks/User";
 
 export default function Router() {
     const [isLogged, setIsLogged] = React.useState(VerifLogged);
+    const [user, setUser] = useState<userType>({
+        id: 0,
+        username: "",
+        email: "",
+        twoFactorAuthenticationSecret: "",
+        isTwoFactorAuthenticationEnabled: false,
+        id42: 0,
+        winratio: "",
+        profile_pic: "",
+        elo: 0,
+        n_win: 0,
+        n_lose: 0,
+        date_of_sign: new Date()
+    });
 
-        const [user, setUser] = useState<userType>({
-            id: 0,
-            username: "",
-            email: "",
-            twoFactorAuthenticationSecret: "",
-            isTwoFactorAuthenticationEnabled: false,
-            id42: 0,
-            winratio: "",
-            profile_pic: "",
-            elo: 0,
-            n_win: 0,
-            n_lose: 0,
-            date_of_sign: new Date()
-        });
-
-        /*
-    useEffect(() => {
-        axios(`http://localhost:3001/api/users`, {withCredentials: true})
-        .then((res) =>
-        {
-          console.log("User found: " + res.data.username);
-          setUser(res.data);
-        })
-        .catch((e) => {console.log("User not found " + e);});
-      }, []);*/
-
-    
     {
         return (
             <Auth.Provider value={{ isLogged }}>
-               <AuthRoute/>
+                <User.Provider value={{user}}>
+                    <AuthRoute />
                     <Navbar />
                     <Routes>
-                        <Route path="/" element={ isLogged ? <Home /> : <Navigate to='/login' />}/>
+                        <Route path="/" element={isLogged ? <Home /> : <Navigate to='/login' />} />
                         <Route path="/login" element={<Login />} />
-                        <Route path="/login/redirect" element={<Redirect setIsLogged={setIsLogged}/> } />
-                        <Route path="/home" element={ isLogged ? <Home />: <Navigate to='/login' />} />
-                        <Route path="/play" element={ isLogged ? <Play />: <Navigate to='/login' />} />
-                        <Route path="/games" element={ isLogged ? <Games />: <Navigate to='/login' />} />
-                        <Route path="profile" element={ isLogged ? <ProfileNavbar/>: <Navigate to='/login' />}>   
-                            <Route index element={ isLogged ? <MyProfile {...user}/>: <Navigate to='/login' />}/>
-                            <Route path="stats" element={ isLogged ? <Stats />: <Navigate to='/login' />} />
-                            <Route path="history" element={ isLogged ? <History/>: <Navigate to='/login' />} />
-                            <Route path=":id" element={ isLogged ? <Profile {...user}/>: <Navigate to='/login' />}/>
-                            <Route path="*" element={ isLogged ? <PageNotFound /> : <Navigate to='/login' />} />
+                        <Route path="/login/redirect" element={<Redirect setIsLogged={setIsLogged} setUser={setUser} />} />
+                        <Route path="/home" element={isLogged ? <Home /> : <Navigate to='/login' />} />
+                        <Route path="/play" element={isLogged ? <Play /> : <Navigate to='/login' />} />
+                        <Route path="/games" element={isLogged ? <Games /> : <Navigate to='/login' />} />
+                        <Route path="/profile" element={isLogged ? <ProfileNavbar /> : <Navigate to='/login' />}>
+                            <Route index element={isLogged ? <MyProfile /> : <Navigate to='/login' />} />
+                            <Route path="stats" element={isLogged ? <Stats /> : <Navigate to='/login' />} />
+                            <Route path="history" element={isLogged ? <History /> : <Navigate to='/login' />} />
+                            <Route path=":id" element={isLogged ? <Profile /> : <Navigate to='/login' />} />
+                            <Route path="*" element={isLogged ? <PageNotFound /> : <Navigate to='/login' />} />
                         </Route>
                         <Route path="*" element={<PageNotFound />} />
-    
                     </Routes>
+                </User.Provider>
             </Auth.Provider>
         );
     }

@@ -1,14 +1,16 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { userType } from "../../types/userType";
 import PageNotFound from "../404/404";
 import MyProfile from "./MyProfile";
 import "../../styles/global.css"
+import User from "../../hooks/User";
 
 
-export default function Profile(user : userType)
+export default function Profile()
 {
+    const {user} = useContext(User)
     const { id } = useParams();
     console.log('id is ' + id);
     const [userProfile, setUserProfile] = useState<userType>({
@@ -39,7 +41,7 @@ export default function Profile(user : userType)
     if (id === user.id.toString())
     {
         console.log("condition true");
-        return (<MyProfile {...user}/>);
+        return (<MyProfile />);
     }
     else if (userProfile.id === -1)
         return ( <h1 className="heightMinusNavProfile flex justify-center text-slate-200 text-8xl items-center">Profile not found.</h1>);

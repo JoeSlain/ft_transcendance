@@ -1,12 +1,14 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ReactCodeInput from 'react-code-input';
+import User from '../../hooks/User';
 import '../../styles/global.css';
 import "../../styles/profil.css";
 import { userType } from '../../types/userType';
 
-export default function MyProfile(user : userType): JSX.Element
+export default function MyProfile(): JSX.Element
 {
+  const {user} = useContext(User)
   const [qrcode, setQrCode] = useState('');
   const [code, setCode] = useState();
   const [enabled, setEnabled] = useState(user.isTwoFactorAuthenticationEnabled);
