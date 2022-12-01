@@ -5,13 +5,15 @@ import axios from 'axios'
 
 import UserEntry from '../components/userEntry'
 import AddFriend from '../components/addFriend'
+import { UserContext } from '../context/userContext'
 
-const Friend = ({ me, setNotifs }) => {
+const Friend = ({ setNotifs }) => {
     const [friends, setFriends] = useState([])
     const [show, setShow] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [clicked, setClicked] = useState({})
     const socket = useContext(ChatContext);
+    const me = useContext(UserContext);
 
     useEffect(() => {
         const handleClick = () => setShow(false)

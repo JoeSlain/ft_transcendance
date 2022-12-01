@@ -24,6 +24,7 @@ import Redirect from './pages/redirect'
 import Notif from './components/notif';
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
 import axios from 'axios';
+import { UserContext } from './context/userContext';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
@@ -54,9 +55,11 @@ function App() {
           setNotifs(response.data)
           console.log('notif', response.data)
         })
-      setUser(data)
-      saveStorageItem('user', data)
-      navigate('/profile')
+      if (!user) {
+        setUser(data)
+        saveStorageItem('user', data)
+        navigate('/profile')
+      }
     })
 
     return () => {
@@ -67,35 +70,37 @@ function App() {
 
   return (
     <div id="main">
-      <Navbar user={user} setUser={setUser} />
-      {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
-      {console.log('notifs', notifs)}
-      {notifs[0] && <Notif notifs={notifs} setNotifs={setNotifs} />}
+      <UserContext.Provider value={user}>
+        <Navbar user={user} setUser={setUser} />
+        {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
+        {console.log('notifs', notifs)}
+        {notifs[0] && <Notif notifs={notifs} setNotifs={setNotifs} />}
 
-      <div className='main'>
-        <div className='main-content'>
-          <Routes>
-            <Route path="/" element={<LoginPage user={user} setUser={setUser} />} />
-            <Route path="login" element={<LoginPage user={user} setUser={setUser} />} />
-            <Route path="login/2fa" element={<TwoFa user={user} setUser={setUser} />} />
-            <Route path="login/redirect" element={<Redirect user={user} setUser={setUser} />} />
+        <div className='main'>
+          <div className='main-content'>
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="login/2fa" element={<TwoFa />} />
+              <Route path="login/redirect" element={<Redirect />} />
 
-            <Route element={<ProtectedRoute user={user} />} >
-              <Route path="profile/:id" element={<ProfilePage user={user} setUser={setUser} />} />
-              <Route path="profile" element={<ProfilePage user={user} setUser={setUser} />} />
-              <Route path="params" element={<Params user={user} setUser={setUser} />} />
-              <Route path="play" element={<Play user={user} setUser={setUser} />} />
-              <Route path="games" element={<Games />} />
-              <Route path="chat" element={<Chat />} />
-            </Route>
-          </Routes>
-        </div>
-        {
-          user && <div className='aside'>
-            <Friend me={user} setNotifs={setNotifs} />
+              <Route element={<ProtectedRoute user={user} />} >
+                <Route path="profile/:id" element={<ProfilePage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="params" element={<Params />} />
+                <Route path="play" element={<Play />} />
+                <Route path="games" element={<Games />} />
+                <Route path="chat" element={<Chat />} />
+              </Route>
+            </Routes>
           </div>
-        }
-      </div>
+          {
+            user && <div className='aside'>
+              <Friend setNotifs={setNotifs} />
+            </div>
+          }
+        </div>
+      </UserContext.Provider>
     </div >
   );
 }

@@ -3,11 +3,9 @@ import { useContext, useState } from 'react'
 import ReactCodeInput from 'react-code-input'
 import { useNavigate } from 'react-router-dom'
 import { ChatContext } from '../context/socketContext'
-import { getStorageItem, getUserId, saveStorageItem } from '../storage/localStorage'
 
-const TwoFa = ({user, setUser}) => {
+const TwoFa = () => {
     const [code, setCode] = useState('');
-    const navigate = useNavigate();
     const socket = useContext(ChatContext);
 
     const getCode = (code) => {

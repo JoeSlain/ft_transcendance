@@ -1,10 +1,11 @@
 import '../styles/play.css'
 import '../styles/popup.css'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import Friend from './friend'
+import { UserContext } from '../context/userContext'
 
 const Play = () => {
-    const user = JSON.parse(localStorage.getItem('user'))
+    const user = useContext(UserContext)
 
     const searchOpponent = () => {
 
