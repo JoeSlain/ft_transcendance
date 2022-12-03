@@ -15,6 +15,20 @@ export class ChatService {
     private readonly authService: AuthService,
   ) { }
 
+  users: Map<number, string> = new Map();
+
+  addUser(id: number, socketId: string) {
+    this.users.set(id, socketId);
+  }
+
+  removeUser(id: number) {
+    this.users.delete(id);
+  }
+
+  getUser(id: number) {
+    return this.users.get(id);
+  }
+
   async getUserFromSocket(socket: Socket) {
     const cookie = socket.handshake.headers.cookie;
     console.log(cookie);

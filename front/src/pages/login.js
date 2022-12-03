@@ -22,11 +22,8 @@ const LoginPage = () => {
             }, { withCredentials: true })
             .then(response => {
                 console.log('dev login')
-                socket.userId = response.data.id
                 socket.emit('login', {
                     user: response.data,
-                    socketId: socket.id,
-                    status: 'online'
                 })
             })
     }

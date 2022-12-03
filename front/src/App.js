@@ -26,7 +26,6 @@ import Notif from './components/notif';
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
 import axios from 'axios';
 import { UserContext } from './context/userContext';
-import { StyledPopUp, StyledPopUpBackdrop } from './styles/popup';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
@@ -41,8 +40,6 @@ function App() {
       if (user) {
         chatSocket.emit('login', {
           user: user,
-          socketId: chatSocket.id,
-          status: 'online'
         })
       }
     })

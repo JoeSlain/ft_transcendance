@@ -12,11 +12,8 @@ const Redirect = () => {
             })
             .then(response => {
                 console.log('getting profile from api')
-                socket.userId = response.data.id
                 socket.emit('login', {
                     user: response.data,
-                    socketId: socket.id,
-                    status: 'online'
                 })
             })
     }, [])

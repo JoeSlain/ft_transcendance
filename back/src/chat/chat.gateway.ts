@@ -1,4 +1,5 @@
 import { MessageBody, OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { map } from 'rxjs';
 import { Socket, Namespace } from 'socket.io';
 import { Notif, User } from 'src/database';
 import { NotifService } from 'src/users/notifs.service';
@@ -29,11 +30,11 @@ export class ChatGateway implements OnGatewayConnection {
   async connect(client: Socket, data: any) {
     console.log('chat ws login')
 
-    client.join(data.user.id);
-    data.user = await this.usersService.updateStatus(data.user.id, data.status, client.id);
+    this.chatService.addUser(data.user.id, client.id);
     if (data.user) {
+      data.status = 'online';
       client.broadcast.emit('updateStatus', data);
-      this.server.to(data.user.id).to(data.user.socketId).emit('loggedIn', data.user);
+      this.server.to(client.id).emit('loggedIn', data.user);
     }
     else
       console.log('error updating user status')
@@ -42,12 +43,33 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage('logout')
   async disconnect(client: Socket, data: any) {
     console.log('chat ws logout')
-    data.user = await this.usersService.updateStatus(data.user.id, data.status, client.id);
+    this.chatService.removeUser(data.user.id);
 
-    if (data.user)
+    if (data.user) {
+      data.status = 'offline';
       client.broadcast.emit('updateStatus', data);
+    }
     else
       console.log('error logging out')
+  }
+
+  @SubscribeMessage('getFriends')
+  async getFriends(client: Socket, data: any) {
+    const friends = await this.usersService.getFriends(data);
+    const map = new Map();
+
+    friends.forEach(friend => {
+      if (this.chatService.getUser(friend.id))
+        map.set(friend.id, 'online');
+      else
+        map.set(friend.id, 'offline');
+    })
+    const ret = {
+      friends: friends,
+      statuses: JSON.stringify(Array.from(map)),
+    }
+
+    this.server.to(client.id).emit('friends', ret)
   }
 
   @SubscribeMessage('notif')
@@ -60,8 +82,9 @@ export class ChatGateway implements OnGatewayConnection {
         return;
     }
     await this.notifService.createNotif(data);
-    if (data.to.status === 'online')
-      this.server.to(data.to.id).to(data.to.socketId).emit('notified', data);
+    const to = this.chatService.getUser(data.to.id);
+    if (to)
+      this.server.to(to).emit('notified', data);
   }
 
   @SubscribeMessage('acceptFriendRequest')
@@ -73,8 +96,10 @@ export class ChatGateway implements OnGatewayConnection {
     const newFriend = await this.usersService.addFriend(data.from, data.to);
     if (newFriend) {
       await this.notifService.deleteNotif(data);
-      this.server.to(data.from.id).to(data.from.socketId).emit('newFriend', data.to)
-      this.server.to(data.to.id).to(data.to.socketId).emit('newFriend', data.from)
+      const from = this.chatService.getUser(data.from.id);
+      if (from)
+        this.server.to(from).emit('newFriend', data.to)
+      this.server.to(client.id).emit('newFriend', data.from)
     }
     else
       console.log('error adding friend')
@@ -96,8 +121,10 @@ export class ChatGateway implements OnGatewayConnection {
     const user1 = await this.usersService.deleteFriend(data.from, data.to.id);
     const user2 = await this.usersService.deleteFriend(data.to, data.from.id)
     if (user1 && user2) {
-      this.server.to(data.from.id).to(data.from.socketId).emit('friendDeleted', data.to)
-      this.server.to(data.to.id).to(data.to.socketId).emit('friendDeleted', data.from)
+      const to = this.chatService.getUser(data.to.id);
+      if (to)
+        this.server.to(to).emit('friendDeleted', data.from)
+      this.server.to(client.id).emit('friendDeleted', data.to)
     }
     else
       console.log('error deleting friend')

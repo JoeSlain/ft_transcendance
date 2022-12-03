@@ -6,7 +6,7 @@ const AddFriend = ({me, friends, setFriends}) => {
     const [name, setName] = useState('')
     const socket = useContext(ChatContext)
 
-    console.log('friends in addfriend', friends)
+    //console.log('friends in addfriend', friends)
 
     /*useEffect(() => {
         socket.on('newFriend', friend => {
