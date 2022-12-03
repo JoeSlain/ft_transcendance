@@ -4,9 +4,11 @@ import axios from "axios";
 import { useContext, useState } from 'react';
 import { ChatContext } from "../context/socketContext";
 import { saveStorageItem } from "../storage/localStorage";
+import { UserContext } from "../context/userContext";
 
-const Navbar = ({ user, setUser }) => {
+const Navbar = ({ setUser }) => {
     const socket = useContext(ChatContext)
+    const user = useContext(UserContext)
 
     const handleLogout = () => {
         socket.emit('logout', {

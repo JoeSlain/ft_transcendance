@@ -1,5 +1,6 @@
 import './App.css';
 import './styles/pages.css'
+import './styles/popup.tsx'
 //import './styles/notif.css'
 
 import { ChatContext, GameContext } from './context/socketContext'
@@ -25,6 +26,7 @@ import Notif from './components/notif';
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
 import axios from 'axios';
 import { UserContext } from './context/userContext';
+import { StyledPopUp, StyledPopUpBackdrop } from './styles/popup';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
@@ -71,7 +73,7 @@ function App() {
   return (
     <div id="main">
       <UserContext.Provider value={user}>
-        <Navbar user={user} setUser={setUser} />
+        <Navbar setUser={setUser} />
         {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
         {console.log('notifs', notifs)}
         {notifs[0] && <Notif notifs={notifs} setNotifs={setNotifs} />}
@@ -84,7 +86,7 @@ function App() {
               <Route path="login/2fa" element={<TwoFa />} />
               <Route path="login/redirect" element={<Redirect />} />
 
-              <Route element={<ProtectedRoute user={user} />} >
+              <Route element={<ProtectedRoute />} >
                 <Route path="profile/:id" element={<ProfilePage />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="params" element={<Params />} />

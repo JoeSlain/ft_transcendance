@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import Popup from 'reactjs-popup';
 import '../styles/notif.css';
 import { ChatContext } from '../context/socketContext';
 import { Modal } from 'react-bootstrap';

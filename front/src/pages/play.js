@@ -1,5 +1,4 @@
 import '../styles/play.css'
-import '../styles/popup.css'
 import { useContext, useState } from 'react'
 import Friend from './friend'
 import { UserContext } from '../context/userContext'
