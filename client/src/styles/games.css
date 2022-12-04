@@ -1,0 +1,12 @@
+canvas{
+	border: 1px solid #ffc300;
+	background-color: rgb(0, 0, 0);
+
+}
+
+.game{
+	margin-top: 2%;
+	display: flex;
+	justify-content: center;
+}
+	

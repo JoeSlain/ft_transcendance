@@ -19,7 +19,12 @@ export default function Home() {
           <Contact/>
         </div>
       </div>
-    </div>
 
-  );
+    );
+  }
+  else {
+    return (
+      <Login />
+    );
+  }
 }
