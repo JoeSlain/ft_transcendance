@@ -29,8 +29,8 @@ import { UserContext } from './context/userContext';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
-  const [notif, setNotif] = useState(null)
   const [notifs, setNotifs] = useState([])
+  const [isLogged, setIsLogged] = useState(false)
   const navigate = useNavigate()
   const chatSocket = useContext(ChatContext)
   const gameSocket = useContext(GameContext)
@@ -52,13 +52,14 @@ function App() {
         })
         .then(response => {
           setNotifs(response.data)
-          console.log('notif', response.data)
+          if (!user) {
+            setUser(data)
+            saveStorageItem('user', data)
+            setIsLogged(true)
+            navigate('/profile')
+          }
+          setIsLogged(true)
         })
-      if (!user) {
-        setUser(data)
-        saveStorageItem('user', data)
-        navigate('/profile')
-      }
     })
 
     return () => {
@@ -70,10 +71,11 @@ function App() {
   return (
     <div id="main">
       <UserContext.Provider value={user}>
-        <Navbar setUser={setUser} />
-        {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
-        {console.log('notifs', notifs)}
-        {notifs[0] && <Notif notifs={notifs} setNotifs={setNotifs} />}
+        <Navbar setUser={setUser} setIsLogged={setIsLogged} />
+        {
+          isLogged && notifs[0] &&
+          <Notif notifs={notifs} setNotifs={setNotifs} />
+        }
 
         <div className='main'>
           <div className='main-content'>
@@ -94,7 +96,7 @@ function App() {
             </Routes>
           </div>
           {
-            user && <div className='aside'>
+            isLogged && <div className='aside'>
               <Friend setNotifs={setNotifs} />
             </div>
           }

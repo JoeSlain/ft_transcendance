@@ -4,9 +4,37 @@ import { ChatContext } from '../context/socketContext';
 import { Modal } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 
+const getNotif = (notif) => {
+    switch(notif.type) {
+        case 'Friend Request':
+            notif.body = `${notif.from.username} wants to be your friend`
+            notif.accept = 'Accept'
+            notif.decline = 'Decline'
+            notif.acceptEvent = 'acceptFriendRequest'
+            notif.declineEvent = 'declineFriendRequest'
+            break;
+        case 'Delete Friend':
+            notif.body = `Delete ${notif.to.username} from your friendlist ?`
+            notif.accept = 'Yes'
+            notif.decline = 'No'
+            notif.acceptEvent = 'deleteFriend'
+            break;
+        case 'Game Invite':
+            notif.body = `${notif.from.username} invited you to play a game`
+            notif.accept = 'Accept'
+            notif.decline = 'Decline'
+            /*notif.acceptEvent = 'acceptFriendRequest'
+            notif.declineEvent = 'declineFriendRequest'*/
+            break;
+        default:
+            break;
+    }
+    return notif;
+}
+
 const Notif = ({ notifs, setNotifs }) => {
     const socket = useContext(ChatContext);
-    const notif = notifs[0];
+    const notif = getNotif(notifs[0]);
 
     const handleAccept = () => {
         if (notif.acceptEvent !== undefined) {
@@ -39,7 +67,7 @@ const Notif = ({ notifs, setNotifs }) => {
             <div className='notif'>
                 <div className='header'>
                     <Modal.Title id='contained-modal-title-vcenter'>
-                        {notif.header}
+                        {notif.type}
                     </Modal.Title>
                 </div>
                 <div className='body'>

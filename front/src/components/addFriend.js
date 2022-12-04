@@ -6,30 +6,11 @@ const AddFriend = ({me, friends, setFriends}) => {
     const [name, setName] = useState('')
     const socket = useContext(ChatContext)
 
-    //console.log('friends in addfriend', friends)
-
-    /*useEffect(() => {
-        socket.on('newFriend', friend => {
-            console.log('newFriendEvent')
-            console.log('friends b4', friends)
-            setFriends(friends.concat(friend))
-            console.log('friends af', friends)
-        })
-        return () => {
-            socket.off('newFriend')
-        }
-    }, [])*/
-
     const notify = (user) => {
         const data = {
-            header: 'Friend Request',
-            body: `${me.username} wants to be your friend`,
-            accept: 'Accept',
-            decline: 'Decline',
+            type: 'Friend Request',
             from: me,
             to: user,
-            acceptEvent: 'acceptFriendRequest',
-            declineEvent: 'declineFriendRequest',
         }
         console.log('data', data)
         socket.emit('notif', data)
@@ -54,18 +35,6 @@ const AddFriend = ({me, friends, setFriends}) => {
                 if (response.data)
                     notify(response.data)
             })
-        /*axios
-            .post('http://localhost:3001/api/users/addFriend', { username: name }, {
-                withCredentials: true
-            })
-            .then(response => {
-                if (response.data) {
-                    setFriends(friends.concat(response.data))
-                    console.log('response', response.data)
-                }
-                else
-                    console.log('user not found')
-            })*/
         setName('')
     }
 

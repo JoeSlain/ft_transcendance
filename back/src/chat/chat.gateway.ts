@@ -5,6 +5,7 @@ import { Notif, User } from 'src/database';
 import { NotifService } from 'src/users/notifs.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
+import { NotifData } from '../utils/types';
 
 @WebSocketGateway(3002, {
   cors: {
@@ -25,7 +26,10 @@ export class ChatGateway implements OnGatewayConnection {
     client.emit('connected')
   }
 
-  // on connect new client
+  /* LOGIN
+  ** clientSocket.emit('login', me: User)
+  ** serverSocket.respond('loggedIn', me: User)
+  */
   @SubscribeMessage('login')
   async connect(client: Socket, data: any) {
     console.log('chat ws login')
@@ -40,6 +44,10 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('error updating user status')
   }
 
+  /* LOGOUT
+  ** clientSocket.emit('logout', me: User)
+  ** serverSocket.broadcast('updateStatus', me: User)
+  */
   @SubscribeMessage('logout')
   async disconnect(client: Socket, data: any) {
     console.log('chat ws logout')
@@ -53,8 +61,16 @@ export class ChatGateway implements OnGatewayConnection {
       console.log('error logging out')
   }
 
+  /* GET FRIENDS
+  ** clientSocket.emit('getFriends', me: User)
+  ** serverSocket.respond('friends', {
+      friends: Array<User>,
+      statuses: JSON string 
+      (use new Map(JSON.parse(data.statuses)) on client side)
+    })
+  */
   @SubscribeMessage('getFriends')
-  async getFriends(client: Socket, data: any) {
+  async getFriends(client: Socket, data: User) {
     const friends = await this.usersService.getFriends(data);
     const map = new Map();
 
@@ -72,11 +88,15 @@ export class ChatGateway implements OnGatewayConnection {
     this.server.to(client.id).emit('friends', ret)
   }
 
+  /* LOGOUT
+  ** clientSocket.emit('logout', notif: NotifData)
+  ** serverSocket.respondTo(notif.to)('notified', notif: Notif)
+  */
   @SubscribeMessage('notif')
-  async notify(client: Socket, data: any) {
+  async notify(client: Socket, data: NotifData) {
     console.log('chat websocket invite');
 
-    if (data.header === 'Friend Request') {
+    if (data.type === 'Friend Request') {
       const friend = await this.usersService.findFriend(data.from.id, data.to.id);
       if (friend.length)
         return;
@@ -88,7 +108,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('acceptFriendRequest')
-  async addFriend(client: Socket, data: any) {
+  async addFriend(client: Socket, data: NotifData) {
     console.log('addFriend event');
     console.log('from', data.from)
     console.log('to', data.to)
@@ -106,7 +126,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('declineFriendRequest')
-  async deleteNotif(client: Socket, data: Notif) {
+  async deleteNotif(client: Socket, data: NotifData) {
     console.log('decline friend event')
     /*console.log('from', data.from)
     console.log('to', data.to)*/
@@ -115,7 +135,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('deleteFriend')
-  async deleteFriend(client: Socket, data: any) {
+  async deleteFriend(client: Socket, data: NotifData) {
     console.log('deleteFriend event');
 
     const user1 = await this.usersService.deleteFriend(data.from, data.to.id);

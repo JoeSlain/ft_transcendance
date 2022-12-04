@@ -1,25 +1,43 @@
 import '../styles/play.css'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Friend from './friend'
 import { UserContext } from '../context/userContext'
+import { GameContext } from '../context/socketContext'
+import { getStorageItem } from '../storage/localStorage'
+import { Socket } from 'socket.io-client'
+import { saveStorageItem } from '../storage/localStorage'
 
 const Play = () => {
-    const user = useContext(UserContext)
+    const gameSocket = useContext(GameContext)
+    const me = useContext(UserContext)
+    const [room, setRoom] = useState(getStorageItem('room'))
+
+    useEffect(() => {
+        if (!room)
+            gameSocket.emit('createRoom', me)
+
+        gameSocket.on('createdRoom', data => {
+            setRoom(data)
+            saveStorageItem('room', data)
+        })
+
+        gameSocket.on('joinedRoom', data => {
+            setRoom(data)
+        })
+
+        return () => {
+            gameSocket.off('room created')
+            gameSocket.off('room joined')
+        }
+    }, [])
 
     const searchOpponent = () => {
 
     }
 
-    const invite = () => {
-
-    }
-
     return (
         <div className='play'>
-            <h1>PLAYERS</h1>
-            <p>
-                {user.username}
-            </p>
+            <h1>ROOM </h1>
 
             <div className='footer'>
                 <button onClick={searchOpponent}> Play </button>

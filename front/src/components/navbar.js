@@ -6,25 +6,24 @@ import { ChatContext } from "../context/socketContext";
 import { saveStorageItem } from "../storage/localStorage";
 import { UserContext } from "../context/userContext";
 
-const Navbar = ({ setUser }) => {
+const Navbar = ({ setUser, setIsLogged }) => {
     const socket = useContext(ChatContext)
     const user = useContext(UserContext)
 
     const handleLogout = () => {
-        socket.emit('logout', {
-            user: user,
-            socketId: socket.id,
-            status: 'offline'
-          })
         axios
             .post('http://localhost:3001/api/auth/logout', {}, {
                 withCredentials: true
             })
             .then(response => {
                 console.log(response.data)
+                socket.emit('logout', {
+                    user,
+                })
                 setUser(null)
+                setIsLogged(false)
+                saveStorageItem('user', null)
             })
-        saveStorageItem('user', null)
     }
 
     return (

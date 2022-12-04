@@ -11,13 +11,25 @@ export type UserDetails = {
     img_url: string;
 }
 
+/* NOTIF
+** header = [
+    'Friend Request',
+    'Game Invite',
+    'Delete Friend',
+    ]
+** acceptEvent = [
+    'acceptFriendRequest',
+    'acceptGameInvite',
+    ]
+** declineEvent = [
+    'declineFriendRequest',
+    'declineGameInvite',
+    null
+    ]
+*/
+
 export type NotifData = {
-    header: string,
-    body: string, 
-    accept: string,
-    decline: string,
+    type: string,
     from: User,
     to: User,
-    acceptEvent: string,
-    declineEvent?: string,
 }

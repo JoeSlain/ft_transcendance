@@ -30,21 +30,13 @@ const Friend = ({ setNotifs }) => {
             setFriends(data.friends)
             setStatuses(new Map(JSON.parse(data.statuses)))
         })
-        /*axios
-            .get('http://localhost:3001/api/users/friends', {
-                withCredentials: true
-            })
-            .then(response => {
-                setFriends(friends.concat(response.data))
-                console.log('friends in axios', response.data)
-            })*/
 
         // new friend
         socket.on('newFriend', data => {
             console.log('newFriendEvent')
-            console.log(`adding friend ${data}`)
+            console.log('adding friend', data)
             setFriends(prev => [...prev, data])
-            setStatuses(prev => new Map(prev.set(data, 'online')))
+            setStatuses(prev => new Map(prev.set(data.id, 'online')))
         })
 
         // update friend status
@@ -93,14 +85,9 @@ return () => {
 
 const handleInvite = (user) => {
     const data = {
-        header: 'Game Invite',
-        body: `${me.username} invited you to play a game`,
-        accept: 'Accept',
-        decline: 'Decline',
+        type: 'Game Invite',
         from: me,
         to: user,
-        acceptEvent: 'acceptInvite',
-        declineEvent: 'declineInvite',
     }
     console.log('data', data)
     socket.emit('notif', data)
@@ -108,13 +95,9 @@ const handleInvite = (user) => {
 
 const handleDelete = (user) => {
     const data = {
-        header: 'Delete friend',
-        body: `Remove ${user.username} from your friendlist ?`,
-        accept: 'Yes',
-        decline: 'No',
+        type: 'Delete Friend',
         from: me,
         to: user,
-        acceptEvent: 'deleteFriend'
     }
     setNotifs(prev => [...prev, data])
 }
