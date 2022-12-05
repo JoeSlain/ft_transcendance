@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Room } from 'src/utils/types';
+import { RoomService } from './room.service';
 
 @Injectable()
 export class GameService {
-    rooms: Map<number, Room> = new Map();
-
+    constructor (
+        private readonly roomService: RoomService,
+    ) {}
 
 }

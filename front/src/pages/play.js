@@ -42,6 +42,10 @@ const Play = () => {
             saveStorageItem('room', data)
         })
 
+        socket.on('joinedRoomFailure', data => {
+            console.log(`failed to join room : ${data}`)
+        })
+
         socket.on('joinedRoom', data => {
             setRoom(data)
         })

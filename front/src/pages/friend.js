@@ -55,86 +55,86 @@ const Friend = ({ setNotifs }) => {
             })
         })
 
-// notif received
-socket.on('notified', data => {
-    console.log('invitation received')
-    if (data.from.id !== me.id) {
-        console.log(`${data.from.username} invited you`)
-        console.log('accept event', data.acceptEvent)
-        console.log('decline event', data.declineEvent)
-        setNotifs(prev => [...prev, data])
-    }
-})
+        // notif received
+        socket.on('notified', data => {
+            console.log('invitation received')
+            if (data.from.id !== me.id) {
+                console.log(`${data.from.username} invited you`)
+                console.log('accept event', data.acceptEvent)
+                console.log('decline event', data.declineEvent)
+                setNotifs(prev => [...prev, data])
+            }
+        })
 
-// friend deleted
-socket.on('friendDeleted', data => {
-    console.log(`deleting ${data.username}`)
-    setFriends(prev => prev.filter(friend => friend.id !== data.id))
-})
+        // friend deleted
+        socket.on('friendDeleted', data => {
+            console.log(`deleting ${data.username}`)
+            setFriends(prev => prev.filter(friend => friend.id !== data.id))
+        })
 
-// unmount
-return () => {
-    window.removeEventListener('click', handleClick)
-    socket.off('friends')
-    socket.off('newFriend')
-    socket.off('updateStatus')
-    socket.off('notified')
-    socket.off('friendDeleted')
-}
+        // unmount
+        return () => {
+            window.removeEventListener('click', handleClick)
+            socket.off('friends')
+            socket.off('newFriend')
+            socket.off('updateStatus')
+            socket.off('notified')
+            socket.off('friendDeleted')
+        }
     }, [])
 
-const handleInvite = (user) => {
-    const data = {
-        type: 'Game Invite',
-        from: me,
-        to: user,
-    }
-    console.log('data', data)
-    socket.emit('notif', data)
-}
-
-const handleDelete = (user) => {
-    const data = {
-        type: 'Delete Friend',
-        from: me,
-        to: user,
-    }
-    setNotifs(prev => [...prev, data])
-}
-
-return (
-    <div>
-        <AddFriend
-            friends={friends}
-            setFriends={setFriends}
-            me={me}
-        />
-        {friends &&
-            <div className='userList'>
-                {friends.map(user =>
-                    <div key={user.username} onContextMenu={(e) => {
-                        e.preventDefault();
-                        console.log(`${user.username} clicked`)
-                        setShow(true)
-                        setPoints({ x: e.pageX, y: e.pageY })
-                        setClicked(user)
-                    }}>
-                        <UserEntry user={user} status={statuses.get(user.id)} show={show} />
-                    </div>
-                )}
-                {show && (
-                    <ContextMenu top={points.y} left={points.x}>
-                        <ul>
-                            <li onClick={() => handleInvite(clicked)}> Invite </li>
-                            <li> Block </li>
-                            <li onClick={() => handleDelete(clicked)}> Delete </li>
-                        </ul>
-                    </ContextMenu>
-                )}
-            </div>
+    const handleInvite = (user) => {
+        const data = {
+            type: 'Game Invite',
+            from: me,
+            to: user,
         }
-    </div>
-)
+        console.log('data', data)
+        socket.emit('notif', data)
+    }
+
+    const handleDelete = (user) => {
+        const data = {
+            type: 'Delete Friend',
+            from: me,
+            to: user,
+        }
+        setNotifs(prev => [...prev, data])
+    }
+
+    return (
+        <div>
+            <AddFriend
+                friends={friends}
+                setFriends={setFriends}
+                me={me}
+            />
+            {friends &&
+                <div className='userList'>
+                    {friends.map(user =>
+                        <div key={user.username} onContextMenu={(e) => {
+                            e.preventDefault();
+                            console.log(`${user.username} clicked`)
+                            setShow(true)
+                            setPoints({ x: e.pageX, y: e.pageY })
+                            setClicked(user)
+                        }}>
+                            <UserEntry user={user} status={statuses.get(user.id)} show={show} />
+                        </div>
+                    )}
+                    {show && (
+                        <ContextMenu top={points.y} left={points.x}>
+                            <ul>
+                                <li onClick={() => handleInvite(clicked)}> Invite </li>
+                                <li> Block </li>
+                                <li onClick={() => handleDelete(clicked)}> Delete </li>
+                            </ul>
+                        </ContextMenu>
+                    )}
+                </div>
+            }
+        </div>
+    )
 }
 
 export default Friend;

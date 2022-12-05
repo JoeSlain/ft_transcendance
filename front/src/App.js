@@ -1,9 +1,9 @@
+// styles
 import './App.css';
 import './styles/pages.css'
 import './styles/popup.tsx'
-//import './styles/notif.css'
 
-import { ChatContext, GameContext } from './context/socketContext'
+// react
 import ProtectedRoute from './components/protectedRoute'
 import { useState, useEffect, useContext } from 'react'
 import {
@@ -11,7 +11,9 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
+import axios from 'axios';
 
+// components
 import LoginPage from './pages/login'
 import ProfilePage from './pages/profile'
 import TwoFa from './pages/2fa'
@@ -24,8 +26,9 @@ import Friend from './pages/friend'
 import Redirect from './pages/redirect'
 import Notif from './components/notif';
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
-import axios from 'axios';
 import { UserContext } from './context/userContext';
+import { ChatContext, GameContext } from './context/socketContext'
+import logout from './components/logout';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
@@ -36,9 +39,13 @@ function App() {
   const gameSocket = useContext(GameContext)
 
   useEffect(() => {
-    chatSocket.on('connected', () => {
+    chatSocket.on('connect', () => {
       if (user)
         chatSocket.emit('login', user)
+    })
+
+    chatSocket.on('disconnect', () => {
+      logout(user, chatSocket, setUser, setIsLogged)
     })
 
     chatSocket.on('loggedIn', data => {
@@ -48,7 +55,6 @@ function App() {
           withCredentials: true
         })
         .then(response => {
-          setNotifs(response.data)
           if (!user) {
             setUser(data)
             saveStorageItem('user', data)
@@ -57,6 +63,7 @@ function App() {
           }
           console.log('user', data);
           setIsLogged(true)
+          setNotifs(response.data)
         })
     })
 

@@ -5,24 +5,11 @@ import { useContext, useState } from 'react';
 import { ChatContext } from "../context/socketContext";
 import { saveStorageItem } from "../storage/localStorage";
 import { UserContext } from "../context/userContext";
+import logout from "./logout";
 
 const Navbar = ({ setUser, setIsLogged }) => {
-    const socket = useContext(ChatContext)
     const user = useContext(UserContext)
-
-    const handleLogout = () => {
-        axios
-            .post('http://localhost:3001/api/auth/logout', {}, {
-                withCredentials: true
-            })
-            .then(response => {
-                console.log(response.data)
-                socket.emit('logout', user)
-                setUser(null)
-                setIsLogged(false)
-                saveStorageItem('user', null)
-            })
-    }
+    const socket = useContext(ChatContext)
 
     return (
         <nav className="navigation">
@@ -45,7 +32,7 @@ const Navbar = ({ setUser, setIsLogged }) => {
                         <NavLink className="navlink" to="/profile">Profile</NavLink>
                     </li>
                     <li>
-                        {user && <button onClick={handleLogout} > LogOut </button>}
+                        {user && <button onClick={() => logout(user, socket, setUser, setIsLogged)} > LogOut </button>}
                     </li>
                 </ul>
             </div>
