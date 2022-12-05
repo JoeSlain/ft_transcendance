@@ -17,9 +17,7 @@ const Navbar = ({ setUser, setIsLogged }) => {
             })
             .then(response => {
                 console.log(response.data)
-                socket.emit('logout', {
-                    user,
-                })
+                socket.emit('logout', user)
                 setUser(null)
                 setIsLogged(false)
                 saveStorageItem('user', null)

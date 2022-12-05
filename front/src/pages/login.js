@@ -22,9 +22,7 @@ const LoginPage = () => {
             }, { withCredentials: true })
             .then(response => {
                 console.log('dev login')
-                socket.emit('login', {
-                    user: response.data,
-                })
+                socket.emit('login', response.data)
             })
     }
 

@@ -37,11 +37,8 @@ function App() {
 
   useEffect(() => {
     chatSocket.on('connected', () => {
-      if (user) {
-        chatSocket.emit('login', {
-          user: user,
-        })
-      }
+      if (user)
+        chatSocket.emit('login', user)
     })
 
     chatSocket.on('loggedIn', data => {
@@ -58,6 +55,7 @@ function App() {
             setIsLogged(true)
             navigate('/profile')
           }
+          console.log('user', data);
           setIsLogged(true)
         })
     })

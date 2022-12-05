@@ -3,27 +3,21 @@ input {
 }
 
 .play {
-    text-align: center;
-}
-
-.aside {
-    width: 20%;
-    height: 600px;
-    box-shadow: 2px 2px 2px 2px rgba(0.23, 0.23, 0.23, 0.23);
-    text-align: center;
-}
-
-.form {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
 }
 
-.form_button {
-    background-color: white;
-    border-width: 1px;
-    color: green;
-    font-weight: bold;
+.playBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 30%;
 }
 
-.form_input {
-    width: 80%;
+.playerEntry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

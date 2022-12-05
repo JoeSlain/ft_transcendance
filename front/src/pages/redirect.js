@@ -1,4 +1,4 @@
-import {useContext, useEffect} from 'react'
+import { useContext, useEffect } from 'react'
 import axios from 'axios'
 import { ChatContext } from '../context/socketContext'
 
@@ -12,9 +12,7 @@ const Redirect = () => {
             })
             .then(response => {
                 console.log('getting profile from api')
-                socket.emit('login', {
-                    user: response.data,
-                })
+                socket.emit('login', response.data)
             })
     }, [])
 

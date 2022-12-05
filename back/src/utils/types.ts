@@ -11,25 +11,21 @@ export type UserDetails = {
     img_url: string;
 }
 
-/* NOTIF
-** header = [
-    'Friend Request',
-    'Game Invite',
-    'Delete Friend',
-    ]
-** acceptEvent = [
-    'acceptFriendRequest',
-    'acceptGameInvite',
-    ]
-** declineEvent = [
-    'declineFriendRequest',
-    'declineGameInvite',
-    null
-    ]
-*/
-
+// notif type
 export type NotifData = {
     type: string,
     from: User,
     to: User,
+}
+
+export type RoomUser = {
+    infos: User;
+    ready: boolean;
+}
+
+// room type
+export type Room = {
+    host: RoomUser;
+    guest: RoomUser;
+    spectators: Array<User>;
 }

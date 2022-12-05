@@ -22,7 +22,7 @@ export class ChatService {
   }
 
   removeUser(id: number) {
-    this.users.delete(id);
+    return this.users.delete(id);
   }
 
   getUser(id: number) {

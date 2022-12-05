@@ -23,9 +23,7 @@ const TwoFa = () => {
             })
             .then(response => {
                 console.log('2fa login')
-                socket.emit('login', {
-                    user: response.data,
-                })
+                socket.emit('login', response.data)
             })
     }
 
