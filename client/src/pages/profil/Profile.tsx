@@ -4,57 +4,43 @@ import { useParams } from "react-router-dom";
 import { userType } from "../../types/userType";
 import PageNotFound from "../404/404";
 import MyProfile from "./MyProfile";
-import "../../styles/global.css"
+import "../../styles/global.css";
 import User from "../../hooks/User";
+import { getUser } from "../../services/GetUser";
+import { useQuery } from "@tanstack/react-query";
 
+export default function Profile() {
+  const user = useContext(User);
+  const userId = useParams().id || "";
 
-export default function Profile()
-{
-    const user = useContext(User)
-    const { id } = useParams();
-    console.log('id is ' + id);
-    const [userProfile, setUserProfile] = useState<userType>({
-        id: 0,
-        username: "",
-        email: "",
-        twoFactorAuthenticationSecret: "",
-        isTwoFactorAuthenticationEnabled: false,
-        id42: 0,
-        winratio: "",
-        profile_pic: "",
-        elo: 0,
-        n_win: 0,
-        n_lose: 0,
-        date_of_sign: new Date()
-    });
-    useEffect(() => {
-        axios(`http://localhost:3001/api/users/userid/${id}`, {withCredentials: true})
-        .then((res) =>
-        {
-            console.log("Userid found: " + res.data.profile_pic);
-            setUserProfile(res.data);
-        })
-        .catch((e) => {console.log("User not found " + e);
-                setUserProfile({...userProfile, id : -1});
-        });
-        }, []);
-    if (id === user.id.toString())
-    {
-        console.log("condition true");
-        return (<MyProfile />);
-    }
-    else if (userProfile.id === -1)
-        return ( <h1 className="heightMinusNavProfile flex justify-center text-slate-200 text-8xl items-center">Profile not found.</h1>);
-    else if (userProfile.id === 0)
-    {
-        return(
-            <h1>Loading</h1>
-        );
-    }
-    else
+  
+  const { isLoading, error, data, isFetching } = useQuery({
+    queryKey: ["userData", userId],
+    queryFn: ({ queryKey }) => getUser(queryKey[1]),
+  });
+  if (userId === user.id.toString())
+  {
+    return <MyProfile/>
+  }
+  if (error)
     return (
-        <>
-            <h1 className="">USER ID {userProfile.id}</h1>
-        </>
+      <h1 className="heightMinusNavProfile flex justify-center text-slate-200 text-8xl items-center">
+        Profile not found.
+      </h1>
     );
+  if (isLoading) {
+    return <h1>Loading</h1>;
+  }
+  return <>
+      {data &&
+        <div className='profil flex flex-col items-center relative'>
+          <p className='text-slate-200'>Username</p>
+          <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
+            <img src={data.profile_pic} alt="Avatar" className='w-32 sm:w-64 avatar cursor-pointer rounded-full'/>
+          </label>
+
+        </div>
+    }
+    </>
+  
 }

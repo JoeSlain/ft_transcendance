@@ -1,4 +1,5 @@
-type userType = {
+
+export  type userType = {
     id: number;
     username: string;
     email: string;
@@ -13,5 +14,3 @@ type userType = {
     date_of_sign: Date;
     
 }
-
-export type {userType};

@@ -9,13 +9,9 @@ import Play from "./pages/play/Play";
 import Games from "./pages/games/Games";
 import ProfileNavbar from "./pages/profil/Navbar";
 import Login from "./pages/login/Login";
-import { VerifLogged } from "./pages/login/Login";
 import Auth from "./hooks/Auth";
 import PageNotFound from "./pages/404/404";
-import axios from "axios";
-import { userType } from "./types/userType";
 import Profile from "./pages/profil/Profile";
-import { Navigate } from "react-router-dom";
 import Redirect from "./pages/login/Redirect";
 import User from "./hooks/User";
 import AuthRoute from "./pages/login/AuthRoute";
@@ -27,7 +23,7 @@ export default function Router() {
 
     console.log('islogged', isLogged)
     {
-        return (
+        return (   
             <Auth.Provider value={isLogged}>
                 <User.Provider value={user}>
                     <Navbar />
