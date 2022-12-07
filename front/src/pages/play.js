@@ -28,26 +28,19 @@ const PlayerEntry = ({ player, ready, setReady }) => {
 
 const Play = () => {
     const socket = useContext(GameContext)
-    const me = useContext(UserContext)
+    const user = useContext(UserContext)
     const [hostReady, setHostReady] = useState(false)
     const [guestReady, setGuestReady] = useState(false)
     const [room, setRoom] = useState(getStorageItem('room'))
 
     useEffect(() => {
-        if (!room)
-            socket.emit('createRoom', me)
-
-        socket.on('createdRoom', data => {
-            setRoom(data)
-            saveStorageItem('room', data)
-        })
-
         socket.on('joinedRoomFailure', data => {
             console.log(`failed to join room : ${data}`)
         })
 
         socket.on('joinedRoom', data => {
             setRoom(data)
+            saveStorageItem('room', data)
         })
 
         return () => {

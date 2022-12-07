@@ -55,20 +55,27 @@ function App() {
           withCredentials: true
         })
         .then(response => {
-          if (!user) {
-            setUser(data)
-            saveStorageItem('user', data)
-            setIsLogged(true)
-            navigate('/profile')
-          }
-          console.log('user', data);
-          setIsLogged(true)
           setNotifs(response.data)
         })
+      if (!user) {
+        setUser(data)
+        saveStorageItem('user', data)
+        setIsLogged(true)
+        navigate('/profile')
+      }
+      if (!getStorageItem('room'))
+        gameSocket.emit('createRoom', data)
+      console.log('user', data);
+      setIsLogged(true)
+    })
+
+    gameSocket.on('createdRoom', data => {
+      saveStorageItem('room', data)
     })
 
     return () => {
-      chatSocket.off('connected')
+      chatSocket.off('connect')
+      chatSocket.off('disconnect')
       chatSocket.off('loggedIn')
     }
   }, [])
@@ -101,7 +108,7 @@ function App() {
             </Routes>
           </div>
           {
-            isLogged && <div className='aside'>
+            isLogged && user && <div className='aside'>
               <Friend setNotifs={setNotifs} />
             </div>
           }

@@ -38,9 +38,6 @@ export class RoomService {
 
     joinRoom(id: number, user: User) {
         console.log('join room')
-        if (this.findRoom(user.id))
-            return 'SUCCESS';
-
         const room = this.findRoom(id);
         this.rooms.forEach((key, value) => {
             console.log(key + '=' + value);
@@ -49,8 +46,10 @@ export class RoomService {
             return 'ROOM NOT FOUND';
         if (room.guest)
             return 'ROOM FULL';
+        console.log('joining room');
         room.guest = this.createRoomUser(user);
         this.rooms.set(user.id, room);
+        this.rooms.set(id, room);
         return 'SUCCESS';
     }
 
