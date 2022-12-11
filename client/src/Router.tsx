@@ -9,6 +9,7 @@ import Play from "./pages/play/Play";
 import Games from "./pages/games/Games";
 import ProfileNavbar from "./pages/profil/Navbar";
 import Login from "./pages/login/Login";
+import VerifLogged from "./pages/login/VerifLogged";
 import Auth from "./hooks/Auth";
 import PageNotFound from "./pages/404/404";
 import Profile from "./pages/profil/Profile";

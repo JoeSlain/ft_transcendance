@@ -2,7 +2,8 @@ import "../../styles/navbar.css";
 import React from "react";
 import { NavLink } from 'react-router-dom';
 import profile from "../../assets/user.png";
-import Login, { VerifLogged } from "../../pages/login/Login";
+import Login from "../../pages/login/Login";
+import VerifLogged from "../../pages/login/VerifLogged";
 
 export default function Navbar()
 {

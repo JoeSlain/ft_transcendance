@@ -1,6 +1,6 @@
 import "../../styles/Home.css";
 import "../../styles/global.css";
-import "../../styles/contact.css";
+
 import Contact from "../../components/contact/contact";
 import React from "react";
 import Auth from "../../hooks/Auth";
