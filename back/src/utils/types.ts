@@ -25,6 +25,7 @@ export type RoomUser = {
 
 // room type
 export type Room = {
+    id: string;
     host: RoomUser;
     guest: RoomUser;
     spectators: Array<User>;

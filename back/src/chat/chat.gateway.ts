@@ -61,6 +61,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.broadcast.emit('updateStatus', data);
     else
       console.log('error logging out')
+    this.server.to(client.id).emit('loggedOut');
   }
 
   /* GET FRIENDS

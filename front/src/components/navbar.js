@@ -32,7 +32,7 @@ const Navbar = ({ setUser, setIsLogged }) => {
                         <NavLink className="navlink" to="/profile">Profile</NavLink>
                     </li>
                     <li>
-                        {user && <button onClick={() => logout(user, socket, setUser, setIsLogged)} > LogOut </button>}
+                        {user && <button onClick={() => socket.emit('logout', user)} > LogOut </button>}
                     </li>
                 </ul>
             </div>

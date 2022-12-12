@@ -34,9 +34,12 @@ function App() {
   const [user, setUser] = useState(getStorageItem('user'))
   const [notifs, setNotifs] = useState([])
   const [isLogged, setIsLogged] = useState(false)
+  const [room, setRoom] = useState(getStorageItem('room'))
   const navigate = useNavigate()
   const chatSocket = useContext(ChatContext)
   const gameSocket = useContext(GameContext)
+
+  console.log('gameSocket id', gameSocket.id);
 
   useEffect(() => {
     chatSocket.on('connect', () => {
@@ -45,7 +48,27 @@ function App() {
     })
 
     chatSocket.on('disconnect', () => {
-      logout(user, chatSocket, setUser, setIsLogged)
+      //logout(user, chatSocket, setUser, setIsLogged)
+      chatSocket.emit('logout', user)
+    })
+
+    chatSocket.on('loggedOut', () => {
+      axios
+        .post('http://localhost:3001/api/auth/logout', {}, {
+          withCredentials: true
+        })
+        .then(() => {
+          if (room) {
+            const data = {
+              userId: user.id,
+              roomId: room.id,
+            }
+            gameSocket.emit('leaveRoom', data)
+          }
+          setUser(null)
+          setIsLogged(false)
+          saveStorageItem('user', null)
+        })
     })
 
     chatSocket.on('loggedIn', data => {
@@ -56,26 +79,55 @@ function App() {
         })
         .then(response => {
           setNotifs(response.data)
+          if (!user) {
+            console.log('user null');
+            setUser(data)
+            saveStorageItem('user', data)
+            setIsLogged(true)
+            navigate('/profile')
+          }
+          console.log('user', data);
+          setIsLogged(true)
         })
-      if (!user) {
-        setUser(data)
-        saveStorageItem('user', data)
-        setIsLogged(true)
-        navigate('/profile')
-      }
-      if (!getStorageItem('room'))
-        gameSocket.emit('createRoom', data)
-      console.log('user', data);
-      setIsLogged(true)
     })
 
-    gameSocket.on('createdRoom', data => {
+    gameSocket.on('joinedRoom', data => {
+      //if (!room && (data.host.infos.id === user.id || data.guest.infos.id === user.id))
+      if (!room)
+        gameSocket.emit('join', data.id, () => {
+          console.log('joined socket ok')
+        })
+      else if (room.id !== data.id) {
+        const data = {
+          userId: user.id,
+          roomId: room.id,
+        }
+        gameSocket.emit('leaveRoom', data)
+        gameSocket.emit('join', data.id, () => {
+          console.log('joined socket ok')
+        })
+      }
+      setRoom(room);
       saveStorageItem('room', data)
+      console.log('joined room socket')
+    })
+
+    gameSocket.on('leftRoom', (data) => {
+      console.log('leftroom')
+      if (data.userId === user.id) {
+        setRoom(null)
+        saveStorageItem('room', null)
+      }
+      else {
+        setRoom(data)
+        saveStorageItem('room', room)
+      }
     })
 
     return () => {
       chatSocket.off('connect')
       chatSocket.off('disconnect')
+      chatSocket.off('loggedOut')
       chatSocket.off('loggedIn')
     }
   }, [])
@@ -101,7 +153,7 @@ function App() {
                 <Route path="profile/:id" element={<ProfilePage />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="params" element={<Params />} />
-                <Route path="play" element={<Play />} />
+                <Route path="play" element={<Play room={room} setRoom={setRoom} />} />
                 <Route path="games" element={<Games />} />
                 <Route path="chat" element={<Chat />} />
               </Route>

@@ -1,59 +1,78 @@
 import { Injectable } from '@nestjs/common';
+import { string } from 'joi';
 import { User } from 'src/database';
 import { generateRandomId } from 'src/utils/functions';
 import { Room, RoomUser } from 'src/utils/types';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class RoomService {
-    rooms: Map<number, Room> = new Map();
+    rooms: Map<string, Room> = new Map();
 
-    createRoomUser(user: User) : RoomUser{
+    createRoomUser(user: User): RoomUser {
         return {
             infos: user,
             ready: false,
         };
     }
 
-    createRoom(user: User) {
+    createRoom(host: User, guest: User) {
         console.log('create room')
-        if (this.findRoom(user.id))
-            return null;
-
-        const newRoom = {
-            host: { 
-                infos: user,
+        const room = {
+            id: host.id.toString(),
+            host: {
+                infos: host,
                 ready: false
             },
-            guest: null,
-            spectators: null,
+            guest: {
+                infos: guest,
+                ready: false
+            },
+            spectators: [],
         };
+        this.rooms.set(room.id, room);
+        return room;
+    }
 
-        this.rooms.set(user.id, newRoom);
-        return newRoom;
+    addSpectator(user: User, room: Room) {
+        room.spectators.push(user);
+        this.rooms.set(room.id, room);
     }
 
     findRoom(id: number) {
-        return this.rooms.get(id);
+        return this.rooms.get(id.toString());
     }
 
-    joinRoom(id: number, user: User) {
+    joinRoom(host: User, guest: User) {
         console.log('join room')
-        const room = this.findRoom(id);
-        this.rooms.forEach((key, value) => {
-            console.log(key + '=' + value);
-        })
-        if (!room)
-            return 'ROOM NOT FOUND';
-        if (room.guest)
-            return 'ROOM FULL';
-        console.log('joining room');
-        room.guest = this.createRoomUser(user);
-        this.rooms.set(user.id, room);
-        this.rooms.set(id, room);
-        return 'SUCCESS';
+        let room = this.findRoom(host.id);
+        if (room !== undefined)
+            this.addSpectator(guest, room);
+        else {
+            /*this.rooms.forEach((value, key) => {
+                console.log(key + '=' + value);
+            })*/
+            room = this.createRoom(host, guest);
+        }
+        return room;
     }
 
-    leaveRoom(id: number) {
-        return this.rooms.delete(id);
+    leaveRoom(id: string, userId: number) {
+        const room = this.rooms.get(id);
+
+        if (room !== undefined) {
+            console.log('room found, leaving room')
+            if (room.host && room.host.infos.id === userId) {
+                room.host = room.guest;
+                room.guest = null;
+            }
+            else if (room.guest && room.guest.infos.id === userId)
+                room.guest = null;
+            else
+                room.spectators.filter(spectator => spectator.id !== userId)
+            this.rooms.set(room.id, room);
+            return (room);
+        }
+        return null;
     }
 }

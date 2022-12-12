@@ -8,4 +8,7 @@ export class GameService {
         private readonly roomService: RoomService,
     ) {}
 
+    users: Map<number, string> = new Map();
+
+    
 }

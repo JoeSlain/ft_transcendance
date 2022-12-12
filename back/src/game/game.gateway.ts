@@ -1,7 +1,8 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
 import { User } from 'src/database';
 import { NotifData } from 'src/utils/types';
+import { GameService } from './game.service';
 import { RoomService } from './room.service';
 
 @WebSocketGateway(3003, {
@@ -11,36 +12,48 @@ import { RoomService } from './room.service';
   namespace: 'game',
 })
 
-export class GameGateway {
+export class GameGateway{
   constructor (
     private readonly roomService: RoomService,
+    private readonly gameService: GameService,
   ) {}
 
   @WebSocketServer() server: Namespace;
 
-  @SubscribeMessage('createRoom')
-  createRoom(client: Socket, user: User) {
-    const room = this.roomService.createRoom(user);
+  @SubscribeMessage('login')
+  login(client: Socket, userId: number) {
+    this.gameService.users.set(userId, client.id);
+  }
 
-    console.log('room', room);
-    if (room) {
-      client.join(user.id.toString());
-      this.server.to(client.id).emit('createdRoom', room);
-    }
-    else
-      console.log('error creating room');
+  @SubscribeMessage('loggout')
+  logout(client: Socket, userId: number) {
+    this.gameService.users.delete(userId)
   }
 
   @SubscribeMessage('joinRoom')
   joinRoom(client: Socket, notif: NotifData) {
-    const joinStatus = this.roomService.joinRoom(notif.from.id, notif.to);
+    console.log('join event')
+    const room = this.roomService.joinRoom(notif.from, notif.to);
 
-    if (joinStatus !== 'SUCCESS')
-      this.server.to(client.id).emit('joinedRoomFailure', joinStatus);
+    this.server.emit('joinedRoom', room);
+  }
+
+  @SubscribeMessage('join')
+  join(client: Socket, roomId: string) {
+    client.join(roomId);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  leaveRoom(client: Socket, data: any) {
+    console.log('leave room event')
+    const room = this.roomService.leaveRoom(data.roomId, data.userId);
+
+    if (!room)
+      console.log('error leaving room')
     else {
-      const room = this.roomService.findRoom(notif.from.id);
-      console.log('room', room);
-      this.server.to(client.id).emit('joinedRoom', room);
+      console.log('room id', room.id)
+      this.server.to(room.id).emit('leftRoom', data);
+      client.leave(data.roomId);
     }
   }
 }

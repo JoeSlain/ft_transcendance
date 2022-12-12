@@ -9,9 +9,5 @@ export default function logout(user, socket, setUser, setIsLogged) {
         .then(response => {
             console.log(response.data)
             socket.emit('logout', user)
-            setUser(null)
-            setIsLogged(false)
-            saveStorageItem('room', null)
-            saveStorageItem('user', null)
         })
 }
