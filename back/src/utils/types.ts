@@ -11,13 +11,22 @@ export type UserDetails = {
     img_url: string;
 }
 
+// notif type
 export type NotifData = {
-    header: string,
-    body: string, 
-    accept: string,
-    decline: string,
+    type: string,
     from: User,
     to: User,
-    acceptEvent: string,
-    declineEvent?: string,
+}
+
+export type RoomUser = {
+    infos: User;
+    ready: boolean;
+}
+
+// room type
+export type Room = {
+    id: string;
+    host: RoomUser;
+    guest: RoomUser;
+    spectators: Array<User>;
 }

@@ -4,13 +4,14 @@ import socketio from "socket.io-client";
 import axios from 'axios'
 
 import { SocketContext } from '../context/socketContext'
+import { UserContext } from "../context/userContext";
 
 const ProtectedRoute = ({
-    user,
     redirectPath = '/login',
     children,
 }) => {
     const url = 'http://localhost:3002/chat'
+    const user = useContext(UserContext)
 
     if (!user) {
         return <Navigate to={redirectPath} replace />

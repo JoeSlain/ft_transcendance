@@ -4,7 +4,7 @@ import ReactCodeInput from 'react-code-input'
 import { Navigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 
-const Params = ({user, setUser}) => {
+const Params = () => {
     const [qrcode, setQrCode] = useState('');
     const [code, setCode] = useState('');
     const [url, setUrl] = useState('');

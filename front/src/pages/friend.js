@@ -5,47 +5,54 @@ import axios from 'axios'
 
 import UserEntry from '../components/userEntry'
 import AddFriend from '../components/addFriend'
+import { UserContext } from '../context/userContext'
 
-const Friend = ({ me, setNotifs }) => {
+const Friend = ({ setNotifs }) => {
     const [friends, setFriends] = useState([])
+    const [statuses, setStatuses] = useState(new Map())
     const [show, setShow] = useState(false)
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [clicked, setClicked] = useState({})
     const socket = useContext(ChatContext);
+    const me = useContext(UserContext);
 
     useEffect(() => {
         const handleClick = () => setShow(false)
+        socket.emit('getFriends', me);
 
         // window listener
         window.addEventListener('click', handleClick)
 
         // get friends
         console.log('get friends axios')
-        axios
-            .get('http://localhost:3001/api/users/friends', {
-                withCredentials: true
-            })
-            .then(response => {
-                setFriends(friends.concat(response.data))
-                console.log('friends in axios', response.data)
-            })
+        socket.on('friends', data => {
+            console.log('friends', data.friends)
+            setFriends(data.friends)
+            setStatuses(new Map(JSON.parse(data.statuses)))
+        })
 
         // new friend
         socket.on('newFriend', data => {
             console.log('newFriendEvent')
-            console.log(`adding friend ${data}`)
+            console.log('adding friend', data)
             setFriends(prev => [...prev, data])
+            setStatuses(prev => new Map(prev.set(data.id, 'online')))
         })
 
         // update friend status
         socket.on('updateStatus', data => {
             console.log('friend update', data.user)
-            setFriends(prev => prev.map(friend => {
-                if (friend.id === data.user.id && friend.status !== data.status) {
-                    return { ...friend, status: data.status }
+            console.log('statuses', statuses)
+            setStatuses(prev => {
+                if (prev.has(data.user.id)) {
+                    console.log('user found, changing status')
+                    return new Map(prev.set(data.user.id, data.status))
                 }
-                return friend
-            }))
+                else {
+                    console.log('user not found, status unchanged')
+                    return prev
+                }
+            })
         })
 
         // notif received
@@ -68,6 +75,7 @@ const Friend = ({ me, setNotifs }) => {
         // unmount
         return () => {
             window.removeEventListener('click', handleClick)
+            socket.off('friends')
             socket.off('newFriend')
             socket.off('updateStatus')
             socket.off('notified')
@@ -77,14 +85,9 @@ const Friend = ({ me, setNotifs }) => {
 
     const handleInvite = (user) => {
         const data = {
-            header: 'Game Invite',
-            body: `${me.username} invited you to play a game`,
-            accept: 'Accept',
-            decline: 'Decline',
+            type: 'Game Invite',
             from: me,
             to: user,
-            acceptEvent: 'acceptInvite',
-            declineEvent: 'declineInvite',
         }
         console.log('data', data)
         socket.emit('notif', data)
@@ -92,13 +95,9 @@ const Friend = ({ me, setNotifs }) => {
 
     const handleDelete = (user) => {
         const data = {
-            header: 'Delete friend',
-            body: `Remove ${user.username} from your friendlist ?`,
-            accept: 'Yes',
-            decline: 'No',
+            type: 'Delete Friend',
             from: me,
             to: user,
-            acceptEvent: 'deleteFriend'
         }
         setNotifs(prev => [...prev, data])
     }
@@ -120,7 +119,7 @@ const Friend = ({ me, setNotifs }) => {
                             setPoints({ x: e.pageX, y: e.pageY })
                             setClicked(user)
                         }}>
-                            <UserEntry user={user} show={show} />
+                            <UserEntry user={user} status={statuses.get(user.id)} show={show} />
                         </div>
                     )}
                     {show && (
