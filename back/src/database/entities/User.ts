@@ -39,12 +39,6 @@ export class User {
     @Column()
     date_of_sign: Date;
 
-    @Column({ default: 'offline'})
-    status: string;
-
-    @Column({ nullable: true })
-    socketId?: string;
-
     // relations
     @ManyToMany((type) => User, (user) => user.friends)
     @JoinTable()

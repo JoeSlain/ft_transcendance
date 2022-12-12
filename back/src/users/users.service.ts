@@ -63,7 +63,7 @@ export class UsersService {
         return null;
     }
 
-    async getFriends(user: User) {
+    async getFriends(user: User) : Promise<Array<User> | null> {
         const users = await this.usersRepository
             .query(
                 ` SELECT * 
@@ -111,11 +111,10 @@ export class UsersService {
         return null;
     }
 
-    async updateStatus(userId: number, newStatus: string, socketId: string) {
-        await this.usersRepository.update(userId, {
+    async updateStatus(userId: number, newStatus: string) {
+        /*await this.usersRepository.update(userId, {
             status: newStatus,
-            socketId
-        })
+        })*/
         const modifiedUser = await this.getById(userId);
         return modifiedUser;
     }

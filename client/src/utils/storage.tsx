@@ -1,7 +1,6 @@
 export function getSavedItem(key : string) : any{
     const saved = localStorage.getItem(key);
 
-    console.log('saved', saved)
     return saved ? JSON.parse(saved) : null;
 }
 

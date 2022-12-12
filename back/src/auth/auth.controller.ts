@@ -21,61 +21,55 @@ import { appendFile } from "fs";
 
 @Controller("auth")
 export class AuthController {
-  constructor(
-    private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
-    private readonly usersService: UsersService,
-    private readonly authService: AuthService
-  ) {}
+    constructor(
+        private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
+    ) { }
 
-  @Get("login")
-  @UseGuards(FortyTwoAuthGuard)
-  login() {
-    console.log("login");
-    return;
-  }
+    @Get('login')
+    @UseGuards(FortyTwoAuthGuard)
+    login() {
+        console.log('login')
+        return;
+    }
 
-  @Post("logout")
- // @UseGuards(TwoFactorGuard)
-  logout(@Req() req, @Res() res) {
-/*     const cookie = this.authService.getLogoutCookie();
+    @Post('logout')
+    @UseGuards(TwoFactorGuard)
+    logout(@Req() req) {
+        const cookie = this.authService.getLogoutCookie();
 
-    req.res.setHeader("Set-Cookie", cookie); */
-    console.log("logout");
-    req.logout(function (err) {
-      if (err) {
-        return err;
-      }
-     // res.redirect('http://localhost:3001/api/auth/login');
-    });
-  }
+        req.res.setHeader('Set-Cookie', cookie);
+        return;
+    }
 
-  @Get("redirect")
-  @UseGuards(FortyTwoAuthGuard)
-  async redirect(@Req() req, @Res() res) {
-    const accessTokenCookie = this.authService.getCookieWithJwtToken(
-      req.user.id
-    );
+    @Get('redirect')
+    @UseGuards(FortyTwoAuthGuard)
+    async redirect(@Req() req, @Res() res) {
+        const accessTokenCookie = this.authService.getCookieWithJwtToken(req.user.id);
 
-    console.log("redirect");
-    req.res.setHeader("Set-Cookie", [accessTokenCookie]);
-    if (req.user.isTwoFactorAuthenticationEnabled)
-      res.redirect(`http://localhost:3000/login/2fa`);
-    else res.redirect("http://localhost:3000/login/redirect");
-  }
+        console.log('redirect')
+        req.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        if (req.user.isTwoFactorAuthenticationEnabled)
+            res.redirect(`http://localhost:3000/login/2fa`);
+        else
+            res.redirect('http://localhost:3000/login/redirect');
+    }
 
-  // test for devs only
-  @UseGuards(LocalAuthenticationGuard)
-  @Post("devlog")
-  async devLogin(@Req() req, @Body() { username }) {
-    const user = await this.usersService.getByUsername(username);
+    // test for devs only
+    @UseGuards(LocalAuthenticationGuard)
+    @Post('devlog')
+    async devLogin(@Req() req, @Body() { username }) {
+        /*const user = await this.usersService.getByUsername(username);
 
-    /*console.log('devlogin')
+        console.log('devlogin')
         console.log('username', username)
-        console.log('user in dev log', user)
-        console.log(user)*/
-    if (user) {
-      const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);
-      req.res.setHeader("Set-Cookie", [accessTokenCookie]);
+        console.log('user in dev log', user)*/
+        if (req.user) {
+            const accessTokenCookie = this.authService.getCookieWithJwtToken(req.user.id);
+            req.res.setHeader('Set-Cookie', [accessTokenCookie]);
+        }
+        return req.user;
     }
     return user;
   }
