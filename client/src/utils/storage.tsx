@@ -7,3 +7,8 @@ export function getSavedItem(key : string) : any{
 export function saveItem(key: string, item: any) : void {
     localStorage.setItem(key, JSON.stringify(item));
 }
+
+export function deleteItem(key :string)
+{
+    localStorage.removeItem(key);
+}
