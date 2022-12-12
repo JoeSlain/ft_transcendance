@@ -7,22 +7,7 @@ export class Notif {
     id: number;
 
     @Column()
-    header: string;
-
-    @Column()
-    body: string;
-
-    @Column()
-    accept: string;
-
-    @Column()
-    decline: string;
-
-    @Column()
-    acceptEvent: string;
-
-    @Column({nullable: true})
-    declineEvent: string;
+    type: string;
 
     @ManyToOne(() => User)
     from: User;

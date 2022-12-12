@@ -1,8 +1,9 @@
+// styles
 import './App.css';
 import './styles/pages.css'
-//import './styles/notif.css'
+import './styles/popup.tsx'
 
-import { ChatContext, GameContext } from './context/socketContext'
+// react
 import ProtectedRoute from './components/protectedRoute'
 import { useState, useEffect, useContext } from 'react'
 import {
@@ -10,7 +11,9 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
+import axios from 'axios';
 
+// components
 import LoginPage from './pages/login'
 import ProfilePage from './pages/profile'
 import TwoFa from './pages/2fa'
@@ -23,25 +26,49 @@ import Friend from './pages/friend'
 import Redirect from './pages/redirect'
 import Notif from './components/notif';
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
-import axios from 'axios';
+import { UserContext } from './context/userContext';
+import { ChatContext, GameContext } from './context/socketContext'
+import logout from './components/logout';
 
 function App() {
   const [user, setUser] = useState(getStorageItem('user'))
-  const [notif, setNotif] = useState(null)
   const [notifs, setNotifs] = useState([])
+  const [isLogged, setIsLogged] = useState(false)
+  const [room, setRoom] = useState(getStorageItem('room'))
   const navigate = useNavigate()
   const chatSocket = useContext(ChatContext)
   const gameSocket = useContext(GameContext)
 
+  console.log('gameSocket id', gameSocket.id);
+
   useEffect(() => {
-    chatSocket.on('connected', () => {
-      if (user) {
-        chatSocket.emit('login', {
-          user: user,
-          socketId: chatSocket.id,
-          status: 'online'
+    chatSocket.on('connect', () => {
+      if (user)
+        chatSocket.emit('login', user)
+    })
+
+    chatSocket.on('disconnect', () => {
+      //logout(user, chatSocket, setUser, setIsLogged)
+      chatSocket.emit('logout', user)
+    })
+
+    chatSocket.on('loggedOut', () => {
+      axios
+        .post('http://localhost:3001/api/auth/logout', {}, {
+          withCredentials: true
         })
-      }
+        .then(() => {
+          if (room) {
+            const data = {
+              userId: user.id,
+              roomId: room.id,
+            }
+            gameSocket.emit('leaveRoom', data)
+          }
+          setUser(null)
+          setIsLogged(false)
+          saveStorageItem('user', null)
+        })
     })
 
     chatSocket.on('loggedIn', data => {
@@ -52,50 +79,93 @@ function App() {
         })
         .then(response => {
           setNotifs(response.data)
-          console.log('notif', response.data)
+          if (!user) {
+            console.log('user null');
+            setUser(data)
+            saveStorageItem('user', data)
+            setIsLogged(true)
+            navigate('/profile')
+          }
+          console.log('user', data);
+          setIsLogged(true)
         })
-      setUser(data)
-      saveStorageItem('user', data)
-      navigate('/profile')
+    })
+
+    gameSocket.on('joinedRoom', data => {
+      //if (!room && (data.host.infos.id === user.id || data.guest.infos.id === user.id))
+      if (!room)
+        gameSocket.emit('join', data.id, () => {
+          console.log('joined socket ok')
+        })
+      else if (room.id !== data.id) {
+        const data = {
+          userId: user.id,
+          roomId: room.id,
+        }
+        gameSocket.emit('leaveRoom', data)
+        gameSocket.emit('join', data.id, () => {
+          console.log('joined socket ok')
+        })
+      }
+      setRoom(room);
+      saveStorageItem('room', data)
+      console.log('joined room socket')
+    })
+
+    gameSocket.on('leftRoom', (data) => {
+      console.log('leftroom')
+      if (data.userId === user.id) {
+        setRoom(null)
+        saveStorageItem('room', null)
+      }
+      else {
+        setRoom(data)
+        saveStorageItem('room', room)
+      }
     })
 
     return () => {
-      chatSocket.off('connected')
+      chatSocket.off('connect')
+      chatSocket.off('disconnect')
+      chatSocket.off('loggedOut')
       chatSocket.off('loggedIn')
     }
   }, [])
 
   return (
     <div id="main">
-      <Navbar user={user} setUser={setUser} />
-      {/*notif && <Notif notif={notif} setNotif={setNotif} />*/}
-      {console.log('notifs', notifs)}
-      {notifs[0] && <Notif notifs={notifs} setNotifs={setNotifs} />}
-
-      <div className='main'>
-        <div className='main-content'>
-          <Routes>
-            <Route path="/" element={<LoginPage user={user} setUser={setUser} />} />
-            <Route path="login" element={<LoginPage user={user} setUser={setUser} />} />
-            <Route path="login/2fa" element={<TwoFa user={user} setUser={setUser} />} />
-            <Route path="login/redirect" element={<Redirect user={user} setUser={setUser} />} />
-
-            <Route element={<ProtectedRoute user={user} />} >
-              <Route path="profile/:id" element={<ProfilePage user={user} setUser={setUser} />} />
-              <Route path="profile" element={<ProfilePage user={user} setUser={setUser} />} />
-              <Route path="params" element={<Params user={user} setUser={setUser} />} />
-              <Route path="play" element={<Play user={user} setUser={setUser} />} />
-              <Route path="games" element={<Games />} />
-              <Route path="chat" element={<Chat />} />
-            </Route>
-          </Routes>
-        </div>
+      <UserContext.Provider value={user}>
+        <Navbar setUser={setUser} setIsLogged={setIsLogged} />
         {
-          user && <div className='aside'>
-            <Friend me={user} setNotifs={setNotifs} />
-          </div>
+          isLogged && notifs[0] &&
+          <Notif notifs={notifs} setNotifs={setNotifs} />
         }
-      </div>
+
+        <div className='main'>
+          <div className='main-content'>
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="login/2fa" element={<TwoFa />} />
+              <Route path="login/redirect" element={<Redirect />} />
+
+              <Route element={<ProtectedRoute />} >
+                <Route path="profile/:id" element={<ProfilePage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="params" element={<Params />} />
+                <Route path="play" element={<Play room={room} setRoom={setRoom} />} />
+                <Route path="games" element={<Games />} />
+                <Route path="chat" element={<Chat />} />
+              </Route>
+            </Routes>
+          </div>
+          {
+            isLogged && user && <div className='aside'>
+              <Friend setNotifs={setNotifs} />
+            </div>
+          }
+        </div>
+      </UserContext.Provider>
     </div >
   );
 }

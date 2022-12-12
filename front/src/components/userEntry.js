@@ -1,7 +1,7 @@
 import '../styles/userEntries.css'
-import { StatusStyle } from '../styles/menus'
+import { FriendStatusStyle } from '../styles/statuses'
 
-const UserEntry = ({ user }) => {
+const UserEntry = ({ user, status }) => {
     const colors = {
         offline: 'grey',
         online: 'green',
@@ -15,7 +15,7 @@ const UserEntry = ({ user }) => {
                 {user.username}
             </div>
             <div className='status'>
-                <StatusStyle color={colors[user.status]}> `` </StatusStyle>
+                <FriendStatusStyle color={colors[status]}> `` </FriendStatusStyle>
             </div>
         </div>
     )

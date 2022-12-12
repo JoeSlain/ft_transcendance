@@ -3,11 +3,9 @@ import { useContext, useState } from 'react'
 import ReactCodeInput from 'react-code-input'
 import { useNavigate } from 'react-router-dom'
 import { ChatContext } from '../context/socketContext'
-import { getStorageItem, getUserId, saveStorageItem } from '../storage/localStorage'
 
-const TwoFa = ({user, setUser}) => {
+const TwoFa = () => {
     const [code, setCode] = useState('');
-    const navigate = useNavigate();
     const socket = useContext(ChatContext);
 
     const getCode = (code) => {
@@ -25,12 +23,7 @@ const TwoFa = ({user, setUser}) => {
             })
             .then(response => {
                 console.log('2fa login')
-                socket.userId = response.data.id
-                socket.emit('login', {
-                    user: response.data,
-                    socketId: socket.id,
-                    status: 'online'
-                })
+                socket.emit('login', response.data)
             })
     }
 

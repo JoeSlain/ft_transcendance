@@ -47,17 +47,16 @@ export class AuthController {
     @UseGuards(LocalAuthenticationGuard)
     @Post('devlog')
     async devLogin(@Req() req, @Body() { username }) {
-        const user = await this.usersService.getByUsername(username);
+        /*const user = await this.usersService.getByUsername(username);
 
-        /*console.log('devlogin')
+        console.log('devlogin')
         console.log('username', username)
-        console.log('user in dev log', user)
-        console.log(user)*/
-        if (user) {
-            const accessTokenCookie = this.authService.getCookieWithJwtToken(user.id);
+        console.log('user in dev log', user)*/
+        if (req.user) {
+            const accessTokenCookie = this.authService.getCookieWithJwtToken(req.user.id);
             req.res.setHeader('Set-Cookie', [accessTokenCookie]);
         }
-        return user;
+        return req.user;
     }
 
     @Post('2fa/generate')

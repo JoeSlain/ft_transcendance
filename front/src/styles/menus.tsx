@@ -5,21 +5,6 @@ type ContextMenuProps = {
     left: number;
 };
 
-type StatusProps = {
-    color: string;
-}
-
-export const StatusStyle = styled.div<StatusProps>`
-    width: 10px;
-    height: 10px;
-    margin: 5px 0px 0px 5px;
-    border-radius: 50%;
-    ${({color}) => css`
-        color: ${color};
-        background-color: ${color};
-    `}
-`
-
 export const ContextMenu = styled.div<ContextMenuProps>`
     border-radius: 4px;
     box-sizing: border-box;

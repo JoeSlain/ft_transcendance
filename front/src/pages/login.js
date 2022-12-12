@@ -1,11 +1,8 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom'
+import { useContext, useState } from "react";
 import { ChatContext } from "../context/socketContext";
-import { getSocketId, getStorageItem, getUserId, saveStorageItem } from "../storage/localStorage";
 
-const LoginPage = ({ user, setUser }) => {
-    const navigate = useNavigate();
+const LoginPage = () => {
     const socket = useContext(ChatContext);
     const [devlog, setDevLog] = useState(false)
     const [username, setUsername] = useState('')
@@ -25,12 +22,8 @@ const LoginPage = ({ user, setUser }) => {
             }, { withCredentials: true })
             .then(response => {
                 console.log('dev login')
-                socket.userId = response.data.id
-                socket.emit('login', {
-                    user: response.data,
-                    socketId: socket.id,
-                    status: 'online'
-                })
+                console.log(response.data)
+                socket.emit('login', response.data)
             })
     }
 
