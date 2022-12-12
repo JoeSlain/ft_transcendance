@@ -10,7 +10,7 @@ export default function Profile() {
   const user = useContext(User);
   const userId = useParams().id || "";
 
-  const { isLoading, error, data, isFetching } = useQuery({
+  const { isLoading, error, data } = useQuery({
     queryKey: ["userData", userId],
     queryFn: ({ queryKey }) => getUser(queryKey[1]),
   });
@@ -35,12 +35,13 @@ export default function Profile() {
     <>
       {data && (
         <div className="profil flex flex-col items-center relative">
-          <p className="text-slate-200">Username</p>
+          <p className="text-slate-200">Username:</p>
+          <p className="text-slate-200">{data.username}</p>
           <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
             <img
               src={data.profile_pic}
               alt="Avatar"
-              className="w-32 sm:w-64 avatar rounded-full"
+              className="w-32 sm:w-64 rounded-full"
             />
           </label>
         </div>

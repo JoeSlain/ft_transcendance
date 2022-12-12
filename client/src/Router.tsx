@@ -28,7 +28,7 @@ export default function Router() {
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={user}>
-        <Navbar />
+        <Navbar userKey={"isLogged"} />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
@@ -42,13 +42,13 @@ export default function Router() {
             <Route path="/games" element={<Games />} />
             <Route path="/profile" element={<ProfileNavbar />}>
               <Route index element={<MyProfile />} />
+              <Route path=":id" element={<Profile />} />
               <Route path="stats" element={<Stats />} />
               <Route path="history" element={<History />} />
-              <Route path=":id" element={<Profile />} />
               <Route path="*" element={<PageNotFound />} />
             </Route>
+            <Route path="*" element={<PageNotFound />} />
           </Route>
-          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </User.Provider>
     </Auth.Provider>
