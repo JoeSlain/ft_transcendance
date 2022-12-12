@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from 'src/database';
 
 @Injectable()
@@ -118,4 +118,8 @@ export class UsersService {
         const modifiedUser = await this.getById(userId);
         return modifiedUser;
     }
+    async updateUser(user: User, newUser: User) {
+        await this.usersRepository.update()
+    }
 }
+
