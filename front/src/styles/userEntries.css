@@ -1,7 +1,7 @@
 .userEntry {
-    display: flex;
-    justify-content: center;
-    box-shadow: 2px 2px 2px 2px rgba(9, 9, 9, 0.23);
-    margin-top: 5px;
-    height: 20px;
+  display: flex;
+  justify-content: center;
+  box-shadow: 2px 2px 2px 2px rgba(9, 9, 9, 0.23);
+  margin-top: 5px;
+  height: 20px;
 }

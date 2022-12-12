@@ -4,12 +4,12 @@ import Login from "./Login";
 import Auth from "../../hooks/Auth";
 
 const AuthRoute: React.FC = () => {
-	const isLogged = useContext(Auth)
+  const isLogged = useContext(Auth);
 
-    if (!isLogged) {
-        return <Navigate to="/login" replace />
-    }
-    return <Outlet />
-}
+  if (!isLogged) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+};
 
 export default AuthRoute;

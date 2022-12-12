@@ -1,58 +1,61 @@
-import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Socket, Namespace } from 'socket.io';
-import { User } from 'src/database';
-import { NotifData } from 'src/utils/types';
-import { GameService } from './game.service';
-import { RoomService } from './room.service';
+import {
+  OnGatewayConnection,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from "@nestjs/websockets";
+import { Socket, Namespace } from "socket.io";
+import { User } from "src/database";
+import { NotifData } from "src/utils/types";
+import { GameService } from "./game.service";
+import { RoomService } from "./room.service";
 
 @WebSocketGateway(3003, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: "http://localhost:3000",
   },
-  namespace: 'game',
+  namespace: "game",
 })
-
-export class GameGateway{
-  constructor (
+export class GameGateway {
+  constructor(
     private readonly roomService: RoomService,
-    private readonly gameService: GameService,
+    private readonly gameService: GameService
   ) {}
 
   @WebSocketServer() server: Namespace;
 
-  @SubscribeMessage('login')
+  @SubscribeMessage("login")
   login(client: Socket, userId: number) {
     this.gameService.users.set(userId, client.id);
   }
 
-  @SubscribeMessage('loggout')
+  @SubscribeMessage("loggout")
   logout(client: Socket, userId: number) {
-    this.gameService.users.delete(userId)
+    this.gameService.users.delete(userId);
   }
 
-  @SubscribeMessage('joinRoom')
+  @SubscribeMessage("joinRoom")
   joinRoom(client: Socket, notif: NotifData) {
-    console.log('join event')
+    console.log("join event");
     const room = this.roomService.joinRoom(notif.from, notif.to);
 
-    this.server.emit('joinedRoom', room);
+    this.server.emit("joinedRoom", room);
   }
 
-  @SubscribeMessage('join')
+  @SubscribeMessage("join")
   join(client: Socket, roomId: string) {
     client.join(roomId);
   }
 
-  @SubscribeMessage('leaveRoom')
+  @SubscribeMessage("leaveRoom")
   leaveRoom(client: Socket, data: any) {
-    console.log('leave room event')
+    console.log("leave room event");
     const room = this.roomService.leaveRoom(data.roomId, data.userId);
 
-    if (!room)
-      console.log('error leaving room')
+    if (!room) console.log("error leaving room");
     else {
-      console.log('room id', room.id)
-      this.server.to(room.id).emit('leftRoom', data);
+      console.log("room id", room.id);
+      this.server.to(room.id).emit("leftRoom", data);
       client.leave(data.roomId);
     }
   }

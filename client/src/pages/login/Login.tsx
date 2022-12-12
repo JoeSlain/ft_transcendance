@@ -2,9 +2,8 @@ import "../../styles/global.css";
 import "../../styles/login.css";
 import React from "react";
 
-export function VerifLogged()
-{
-    return false;
+export function VerifLogged() {
+  return false;
 }
 
 export default function Login() {

@@ -1,43 +1,40 @@
 .profil {
-    display: flex;
-    justify-content: center;
-    padding-top: 10rem;
-    min-height: 50%;
+  display: flex;
+  justify-content: center;
+  padding-top: 10rem;
+  min-height: 50%;
 }
 
 .avatar:hover {
-    opacity: 0.8;
-    cursor: pointer;
-    filter: grayscale(0.5);
-    filter: blur(2px);
+  opacity: 0.8;
+  cursor: pointer;
+  filter: grayscale(0.5);
+  filter: blur(2px);
 }
 
-.avatar-txt{
-    display: none;
-    position: absolute;
-    color:aliceblue;
-    font-weight: bold;
-
+.avatar-txt {
+  display: none;
+  position: absolute;
+  color: aliceblue;
+  font-weight: bold;
 }
 
 .avatar-txt:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-.avatar-txt:hover + .avatar
-{
-    filter: blur(2px); 
+.avatar-txt:hover + .avatar {
+  filter: blur(2px);
 }
 
-.avatar:hover + .avatar-txt{
-    display:block;
-    cursor: pointer;
+.avatar:hover + .avatar-txt {
+  display: block;
+  cursor: pointer;
 }
 
-input
-{ 
-    color: black;
-    text-align: center;
-    font-size: large;
-    opacity: 1; /* Firefox */
-  }
+input {
+  color: black;
+  text-align: center;
+  font-size: large;
+  opacity: 1; /* Firefox */
+}

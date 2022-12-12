@@ -90,7 +90,7 @@ export class UsersController {
 
   @Get("notifs")
   @UseGuards(TwoFactorGuard)
-  async getNotifs(@Req() req ) {
+  async getNotifs(@Req() req) {
     const notifs = await this.notifService.getNotifs(req.user.id);
 
     //console.log('notifs', notifs);
@@ -99,7 +99,7 @@ export class UsersController {
   @Post("updateUser")
   @UseGuards(TwoFactorGuard)
   async updateUser(@Req() req) {
-    console.log(req.body)
+    console.log(req.body);
     const user = await this.usersService.updateUser(req.user);
   }
 }

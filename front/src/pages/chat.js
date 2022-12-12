@@ -1,7 +1,3 @@
-
-
-const Chat = () => {
-
-}
+const Chat = () => {};
 
 export default Chat;

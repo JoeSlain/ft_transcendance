@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 
-export default function ProfileNavbar(props : {userId : number}) {
+export default function ProfileNavbar(props: { userId: number }) {
   return (
     <>
       <nav className="navigation mt-5 ">

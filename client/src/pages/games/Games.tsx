@@ -1,8 +1,4 @@
-
-
-export default function Games(){
-    console.log("games");
-    return (
-        <></>
-    );
-};
+export default function Games() {
+  console.log("games");
+  return <></>;
+}

@@ -1,7 +1,3 @@
-
-export default function Stats()
-{
-    return (
-        <></>
-    );
+export default function Stats() {
+  return <></>;
 }

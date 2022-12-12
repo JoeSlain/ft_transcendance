@@ -1,15 +1,15 @@
 import { ISession } from "connect-typeorm";
 import { Entity, Index, Column, PrimaryColumn } from "typeorm";
 
-@Entity({ name: 'sessions' })
+@Entity({ name: "sessions" })
 export class TypeORMSession implements ISession {
-    @Index()
-    @Column('bigint')
-    expiredAt: number;
+  @Index()
+  @Column("bigint")
+  expiredAt: number;
 
-    @PrimaryColumn('varchar', { length: 255 })
-    id: string;
+  @PrimaryColumn("varchar", { length: 255 })
+  id: string;
 
-    @Column('text')
-    json: string;
+  @Column("text")
+  json: string;
 }

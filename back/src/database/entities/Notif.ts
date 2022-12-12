@@ -1,17 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User } from './User';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { User } from "./User";
 
-@Entity({ name: 'notif' })
+@Entity({ name: "notif" })
 export class Notif {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    type: string;
+  @Column()
+  type: string;
 
-    @ManyToOne(() => User)
-    from: User;
+  @ManyToOne(() => User)
+  from: User;
 
-    @ManyToOne(() => User)
-    to: User;
+  @ManyToOne(() => User)
+  to: User;
 }

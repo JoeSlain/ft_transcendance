@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { entities } from './database';
-import { PassportModule } from '@nestjs/passport';
-import { UsersModule } from './users/users.module';
-import { GameModule } from './game/game.module';
-import { ChatModule } from './chat/chat.module';
+import { Module } from "@nestjs/common";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { ConfigModule } from "@nestjs/config";
+import * as Joi from "joi";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { entities } from "./database";
+import { PassportModule } from "@nestjs/passport";
+import { UsersModule } from "./users/users.module";
+import { GameModule } from "./game/game.module";
+import { ChatModule } from "./chat/chat.module";
 
 @Module({
   imports: [
@@ -39,4 +39,4 @@ import { ChatModule } from './chat/chat.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

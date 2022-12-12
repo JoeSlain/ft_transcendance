@@ -1,28 +1,27 @@
-import { useContext, useState } from "react"
-import { Navigate } from 'react-router-dom'
-import { UserContext } from "../context/userContext"
+import { useContext, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { UserContext } from "../context/userContext";
 
 const ProfilePage = () => {
-    const [url, setUrl] = useState('')
-    const user = useContext(UserContext);
+  const [url, setUrl] = useState("");
+  const user = useContext(UserContext);
 
-    return (
-        <div>
-            {url && <Navigate to="/params" replace='true' />}
+  return (
+    <div>
+      {url && <Navigate to="/params" replace="true" />}
 
-            <button onClick={() => setUrl('http://localhost:3000/params')}> Params </button>
-            <h1>
-                Welcome {user.username} !
-            </h1>
-            <p>
-                Your winratio is {user.winratio}
-                (W: {user.n_win}, L: {user.n_lose})
-            </p>
-            <p>
-                Your avatar url is {user.profile_pic}
-            </p>
-        </div>
-    )
-}
+      <button onClick={() => setUrl("http://localhost:3000/params")}>
+        {" "}
+        Params{" "}
+      </button>
+      <h1>Welcome {user.username} !</h1>
+      <p>
+        Your winratio is {user.winratio}
+        (W: {user.n_win}, L: {user.n_lose})
+      </p>
+      <p>Your avatar url is {user.profile_pic}</p>
+    </div>
+  );
+};
 
 export default ProfilePage;

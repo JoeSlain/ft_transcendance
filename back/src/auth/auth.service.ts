@@ -1,17 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from 'src/database/entities/User';
-import { UserDetails } from 'src/utils/types';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "src/database/entities/User";
+import { UserDetails } from "src/utils/types";
+import { JwtService } from "@nestjs/jwt";
+import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UsersService
   ) {}
 
   async createUser(details: UserDetails) {
@@ -19,13 +19,13 @@ export class AuthService {
       username: details.username,
       id42: details.id42,
       email: details.email,
-      winratio: 'no games played',
+      winratio: "no games played",
       profile_pic: details.img_url,
       elo: 0,
       n_win: 0,
       n_lose: 0,
       date_of_sign: new Date(),
-    }
+    };
 
     return this.userRepository.create(user);
   }
@@ -58,14 +58,14 @@ export class AuthService {
     const user = await this.userRepository.findOneBy({ username: username });
 
     if (!user) {
-      const details : UserDetails = {
+      const details: UserDetails = {
         username: username,
         email: `${username}@test.test`,
         id42: null,
-        img_url: 'none',
-      }
+        img_url: "none",
+      };
       const newUser = await this.createUser(details);
-      return (this.userRepository.save(newUser))
+      return this.userRepository.save(newUser);
     }
     return user;
   }
@@ -82,9 +82,13 @@ export class AuthService {
   }
 
   // 2fa cookie token
-  getCookieWithJwtAccessToken(userId: number, isSecondFactorAuthenticated = false) {
+  getCookieWithJwtAccessToken(
+    userId: number,
+    isSecondFactorAuthenticated = false
+  ) {
     const payload = {
-      userId, isSecondFactorAuthenticated
+      userId,
+      isSecondFactorAuthenticated,
     };
     const token = this.jwtService.sign(payload, {
       secret: process.env.FT_SECRET,
