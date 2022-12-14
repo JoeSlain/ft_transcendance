@@ -39,8 +39,6 @@ function App() {
   const chatSocket = useContext(ChatContext)
   const gameSocket = useContext(GameContext)
 
-  console.log('gameSocket id', gameSocket.id);
-
   useEffect(() => {
     chatSocket.on('connect', () => {
       if (user)
@@ -50,25 +48,6 @@ function App() {
     chatSocket.on('disconnect', () => {
       //logout(user, chatSocket, setUser, setIsLogged)
       chatSocket.emit('logout', user)
-    })
-
-    chatSocket.on('loggedOut', () => {
-      axios
-        .post('http://localhost:3001/api/auth/logout', {}, {
-          withCredentials: true
-        })
-        .then(() => {
-          if (room) {
-            const data = {
-              userId: user.id,
-              roomId: room.id,
-            }
-            gameSocket.emit('leaveRoom', data)
-          }
-          setUser(null)
-          setIsLogged(false)
-          saveStorageItem('user', null)
-        })
     })
 
     chatSocket.on('loggedIn', data => {
@@ -91,12 +70,50 @@ function App() {
         })
     })
 
-    gameSocket.on('joinedRoom', data => {
-      //if (!room && (data.host.infos.id === user.id || data.guest.infos.id === user.id))
-      if (!room)
-        gameSocket.emit('join', data.id, () => {
-          console.log('joined socket ok')
+    gameSocket.on('connect', () => {
+      if (room)
+        gameSocket.emit('join', room.id)
+    })
+
+    gameSocket.on('clearRoom', () => {
+        console.log('me left')
+        setRoom(null)
+        saveStorageItem('room', null)
+    })
+
+    return () => {
+      chatSocket.off('connect')
+      chatSocket.off('disconnect')
+      chatSocket.off('loggedIn')
+      chatSocket.off('clearRoom')
+    }
+  }, [])
+
+  useEffect(() => {
+    chatSocket.on('loggedOut', () => {
+      axios
+        .post('http://localhost:3001/api/auth/logout', {}, {
+          withCredentials: true
         })
+        .then(() => {
+          if (room) {
+            const data = {
+              userId: user.id,
+              roomId: room.id,
+            }
+            gameSocket.emit('leaveRoom', data)
+          }
+          setUser(null)
+          setIsLogged(false)
+          saveStorageItem('user', null)
+        })
+    })
+
+    gameSocket.on('joinedRoom', data => {
+      if (!room) {
+        console.log('room created')
+        gameSocket.emit('join', data.id)
+      }
       else if (room.id !== data.id) {
         const data = {
           userId: user.id,
@@ -107,30 +124,26 @@ function App() {
           console.log('joined socket ok')
         })
       }
-      setRoom(room);
+      setRoom(data);
       saveStorageItem('room', data)
+      console.log('data room', data)
       console.log('joined room socket')
     })
 
     gameSocket.on('leftRoom', (data) => {
       console.log('leftroom')
-      if (data.userId === user.id) {
-        setRoom(null)
-        saveStorageItem('room', null)
-      }
-      else {
-        setRoom(data)
-        saveStorageItem('room', room)
-      }
+
+      console.log('someone left')
+      setRoom(data.room)
+      saveStorageItem('room', data.room)
     })
 
     return () => {
-      chatSocket.off('connect')
-      chatSocket.off('disconnect')
       chatSocket.off('loggedOut')
-      chatSocket.off('loggedIn')
+      gameSocket.off('joinedRoom')
+      gameSocket.off('leftRoom')
     }
-  }, [])
+  }, [user, room])
 
   return (
     <div id="main">

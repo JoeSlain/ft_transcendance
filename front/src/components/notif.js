@@ -25,8 +25,8 @@ const getNotif = (notif, chatSocket, gameSocket) => {
             notif.body = `${notif.from.username} invited you to play a game`
             notif.accept = 'Accept'
             notif.decline = 'Decline'
-            notif.acceptEvent = 'joinRoom'
-            notif.socket = gameSocket
+            notif.acceptEvent = 'acceptInvite'
+            notif.socket = chatSocket
             break;
         default:
             break;

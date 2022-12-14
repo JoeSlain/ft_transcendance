@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { ContextMenu } from '../styles/menus'
-import { ChatContext } from '../context/socketContext'
+import { ChatContext, GameContext } from '../context/socketContext'
 import axios from 'axios'
 
 import UserEntry from '../components/userEntry'
@@ -14,6 +14,7 @@ const Friend = ({ setNotifs }) => {
     const [points, setPoints] = useState({ x: 0, y: 0 })
     const [clicked, setClicked] = useState({})
     const socket = useContext(ChatContext);
+    const gameSocket = useContext(GameContext);
     const me = useContext(UserContext);
 
     useEffect(() => {
@@ -70,6 +71,17 @@ const Friend = ({ setNotifs }) => {
         socket.on('friendDeleted', data => {
             console.log(`deleting ${data.username}`)
             setFriends(prev => prev.filter(friend => friend.id !== data.id))
+        })
+
+        // invite to play
+        socket.on('acceptedInvite', data => {
+            console.log('data host id', data);
+            const roomData = {
+                user: me,
+                hostId: data,
+            }
+            console.log('acceptedInvite')
+            gameSocket.emit('joinRoom', roomData);
         })
 
         // unmount

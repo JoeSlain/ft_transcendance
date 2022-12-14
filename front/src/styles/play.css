@@ -21,3 +21,13 @@ input {
     flex-direction: column;
     align-items: center;
 }
+
+.playFooter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.spectators {
+    margin-top: 10%;
+}

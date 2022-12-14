@@ -6,6 +6,7 @@ import { NotifService } from 'src/users/notifs.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { NotifData } from '../utils/types';
+import { RoomService } from 'src/game/room.service';
 
 @WebSocketGateway(3002, {
   cors: {
@@ -18,6 +19,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly usersService: UsersService,
     private readonly chatService: ChatService,
     private readonly notifService: NotifService,
+    private readonly roomService: RoomService,
   ) { }
 
   @WebSocketServer() server: Namespace;
@@ -88,7 +90,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       statuses: JSON.stringify(Array.from(map)),
     }
 
-    this.server.to(client.id).emit('friends', ret)
+    this.server.to(client.id).emit('friends', ret);
   }
 
   /* NOTIF
@@ -117,24 +119,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('acceptFriendRequest')
   async addFriend(client: Socket, data: NotifData) {
     console.log('addFriend event');
-    console.log('from', data.from)
-    console.log('to', data.to)
+    console.log('from', data.from);
+    console.log('to', data.to);
 
     const newFriend = await this.usersService.addFriend(data.from, data.to);
     if (newFriend) {
       await this.notifService.deleteNotif(data);
       const from = this.chatService.getUser(data.from.id);
       if (from)
-        this.server.to(from).emit('newFriend', data.to)
-      this.server.to(client.id).emit('newFriend', data.from)
+        this.server.to(from).emit('newFriend', data.to);
+      this.server.to(client.id).emit('newFriend', data.from);
     }
     else
-      console.log('error adding friend')
+      console.log('error adding friend');
   }
 
   @SubscribeMessage('declineFriendRequest')
   async deleteNotif(client: Socket, data: NotifData) {
-    console.log('decline friend event')
+    console.log('decline friend event');
     /*console.log('from', data.from)
     console.log('to', data.to)*/
 
@@ -150,10 +152,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (user1 && user2) {
       const to = this.chatService.getUser(data.to.id);
       if (to)
-        this.server.to(to).emit('friendDeleted', data.from)
-      this.server.to(client.id).emit('friendDeleted', data.to)
+        this.server.to(to).emit('friendDeleted', data.from);
+      this.server.to(client.id).emit('friendDeleted', data.to);
     }
     else
-      console.log('error deleting friend')
-  }  
+      console.log('error deleting friend');
+  }
+
+  @SubscribeMessage('acceptInvite')
+  async acceptInvite(client: Socket, data: NotifData) {
+    const from = this.chatService.getUser(data.from.id);
+
+    if (from) {
+      this.server.to(from).emit('acceptedInvite', data.from.id);
+      this.server.to(client.id).emit('acceptedInvite', data.from.id);
+    }
+
+    /*if (from) {
+      let room = this.roomService.findRoom(data.from.id);
+      if (!room)
+        room = this.roomService.createRoom(data.from, data.to);
+      this.server.to(from).emit('acceptedInvite', room);
+      this.server.to(client.id).emit('acceptedInvite', room);
+    }*/
+  }
 }

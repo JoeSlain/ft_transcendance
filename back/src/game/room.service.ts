@@ -16,22 +16,25 @@ export class RoomService {
         };
     }
 
-    createRoom(host: User, guest: User) {
+    createRoom(roomId: number) {
         console.log('create room')
         const room = {
-            id: host.id.toString(),
-            host: {
-                infos: host,
-                ready: false
-            },
-            guest: {
-                infos: guest,
-                ready: false
-            },
+            id: roomId.toString(),
+            guest: null,
+            host: null,
             spectators: [],
         };
         this.rooms.set(room.id, room);
         return room;
+    }
+
+    isEmptyRoom(room: Room) {
+        return !room.host && !room.guest;
+    }
+
+    deleteRoom(roomId: string) {
+        this.rooms.delete(roomId);
+        return null;
     }
 
     addSpectator(user: User, room: Room) {
@@ -43,33 +46,39 @@ export class RoomService {
         return this.rooms.get(id.toString());
     }
 
-    joinRoom(host: User, guest: User) {
+    joinRoom(data: any) {
         console.log('join room')
-        let room = this.findRoom(host.id);
-        if (room !== undefined)
-            this.addSpectator(guest, room);
-        else {
-            /*this.rooms.forEach((value, key) => {
-                console.log(key + '=' + value);
-            })*/
-            room = this.createRoom(host, guest);
-        }
+        let room = this.findRoom(data.hostId);
+
+        if (!room)
+            room = this.createRoom(data.hostId);
+        if (data.user.id === data.hostId)
+            room.host = this.createRoomUser(data.user);
+        else if (!room.guest)
+            room.guest = this.createRoomUser(data.user);
+        else
+            return null;
+        this.rooms.set(room.id, room);
         return room;
     }
 
     leaveRoom(id: string, userId: number) {
-        const room = this.rooms.get(id);
+        let room = this.rooms.get(id);
 
         if (room !== undefined) {
-            console.log('room found, leaving room')
             if (room.host && room.host.infos.id === userId) {
                 room.host = room.guest;
                 room.guest = null;
+                if (this.isEmptyRoom(room)) {
+                    console.log('room empty, deleting room')
+                    return this.deleteRoom(id);
+                }
             }
             else if (room.guest && room.guest.infos.id === userId)
                 room.guest = null;
-            else
-                room.spectators.filter(spectator => spectator.id !== userId)
+            else {
+                room.spectators = room.spectators.filter(spectator => spectator.id !== userId)
+            }
             this.rooms.set(room.id, room);
             return (room);
         }
