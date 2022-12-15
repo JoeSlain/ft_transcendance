@@ -8,6 +8,7 @@ import { UpdateResult } from 'typeorm';
 @Injectable()
 export class RoomService {
     rooms: Map<string, Room> = new Map();
+    usersRooms: Map<number, Room> = new Map();
 
     createRoomUser(user: User): RoomUser {
         return {
@@ -39,6 +40,7 @@ export class RoomService {
 
     addSpectator(user: User, room: Room) {
         room.spectators.push(user);
+        this.usersRooms.set(user.id, room);
         this.rooms.set(room.id, room);
     }
 
@@ -65,6 +67,7 @@ export class RoomService {
     leaveRoom(id: string, userId: number) {
         let room = this.rooms.get(id);
 
+        this.usersRooms.delete(userId);
         if (room !== undefined) {
             if (room.host && room.host.infos.id === userId) {
                 room.host = room.guest;

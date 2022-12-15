@@ -103,8 +103,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (data.type === 'Friend Request') {
       const friend = await this.usersService.findFriend(data.from.id, data.to.id);
-      if (friend.length)
+      if (friend.length) {
+        this.server.to(client.id).emit('error', `friend ${data.to.username} already added`)
         return;
+      }
       await this.notifService.createNotif(data);
     }
     const to = this.chatService.getUser(data.to.id);

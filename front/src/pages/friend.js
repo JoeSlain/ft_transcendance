@@ -114,6 +114,14 @@ const Friend = ({ setNotifs }) => {
         setNotifs(prev => [...prev, data])
     }
 
+    const handleSpectate = (user) => {
+        const data = {
+            me,
+            user
+        }
+        gameSocket.emit('spectate', data);
+    }
+
     return (
         <div>
             <AddFriend
@@ -140,6 +148,7 @@ const Friend = ({ setNotifs }) => {
                                 <li onClick={() => handleInvite(clicked)}> Invite </li>
                                 <li> Block </li>
                                 <li onClick={() => handleDelete(clicked)}> Delete </li>
+                                <li onClick={() => handleSpectate(clicked)}> Spectate </li>
                             </ul>
                         </ContextMenu>
                     )}

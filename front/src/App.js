@@ -25,6 +25,8 @@ import Chat from './pages/chat'
 import Friend from './pages/friend'
 import Redirect from './pages/redirect'
 import Notif from './components/notif';
+import Alert from './components/alert';
+
 import { getStorageItem, saveStorageItem } from './storage/localStorage';
 import { UserContext } from './context/userContext';
 import { ChatContext, GameContext } from './context/socketContext'
@@ -35,6 +37,7 @@ function App() {
   const [notifs, setNotifs] = useState([])
   const [isLogged, setIsLogged] = useState(false)
   const [room, setRoom] = useState(getStorageItem('room'))
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
   const chatSocket = useContext(ChatContext)
   const gameSocket = useContext(GameContext)
@@ -70,6 +73,10 @@ function App() {
         })
     })
 
+    chatSocket.on('error', data => {
+      alert(data);
+    })
+
     gameSocket.on('connect', () => {
       if (room)
         gameSocket.emit('join', room.id)
@@ -81,13 +88,19 @@ function App() {
         saveStorageItem('room', null)
     })
 
+    gameSocket.on('error', data => {
+      alert(data)
+    })
+
     return () => {
       chatSocket.off('connect')
       chatSocket.off('disconnect')
       chatSocket.off('loggedIn')
       chatSocket.off('clearRoom')
+      chatSocket.off('error')
+      gameSocket.off('error')
     }
-  }, [])
+  }, [error])
 
   useEffect(() => {
     chatSocket.on('loggedOut', () => {
@@ -112,7 +125,7 @@ function App() {
     gameSocket.on('joinedRoom', data => {
       if (!room) {
         console.log('room created')
-        gameSocket.emit('join', data.id)
+        //gameSocket.emit('join', data.id)
       }
       else if (room.id !== data.id) {
         const data = {
@@ -120,9 +133,9 @@ function App() {
           roomId: room.id,
         }
         gameSocket.emit('leaveRoom', data)
-        gameSocket.emit('join', data.id, () => {
+        /*gameSocket.emit('join', data.id, () => {
           console.log('joined socket ok')
-        })
+        })*/
       }
       setRoom(data);
       saveStorageItem('room', data)
