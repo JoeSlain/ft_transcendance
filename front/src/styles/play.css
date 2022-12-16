@@ -1,19 +1,19 @@
 input {
-    width: 80%;
+  width: 80%;
 }
 
 .play {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
 }
 
 .playBody {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 50%;
 }
 
 .playerEntry {

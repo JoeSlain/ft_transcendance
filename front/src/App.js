@@ -83,9 +83,9 @@ function App() {
     })
 
     gameSocket.on('clearRoom', () => {
-        console.log('me left')
-        setRoom(null)
-        saveStorageItem('room', null)
+      console.log('me left')
+      setRoom(null)
+      saveStorageItem('room', null)
     })
 
     gameSocket.on('error', data => {
@@ -177,8 +177,8 @@ function App() {
 
               <Route element={<ProtectedRoute />} >
                 <Route path="profile/:id" element={<ProfilePage />} />
-                <Route path="profile" element={<ProfilePage />} />
-                <Route path="params" element={<Params />} />
+                <Route path="profile" element={<ProfilePage setUser={setUser} />} />
+                <Route path="params" element={<Params setUser={setUser} />} />
                 <Route path="play" element={<Play room={room} setRoom={setRoom} />} />
                 <Route path="games" element={<Games />} />
                 <Route path="chat" element={<Chat />} />

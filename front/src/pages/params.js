@@ -3,8 +3,9 @@ import { useState } from 'react'
 import ReactCodeInput from 'react-code-input'
 import { Navigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
+import UploadAvatar from '../components/uploadAvatar'
 
-const Params = () => {
+const Params = ({ setUser }) => {
     const [qrcode, setQrCode] = useState('');
     const [code, setCode] = useState('');
     const [url, setUrl] = useState('');
@@ -52,11 +53,12 @@ const Params = () => {
 
     return (
         <div>
-            { url && <Navigate to={url} />}
+            {url && <Navigate to={url} />}
 
             <button onClick={generate2fa}> activate 2fa </button>
             <button onClick={deactivate2fa}> deactivate 2fa </button>
             <button onClick={profile}> profile </button>
+            <UploadAvatar setUser={setUser} />
             <p>
                 <img src={qrcode} />
             </p>

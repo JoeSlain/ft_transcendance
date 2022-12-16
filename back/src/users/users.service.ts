@@ -118,4 +118,12 @@ export class UsersService {
         const modifiedUser = await this.getById(userId);
         return modifiedUser;
     }
+
+    async updateAvatar(userId: number, url: string) {
+        const user = await this.usersRepository.update(userId, {
+             profile_pic: url,
+        });
+
+        return user;
+    }
 }

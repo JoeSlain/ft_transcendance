@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { User } from 'src/database';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,9 @@ import { AuthenticatedGuard } from 'src/auth/42auth/42.guard';
 import { TwoFactorGuard } from 'src/auth/2fa/2fa.guard';
 import { UsersService } from './users.service';
 import { NotifService } from './notifs.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 class PostDTO {
     content: string;
@@ -85,5 +88,26 @@ export class UsersController {
 
         //console.log('notifs', notifs);
         return notifs;
+    }
+
+    @Post('uploadAvatar')
+    @UseGuards(TwoFactorGuard)
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads',
+            filename: (req, file, callback) => {
+                if (!file.originalname)
+                    callback(new Error('error uploading avatar'), file.fieldname)
+                else {
+                    console.log('filename', file.originalname)
+                    const filename = file.originalname;
+                    callback(null, filename);
+                }
+            }
+        })
+    }))
+    async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+        console.log('file', file);
+        await this.usersService.updateAvatar(req.user.id, file.path)
     }
 }
