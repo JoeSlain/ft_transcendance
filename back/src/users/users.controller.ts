@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { User } from 'src/database';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -106,8 +106,17 @@ export class UsersController {
             }
         })
     }))
-    async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
-        console.log('file', file);
-        await this.usersService.updateAvatar(req.user.id, file.path)
+    async uploadAvatar(@Req() req, @Res() res, @UploadedFile() file: Express.Multer.File) {
+        console.log('uploadAvatar');
+        return this.usersService.uploadAvatar(req.user.id, file.filename);
+    }
+
+    @Get('getAvatar')
+    @UseGuards(TwoFactorGuard)
+    getAvatar(@Req() req, @Res() res) {
+        const path = req.user.avatar;
+
+        console.log('path', path);
+        return res.sendFile(path, {root: './uploads'});
     }
 }

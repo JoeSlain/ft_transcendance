@@ -3,7 +3,7 @@ import { useContext, useRef } from 'react';
 import { Prev } from 'react-bootstrap/esm/PageItem';
 import { UserContext } from '../context/userContext';
 
-const UploadAvatar = (setUser) => {
+const UploadAvatar = ({ setUser }) => {
     const user = useContext(UserContext)
     const inputRef = useRef(null)
 
@@ -11,7 +11,7 @@ const UploadAvatar = (setUser) => {
         inputRef.current.click();
     }
 
-    const handleFileChange = (e) => {
+    async function handleFileChange(e) {
         const file = e.target.files && e.target.files[0]
         let formData = new FormData();
 
@@ -26,13 +26,9 @@ const UploadAvatar = (setUser) => {
                 .post('http://localhost:3001/api/users/uploadAvatar', formData, {
                     withCredentials: true,
                 })
-                .then(response => {
-                    setUser(response.data);
-                })
+                .then(response => setUser(response.data))
         }
     }
-
-    console.log('avatar url', user.profile_pic);
 
     return (
         <div className='upload'>
@@ -43,7 +39,6 @@ const UploadAvatar = (setUser) => {
                 onChange={handleFileChange}
             />
             <button onClick={handleClick}>Upload image</button>
-            <img src={user.profile_pic} />
         </div>
     )
 }

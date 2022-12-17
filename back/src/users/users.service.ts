@@ -119,11 +119,10 @@ export class UsersService {
         return modifiedUser;
     }
 
-    async updateAvatar(userId: number, url: string) {
-        const user = await this.usersRepository.update(userId, {
-             profile_pic: url,
+    async uploadAvatar(userId: number, url: string) {
+        await this.usersRepository.update(userId, {
+             avatar: url,
         });
-
-        return user;
+        return this.getById(userId);
     }
 }
