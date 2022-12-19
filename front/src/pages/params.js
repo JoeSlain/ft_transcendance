@@ -16,17 +16,7 @@ const Params = () => {
   };
 
   // deactivate 2fa
-  const deactivate2fa = () => {
-    axios
-      .post(
-        "http://localhost:3001/api/auth/2fa/turn-off",
-        {},
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => console.log(response));
-  };
+  
 
   // generate 2fa qr code
   async function generate2fa() {

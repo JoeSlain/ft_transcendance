@@ -10,6 +10,7 @@ export default function Login() {
   const buttonAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     window.location.assign("http://localhost:3001/api/auth/login");
+    console.log("button de emrde");
   };
 
   return (

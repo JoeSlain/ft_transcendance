@@ -7,18 +7,16 @@ export default function ProfileNavbar(props: { userId: number }) {
         <div className=" ml-8">
           <ul className="flex justify-center space-x-10 text-slate-100 text-xl">
             <li>
-              <NavLink className="navlink" to="/profile">
+              <NavLink
+                className="navlink"
+                to={`/profile/${props.userId}`}
+              >
                 Account
               </NavLink>
             </li>
             <li>
-              <NavLink className="navlink" to="/stats">
+              <NavLink className="navlink" to="/profile/stats">
                 Statistics
-              </NavLink>
-            </li>
-            <li>
-              <NavLink className="navlink" to="/history">
-                Match history
               </NavLink>
             </li>
           </ul>

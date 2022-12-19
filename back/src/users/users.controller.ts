@@ -100,6 +100,6 @@ export class UsersController {
   @UseGuards(TwoFactorGuard)
   async updateUser(@Req() req) {
     console.log(req.body);
-    const user = await this.usersService.updateUser(req.user);
+    const user = await this.usersService.updateUser(req.user, req.newUser);
   }
 }

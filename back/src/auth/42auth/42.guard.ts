@@ -6,6 +6,8 @@ export class FortyTwoAuthGuard extends AuthGuard("42") {
   async canActivate(context: ExecutionContext) {
     const activate = (await super.canActivate(context)) as boolean;
     const request = context.switchToHttp().getRequest();
+    console.log("42 auth guard ");
+   // console.log(request);
 
     await super.logIn(request);
     return activate;

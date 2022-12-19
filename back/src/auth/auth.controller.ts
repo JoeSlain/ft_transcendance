@@ -1,4 +1,3 @@
-import { redirect } from "react-router-dom";
 import {
   Controller,
   UseGuards,
@@ -7,9 +6,7 @@ import {
   Res,
   Post,
   Body,
-  UnauthorizedException,
-  HttpCode,
-  Redirect,
+  UnauthorizedException
 } from "@nestjs/common";
 import { FortyTwoAuthGuard, AuthenticatedGuard } from "./42auth/42.guard";
 import { TwoFactorAuthenticationService } from "./2fa/2fa.service";
@@ -17,7 +14,6 @@ import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { TwoFactorGuard } from "./2fa/2fa.guard";
 import { LocalAuthenticationGuard } from "./local.guard";
-import { appendFile } from "fs";
 
 @Controller("auth")
 export class AuthController {
@@ -54,7 +50,10 @@ export class AuthController {
     req.res.setHeader("Set-Cookie", [accessTokenCookie]);
     if (req.user.isTwoFactorAuthenticationEnabled)
       res.redirect(`http://localhost:3000/login/2fa`);
-    else res.redirect("http://localhost:3000/login/redirect");
+    else {
+      res.redirect("http://localhost:3000/login/redirect");
+      console.log("2fa is off, redirected ")
+  }
   }
 
   // test for devs only
