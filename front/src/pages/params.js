@@ -1,13 +1,14 @@
-import axios from "axios";
-import { useState } from "react";
-import ReactCodeInput from "react-code-input";
-import { Navigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import axios from 'axios'
+import { useState } from 'react'
+import ReactCodeInput from 'react-code-input'
+import { Navigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import UploadAvatar from '../components/uploadAvatar'
 
-const Params = () => {
-  const [qrcode, setQrCode] = useState("");
-  const [code, setCode] = useState("");
-  const [url, setUrl] = useState("");
+const Params = ({ setUser }) => {
+  const [qrcode, setQrCode] = useState('');
+  const [code, setCode] = useState('');
+  const [url, setUrl] = useState('');
   const params = useParams();
 
   // profile
@@ -16,7 +17,17 @@ const Params = () => {
   };
 
   // deactivate 2fa
-  
+  const deactivate2fa = () => {
+    axios
+      .post(
+        "http://localhost:3001/api/auth/2fa/turn-off",
+        {},
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => response.data);
+  };
 
   // generate 2fa qr code
   async function generate2fa() {
@@ -56,15 +67,16 @@ const Params = () => {
       <button onClick={generate2fa}> activate 2fa </button>
       <button onClick={deactivate2fa}> deactivate 2fa </button>
       <button onClick={profile}> profile </button>
+      <UploadAvatar setUser={setUser} />
       <p>
         <img src={qrcode} />
       </p>
       <form onSubmit={turnOn2fa}>
-        <ReactCodeInput type="text" fields={6} onChange={getCode} />
+        <ReactCodeInput type='text' fields={6} onChange={getCode} />
         <button type="submit"> confirm </button>
       </form>
     </div>
-  );
-};
+  )
+}
 
 export default Params;

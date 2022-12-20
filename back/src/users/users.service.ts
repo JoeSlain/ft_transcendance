@@ -123,4 +123,11 @@ export class UsersService {
     user = newUser;
     return this.usersRepository.save(user);
   }
+
+    async uploadAvatar(userId: number, url: string) {
+        await this.usersRepository.update(userId, {
+             avatar: url,
+        });
+        return this.getById(userId);
+    }
 }

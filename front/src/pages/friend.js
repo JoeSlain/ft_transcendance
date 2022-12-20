@@ -1,19 +1,20 @@
-import { useContext, useEffect, useState } from "react";
-import { ContextMenu } from "../styles/menus";
-import { ChatContext } from "../context/socketContext";
-import axios from "axios";
+import { useContext, useEffect, useState } from 'react'
+import { ContextMenu } from '../styles/menus'
+import { ChatContext, GameContext } from '../context/socketContext'
+import axios from 'axios'
 
 import UserEntry from "../components/userEntry";
 import AddFriend from "../components/addFriend";
 import { UserContext } from "../context/userContext";
 
 const Friend = ({ setNotifs }) => {
-  const [friends, setFriends] = useState([]);
-  const [statuses, setStatuses] = useState(new Map());
-  const [show, setShow] = useState(false);
-  const [points, setPoints] = useState({ x: 0, y: 0 });
-  const [clicked, setClicked] = useState({});
+  const [friends, setFriends] = useState([])
+  const [statuses, setStatuses] = useState(new Map())
+  const [show, setShow] = useState(false)
+  const [points, setPoints] = useState({ x: 0, y: 0 })
+  const [clicked, setClicked] = useState({})
   const socket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
   const me = useContext(UserContext);
 
   useEffect(() => {
@@ -71,16 +72,27 @@ const Friend = ({ setNotifs }) => {
       setFriends((prev) => prev.filter((friend) => friend.id !== data.id));
     });
 
+    // invite to play
+    socket.on('acceptedInvite', data => {
+      console.log('data host id', data);
+      const roomData = {
+        user: me,
+        hostId: data,
+      }
+      console.log('acceptedInvite')
+      gameSocket.emit('joinRoom', roomData);
+    })
+
     // unmount
     return () => {
-      window.removeEventListener("click", handleClick);
-      socket.off("friends");
-      socket.off("newFriend");
-      socket.off("updateStatus");
-      socket.off("notified");
-      socket.off("friendDeleted");
-    };
-  }, []);
+      window.removeEventListener('click', handleClick)
+      socket.off('friends')
+      socket.off('newFriend')
+      socket.off('updateStatus')
+      socket.off('notified')
+      socket.off('friendDeleted')
+    }
+  }, [])
 
   const handleInvite = (user) => {
     const data = {
@@ -101,42 +113,48 @@ const Friend = ({ setNotifs }) => {
     setNotifs((prev) => [...prev, data]);
   };
 
+  const handleSpectate = (user) => {
+    const data = {
+      me,
+      user
+    }
+    gameSocket.emit('spectate', data);
+  }
+
   return (
     <div>
-      <AddFriend friends={friends} setFriends={setFriends} me={me} />
-      {friends && (
-        <div className="userList">
-          {friends.map((user) => (
-            <div
-              key={user.username}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                console.log(`${user.username} clicked`);
-                setShow(true);
-                setPoints({ x: e.pageX, y: e.pageY });
-                setClicked(user);
-              }}
-            >
-              <UserEntry
-                user={user}
-                status={statuses.get(user.id)}
-                show={show}
-              />
+      <AddFriend
+        friends={friends}
+        setFriends={setFriends}
+        me={me}
+      />
+      {friends &&
+        <div className='userList'>
+          {friends.map(user =>
+            <div key={user.username} onContextMenu={(e) => {
+              e.preventDefault();
+              console.log(`${user.username} clicked`)
+              setShow(true)
+              setPoints({ x: e.pageX, y: e.pageY })
+              setClicked(user)
+            }}>
+              <UserEntry user={user} status={statuses.get(user.id)} show={show} />
             </div>
-          ))}
+          )}
           {show && (
             <ContextMenu top={points.y} left={points.x}>
               <ul>
                 <li onClick={() => handleInvite(clicked)}> Invite </li>
                 <li> Block </li>
                 <li onClick={() => handleDelete(clicked)}> Delete </li>
+                <li onClick={() => handleSpectate(clicked)}> Spectate </li>
               </ul>
             </ContextMenu>
           )}
         </div>
-      )}
+      }
     </div>
-  );
-};
+  )
+}
 
 export default Friend;

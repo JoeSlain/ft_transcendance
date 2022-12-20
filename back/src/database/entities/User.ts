@@ -34,6 +34,9 @@ export class User {
   @Column()
   profile_pic: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @Column()
   elo: number;
 

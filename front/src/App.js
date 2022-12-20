@@ -10,32 +10,33 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // components
-import LoginPage from "./pages/login";
-import ProfilePage from "./pages/profile";
-import TwoFa from "./pages/2fa";
-import Params from "./pages/params";
-import Navbar from "./components/navbar";
-import Play from "./pages/play";
-import Games from "./pages/games";
-import Chat from "./pages/chat";
-import Friend from "./pages/friend";
-import Redirect from "./pages/redirect";
-import Notif from "./components/notif";
-import { getStorageItem, saveStorageItem } from "./storage/localStorage";
-import { UserContext } from "./context/userContext";
-import { ChatContext, GameContext } from "./context/socketContext";
-import logout from "./components/logout";
+import LoginPage from './pages/login'
+import ProfilePage from './pages/profile'
+import TwoFa from './pages/2fa'
+import Params from './pages/params'
+import Navbar from './components/navbar'
+import Play from './pages/play'
+import Games from './pages/games'
+import Chat from './pages/chat'
+import Friend from './pages/friend'
+import Redirect from './pages/redirect'
+import Notif from './components/notif';
+import Alert from './components/alert';
+
+import { getStorageItem, saveStorageItem } from './storage/localStorage';
+import { UserContext } from './context/userContext';
+import { ChatContext, GameContext } from './context/socketContext'
+import logout from './components/logout';
 
 function App() {
-  const [user, setUser] = useState(getStorageItem("user"));
-  const [notifs, setNotifs] = useState([]);
-  const [isLogged, setIsLogged] = useState(false);
-  const [room, setRoom] = useState(getStorageItem("room"));
-  const navigate = useNavigate();
-  const chatSocket = useContext(ChatContext);
-  const gameSocket = useContext(GameContext);
-
-  console.log("gameSocket id", gameSocket.id);
+  const [user, setUser] = useState(getStorageItem('user'))
+  const [notifs, setNotifs] = useState([])
+  const [isLogged, setIsLogged] = useState(false)
+  const [room, setRoom] = useState(getStorageItem('room'))
+  const [error, setError] = useState(null)
+  const navigate = useNavigate()
+  const chatSocket = useContext(ChatContext)
+  const gameSocket = useContext(GameContext)
 
   useEffect(() => {
     chatSocket.on("connect", () => {
@@ -47,31 +48,8 @@ function App() {
       chatSocket.emit("logout", user);
     });
 
-    chatSocket.on("loggedOut", () => {
-      axios
-        .post(
-          "http://localhost:3001/api/auth/logout",
-          {},
-          {
-            withCredentials: true,
-          }
-        )
-        .then(() => {
-          if (room) {
-            const data = {
-              userId: user.id,
-              roomId: room.id,
-            };
-            gameSocket.emit("leaveRoom", data);
-          }
-          setUser(null);
-          setIsLogged(false);
-          saveStorageItem("user", null);
-        });
-    });
-
-    chatSocket.on("loggedIn", (data) => {
-      console.log("loggedIn");
+    chatSocket.on('loggedIn', data => {
+      console.log('loggedIn')
       axios
         .get("http://localhost:3001/api/users/notifs", {
           withCredentials: true,
@@ -90,45 +68,90 @@ function App() {
         });
     });
 
-    gameSocket.on("joinedRoom", (data) => {
-      //if (!room && (data.host.infos.id === user.id || data.guest.infos.id === user.id))
-      if (!room)
-        gameSocket.emit("join", data.id, () => {
-          console.log("joined socket ok");
-        });
+    chatSocket.on('error', data => {
+      alert(data);
+    })
+
+    gameSocket.on('connect', () => {
+      if (room)
+        gameSocket.emit('join', room.id)
+    })
+
+    gameSocket.on('clearRoom', () => {
+      console.log('me left')
+      setRoom(null)
+      saveStorageItem('room', null)
+    })
+
+    gameSocket.on('error', data => {
+      alert(data)
+    })
+
+    return () => {
+      chatSocket.off('connect')
+      chatSocket.off('disconnect')
+      chatSocket.off('loggedIn')
+      chatSocket.off('clearRoom')
+      chatSocket.off('error')
+      gameSocket.off('error')
+    }
+  }, [error])
+
+  useEffect(() => {
+    chatSocket.on('loggedOut', () => {
+      axios
+        .post('http://localhost:3001/api/auth/logout', {}, {
+          withCredentials: true
+        })
+        .then(() => {
+          if (room) {
+            const data = {
+              userId: user.id,
+              roomId: room.id,
+            }
+            gameSocket.emit('leaveRoom', data)
+          }
+          setUser(null)
+          setIsLogged(false)
+          saveStorageItem('user', null)
+        })
+    })
+
+    gameSocket.on('joinedRoom', data => {
+      if (!room) {
+        console.log('room created')
+        //gameSocket.emit('join', data.id)
+      }
       else if (room.id !== data.id) {
         const data = {
           userId: user.id,
           roomId: room.id,
-        };
-        gameSocket.emit("leaveRoom", data);
-        gameSocket.emit("join", data.id, () => {
-          console.log("joined socket ok");
-        });
+        }
+        gameSocket.emit('leaveRoom', data)
+        /*gameSocket.emit('join', data.id, () => {
+          console.log('joined socket ok')
+        })*/
       }
-      setRoom(room);
-      saveStorageItem("room", data);
-      console.log("joined room socket");
-    });
+      setRoom(data);
+      saveStorageItem('room', data)
+      console.log('data room', data)
+      console.log('joined room socket')
+    })
 
-    gameSocket.on("leftRoom", (data) => {
-      console.log("leftroom");
-      if (data.userId === user.id) {
-        setRoom(null);
-        saveStorageItem("room", null);
-      } else {
-        setRoom(data);
-        saveStorageItem("room", room);
-      }
-    });
+    gameSocket.on('leftRoom', (data) => {
+      console.log('leftroom')
+
+      console.log('someone left')
+      setRoom(data.room)
+      saveStorageItem('room', data.room)
+    })
 
     return () => {
-      chatSocket.off("connect");
-      chatSocket.off("disconnect");
-      chatSocket.off("loggedOut");
-      chatSocket.off("loggedIn");
-    };
-  }, []);
+      chatSocket.off('loggedOut')
+      gameSocket.off('joinedRoom')
+      gameSocket.off('leftRoom')
+    }
+  }, [user, room])
 
   return (
     <div id="main">
@@ -148,12 +171,9 @@ function App() {
 
               <Route element={<ProtectedRoute />}>
                 <Route path="profile/:id" element={<ProfilePage />} />
-                <Route path="profile" element={<ProfilePage />} />
-                <Route path="params" element={<Params />} />
-                <Route
-                  path="play"
-                  element={<Play room={room} setRoom={setRoom} />}
-                />
+                <Route path="profile" element={<ProfilePage setUser={setUser} />} />
+                <Route path="params" element={<Params setUser={setUser} />} />
+                <Route path="play" element={<Play room={room} setRoom={setRoom} />} />
                 <Route path="games" element={<Games />} />
                 <Route path="chat" element={<Chat />} />
               </Route>

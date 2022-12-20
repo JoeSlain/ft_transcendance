@@ -42,72 +42,62 @@ const PlayerEntry = ({ room, player, ready, setReady }) => {
   );
 };
 
+const Spectators = ({ room }) => {
+  console.log('spectators', room.spectators)
+  console.log('room', room)
+  return (
+    <div className='spectators'>
+      <b>Spectating : </b>
+      {room.spectators && room.spectators.map(spectator => {
+        return `${spectator.username}, `
+      })}
+    </div>
+  )
+}
+
 const Play = ({ room, setRoom }) => {
-  const socket = useContext(GameContext);
-  const user = useContext(UserContext);
-  const [hostReady, setHostReady] = useState(false);
-  const [guestReady, setGuestReady] = useState(false);
+  const [hostReady, setHostReady] = useState(false)
+  const [guestReady, setGuestReady] = useState(false)
 
-  /*useEffect(() => {
-        socket.on('leftRoom', (room, userId) => {
-            console.log('leftroom')
-            if (userId === user.id) {
-                setRoom(null)
-                saveStorageItem('room', null)
-            }
-            else {
-                setRoom(room)
-                saveStorageItem('room', room)
-            }
-        })
+  const searchOpponent = () => {
 
-        return () => {
-            socket.off('leftRoom')
-        }
-    }, [])*/
+  }
 
-  const searchOpponent = () => {};
+  const startGame = () => {
 
-  const startGame = () => {};
+  }
 
   if (room) {
     return (
-      <div className="play">
-        <div className="playHeader">
-          <h1> {room.host.infos.username}'s room </h1>
+      <div className='play'>
+        <div className='playHeader'>
+          <h1> Room {room && room.id} </h1>
         </div>
-        <div className="playBody">
-          <PlayerEntry
-            player={room.host}
-            ready={hostReady}
-            setReady={setHostReady}
-            room={room}
-          />
-          <PlayerEntry
-            player={room.guest}
-            ready={guestReady}
-            setReady={setGuestReady}
-            room={room}
-          />
+        <div className='playBody'>
+          {room.host && <PlayerEntry player={room.host} ready={hostReady} setReady={setHostReady} room={room} />}
+          {room.guest && <PlayerEntry player={room.guest} ready={guestReady} setReady={setGuestReady} room={room} />}
         </div>
-        <div className="playFooter">
+        <div className='playFooter'>
           <button onClick={startGame}> Start </button>
+          <Spectators room={room} />
         </div>
-      </div>
-    );
-  } else {
+      </div >
+    )
+  }
+  else {
     return (
-      <div className="play">
-        <div className="playHeader">
+      <div className='play'>
+        <div className='playHeader'>
           <h1> Play </h1>
         </div>
-        <div className="playBody"></div>
-        <div className="playFooter">
+        <div className='playBody'>
+        </div>
+        <div className='playFooter'>
           <button onClick={searchOpponent}> Search opponent </button>
         </div>
       </div>
-    );
+    )
   }
-};
+}
 
 export default Play;

@@ -7,7 +7,8 @@ import { UpdateResult } from "typeorm";
 
 @Injectable()
 export class RoomService {
-  rooms: Map<string, Room> = new Map();
+    rooms: Map<string, Room> = new Map();
+    usersRooms: Map<number, Room> = new Map();
 
   createRoomUser(user: User): RoomUser {
     return {
@@ -16,60 +17,74 @@ export class RoomService {
     };
   }
 
-  createRoom(host: User, guest: User) {
-    console.log("create room");
-    const room = {
-      id: host.id.toString(),
-      host: {
-        infos: host,
-        ready: false,
-      },
-      guest: {
-        infos: guest,
-        ready: false,
-      },
-      spectators: [],
-    };
-    this.rooms.set(room.id, room);
-    return room;
-  }
+    createRoom(roomId: number) {
+        console.log('create room')
+        const room = {
+            id: roomId.toString(),
+            guest: null,
+            host: null,
+            spectators: [],
+        };
+        this.rooms.set(room.id, room);
+        return room;
+    }
 
-  addSpectator(user: User, room: Room) {
-    room.spectators.push(user);
-    this.rooms.set(room.id, room);
-  }
+    isEmptyRoom(room: Room) {
+        return !room.host && !room.guest;
+    }
+
+    deleteRoom(roomId: string) {
+        this.rooms.delete(roomId);
+        return null;
+    }
+
+    addSpectator(user: User, room: Room) {
+        room.spectators.push(user);
+        this.usersRooms.set(user.id, room);
+        this.rooms.set(room.id, room);
+    }
 
   findRoom(id: number) {
     return this.rooms.get(id.toString());
   }
 
-  joinRoom(host: User, guest: User) {
-    console.log("join room");
-    let room = this.findRoom(host.id);
-    if (room !== undefined) this.addSpectator(guest, room);
-    else {
-      /*this.rooms.forEach((value, key) => {
-                console.log(key + '=' + value);
-            })*/
-      room = this.createRoom(host, guest);
-    }
+  joinRoom(data: any) {
+    console.log('join room')
+    let room = this.findRoom(data.hostId);
+
+    if (!room)
+        room = this.createRoom(data.hostId);
+      if (data.user.id === data.hostId)
+        room.host = this.createRoomUser(data.user);
+      else if (!room.guest)
+        room.guest = this.createRoomUser(data.user);
+      else
+        return null;
+    this.rooms.set(room.id, room);
     return room;
   }
 
-  leaveRoom(id: string, userId: number) {
-    const room = this.rooms.get(id);
+    leaveRoom(id: string, userId: number) {
+        let room = this.rooms.get(id);
 
-    if (room !== undefined) {
-      console.log("room found, leaving room");
-      if (room.host && room.host.infos.id === userId) {
-        room.host = room.guest;
-        room.guest = null;
-      } else if (room.guest && room.guest.infos.id === userId)
-        room.guest = null;
-      else room.spectators.filter((spectator) => spectator.id !== userId);
-      this.rooms.set(room.id, room);
-      return room;
+        this.usersRooms.delete(userId);
+        if (room !== undefined) {
+            if (room.host && room.host.infos.id === userId) {
+                room.host = room.guest;
+                room.guest = null;
+                if (this.isEmptyRoom(room)) {
+                    console.log('room empty, deleting room')
+                    return this.deleteRoom(id);
+                }
+            }
+            else if (room.guest && room.guest.infos.id === userId)
+                room.guest = null;
+            else {
+                room.spectators = room.spectators.filter(spectator => spectator.id !== userId)
+            }
+            this.rooms.set(room.id, room);
+            return (room);
+        }
+        return null;
     }
-    return null;
-  }
 }

@@ -1,14 +1,10 @@
-import {
-  OnGatewayConnection,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from "@nestjs/websockets";
-import { Socket, Namespace } from "socket.io";
-import { User } from "src/database";
-import { NotifData } from "src/utils/types";
-import { GameService } from "./game.service";
-import { RoomService } from "./room.service";
+import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { userInfo } from 'os';
+import { Socket, Namespace } from 'socket.io';
+import { User } from 'src/database';
+import { NotifData, Room } from 'src/utils/types';
+import { GameService } from './game.service';
+import { RoomService } from './room.service';
 
 @WebSocketGateway(3003, {
   cors: {
@@ -16,11 +12,12 @@ import { RoomService } from "./room.service";
   },
   namespace: "game",
 })
+
 export class GameGateway {
   constructor(
     private readonly roomService: RoomService,
-    private readonly gameService: GameService
-  ) {}
+    private readonly gameService: GameService,
+  ) { }
 
   @WebSocketServer() server: Namespace;
 
@@ -34,12 +31,27 @@ export class GameGateway {
     this.gameService.users.delete(userId);
   }
 
-  @SubscribeMessage("joinRoom")
-  joinRoom(client: Socket, notif: NotifData) {
-    console.log("join event");
-    const room = this.roomService.joinRoom(notif.from, notif.to);
+  @SubscribeMessage('joinRoom')
+  joinRoom(client: Socket, data: any) {
+    console.log('join event')
+    const oldRoom = this.roomService.usersRooms.get(data.user.id);
+    const room = this.roomService.joinRoom(data);
 
-    this.server.emit("joinedRoom", room);
+    if (!room)
+      this.server.to(client.id).emit('error', `couldn't join room : room full`)
+    else {
+      console.log('return room', room);
+      if (oldRoom) {
+        const leaveData = {
+          roomId: oldRoom.id,
+          userId: data.user.id,
+        }
+        this.leaveRoom(client, leaveData);
+      }
+      this.roomService.usersRooms.set(data.user.id, room);
+      client.join(room.id);
+      this.server.to(room.id).emit('joinedRoom', room);
+    }
   }
 
   @SubscribeMessage("join")
@@ -51,12 +63,29 @@ export class GameGateway {
   leaveRoom(client: Socket, data: any) {
     console.log("leave room event");
     const room = this.roomService.leaveRoom(data.roomId, data.userId);
+    const left = {
+      userId: data.userId,
+      room
+    };
 
-    if (!room) console.log("error leaving room");
+    console.log(`client ${data.userId} left`)
+    client.to(data.roomId).emit('leftRoom', left);
+    this.server.to(client.id).emit('clearRoom');
+    client.leave(data.roomId);
+  }
+
+  @SubscribeMessage('spectate')
+  spectate(client: Socket, data: any) {
+    console.log('spectatate event');
+    const room = this.roomService.usersRooms.get(data.user.id);
+
+    if (!room)
+      this.server.to(client.id).emit('error', `user ${data.user.username} is not currently in a game`);
     else {
-      console.log("room id", room.id);
-      this.server.to(room.id).emit("leftRoom", data);
-      client.leave(data.roomId);
+      this.roomService.addSpectator(data.me, room);
+      client.join(room.id);
+      this.server.to(room.id).emit('joinedRoom', room);
     }
+
   }
 }
