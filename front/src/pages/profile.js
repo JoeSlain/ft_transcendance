@@ -6,11 +6,11 @@ import Params from './params'
 const ProfilePage = ({ setUser }) => {
     const user = useContext(UserContext);
     const [params, setParams] = useState(false);
-    const [url, setUrl] = useState(user.profile_pic);
+    const [url, setUrl] = useState(null);
 
     useEffect(() => {
         async function getAvatar() {
-            const res = await fetch('http://localhost:3001/api/users/getAvatar', {
+            const res = await fetch(`http://localhost:3001/api/users/getAvatar/${user.id}`, {
                 method: 'GET', credentials: 'include'
             })
             const blob = await res.blob()
@@ -18,6 +18,8 @@ const ProfilePage = ({ setUser }) => {
         }
         if (user.avatar)
             getAvatar();
+        else
+            setUrl(user.profile_pic);
     }, [user.avatar])
 
     if (params)
@@ -33,7 +35,7 @@ const ProfilePage = ({ setUser }) => {
                     Your winratio is {user.winratio}
                     (W: {user.n_win}, L: {user.n_lose})
                 </p>
-                <img src={url} />
+                {url && <img src={url} />}
             </div>
         )
     }

@@ -117,6 +117,18 @@ export class UsersController {
         const path = req.user.avatar;
 
         console.log('path', path);
-        return res.sendFile(path, {root: './uploads'});
+        if (path)
+            return res.sendFile(path, {root: './uploads'});
+        console.log('error geting avatar: invalid file path');
+    }
+
+    @Get('getAvatar/:id')
+    @UseGuards(TwoFactorGuard)
+    async getAvatarById(@Param() params, @Res() res) {
+        const user = await this.usersService.getById(params.id);
+
+        if (user && user.avatar)
+            return res.sendFile(user.avatar, {root: './uploads'});
+        console.log('error getting avatar: invalid user or file path');
     }
 }
