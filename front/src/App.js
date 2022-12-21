@@ -50,7 +50,8 @@ function App() {
 
     chatSocket.on('disconnect', () => {
       //logout(user, chatSocket, setUser, setIsLogged)
-      chatSocket.emit('logout', user)
+      if (user)
+        chatSocket.emit('logout', user)
     })
 
     chatSocket.on('loggedIn', data => {
@@ -96,8 +97,10 @@ function App() {
       chatSocket.off('connect')
       chatSocket.off('disconnect')
       chatSocket.off('loggedIn')
-      chatSocket.off('clearRoom')
       chatSocket.off('error')
+
+      gameSocket.off('connect')
+      gameSocket.off('clearRoom')
       gameSocket.off('error')
     }
   }, [error])

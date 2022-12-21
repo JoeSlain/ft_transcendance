@@ -92,6 +92,7 @@ const Friend = ({ setNotifs }) => {
             socket.off('updateStatus')
             socket.off('notified')
             socket.off('friendDeleted')
+            socket.off('acceptedInvite')
         }
     }, [])
 
