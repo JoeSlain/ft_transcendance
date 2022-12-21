@@ -18,59 +18,60 @@ const Friend = ({ setNotifs }) => {
   const me = useContext(UserContext);
 
   useEffect(() => {
-    const handleClick = () => setShow(false);
-    socket.emit("getFriends", me);
+    const handleClick = () => setShow(false)
+    socket.emit('getFriends', me);
 
     // window listener
-    window.addEventListener("click", handleClick);
+    window.addEventListener('click', handleClick)
 
     // get friends
-    console.log("get friends axios");
-    socket.on("friends", (data) => {
-      console.log("friends", data.friends);
-      setFriends(data.friends);
-      setStatuses(new Map(JSON.parse(data.statuses)));
-    });
+    console.log('get friends axios')
+    socket.on('friends', data => {
+      console.log('friends', data.friends)
+      setFriends(data.friends)
+      setStatuses(new Map(JSON.parse(data.statuses)))
+    })
 
     // new friend
-    socket.on("newFriend", (data) => {
-      console.log("newFriendEvent");
-      console.log("adding friend", data);
-      setFriends((prev) => [...prev, data]);
-      setStatuses((prev) => new Map(prev.set(data.id, "online")));
-    });
+    socket.on('newFriend', data => {
+      console.log('newFriendEvent')
+      console.log('adding friend', data)
+      setFriends(prev => [...prev, data])
+      setStatuses(prev => new Map(prev.set(data.id, 'online')))
+    })
 
     // update friend status
-    socket.on("updateStatus", (data) => {
-      console.log("friend update", data.user);
-      console.log("statuses", statuses);
-      setStatuses((prev) => {
+    socket.on('updateStatus', data => {
+      console.log('friend update', data.user)
+      console.log('statuses', statuses)
+      setStatuses(prev => {
         if (prev.has(data.user.id)) {
-          console.log("user found, changing status");
-          return new Map(prev.set(data.user.id, data.status));
-        } else {
-          console.log("user not found, status unchanged");
-          return prev;
+          console.log('user found, changing status')
+          return new Map(prev.set(data.user.id, data.status))
         }
-      });
-    });
+        else {
+          console.log('user not found, status unchanged')
+          return prev
+        }
+      })
+    })
 
     // notif received
-    socket.on("notified", (data) => {
-      console.log("invitation received");
+    socket.on('notified', data => {
+      console.log('invitation received')
       if (data.from.id !== me.id) {
-        console.log(`${data.from.username} invited you`);
-        console.log("accept event", data.acceptEvent);
-        console.log("decline event", data.declineEvent);
-        setNotifs((prev) => [...prev, data]);
+        console.log(`${data.from.username} invited you`)
+        console.log('accept event', data.acceptEvent)
+        console.log('decline event', data.declineEvent)
+        setNotifs(prev => [...prev, data])
       }
-    });
+    })
 
     // friend deleted
-    socket.on("friendDeleted", (data) => {
-      console.log(`deleting ${data.username}`);
-      setFriends((prev) => prev.filter((friend) => friend.id !== data.id));
-    });
+    socket.on('friendDeleted', data => {
+      console.log(`deleting ${data.username}`)
+      setFriends(prev => prev.filter(friend => friend.id !== data.id))
+    })
 
     // invite to play
     socket.on('acceptedInvite', data => {
@@ -91,8 +92,9 @@ const Friend = ({ setNotifs }) => {
       socket.off('updateStatus')
       socket.off('notified')
       socket.off('friendDeleted')
+      socket.off('acceptedInvite')
     }
-  }, [])
+  });
 
   const handleInvite = (user) => {
     const data = {

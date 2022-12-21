@@ -70,6 +70,7 @@ export class RoomService {
         this.usersRooms.delete(userId);
         if (room !== undefined) {
             if (room.host && room.host.infos.id === userId) {
+                console.log('host left');
                 room.host = room.guest;
                 room.guest = null;
                 if (this.isEmptyRoom(room)) {
@@ -78,8 +79,12 @@ export class RoomService {
                 }
             }
             else if (room.guest && room.guest.infos.id === userId)
+            {
+                console.log('guest left');
                 room.guest = null;
+            }
             else {
+                console.log('spetator left');
                 room.spectators = room.spectators.filter(spectator => spectator.id !== userId)
             }
             this.rooms.set(room.id, room);
