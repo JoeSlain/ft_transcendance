@@ -7,6 +7,7 @@ export type userType = {
   id42: number;
   winratio: string;
   profile_pic: string;
+  avatar : string | null,
   elo: number;
   n_win: number;
   n_lose: number;

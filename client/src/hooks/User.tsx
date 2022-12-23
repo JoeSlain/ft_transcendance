@@ -1,6 +1,7 @@
 import React from "react";
+import { userType } from "../types/userType";
 
-export default React.createContext({
+export default React.createContext<userType>({
   id: 0,
   username: "",
   email: "",
@@ -12,5 +13,6 @@ export default React.createContext({
   elo: 0,
   n_win: 0,
   n_lose: 0,
-  date_of_sign: new Date(),
+  avatar : null,
+  date_of_sign: new Date()
 });

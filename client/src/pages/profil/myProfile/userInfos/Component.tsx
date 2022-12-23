@@ -30,7 +30,7 @@ export default function UserInfos() {
       ></input>
       <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
         <img
-          src={user.profile_pic}
+          src={user.avatar != null ? user.avatar : user.profile_pic}
           alt="Avatar"
           className="w-32 sm:w-64 avatar cursor-pointer rounded-full"
         />
