@@ -3,7 +3,8 @@
   height: 100%;
 }
 
-.main-content {
+.chatMain {
+  width: 100%;
   text-align: center;
 }
 
@@ -11,14 +12,15 @@
   display: flex;
 }
 
-.dmEntry {
-  border: 2px solid rgba(9, 9, 9, 0.23);
-  padding: 5px;
-  border-radius: 5px;
+.chatBody {
+  height: 420px;
 }
 
-.chatBody {
-  height: 70%;
+.chanUsers {
+  width: 20%;
+  height: 600px;
+  box-shadow: 2px 2px 2px 2px rgba(0.23, 0.23, 0.23, 0.23);
+  text-align: center;
 }
 
 .message {

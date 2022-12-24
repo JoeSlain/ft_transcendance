@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { Notif } from './Notif';
 
 @Entity({ name: 'users' })
 export class User {

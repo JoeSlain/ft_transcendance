@@ -1,18 +1,26 @@
-import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { map } from 'rxjs';
-import { Socket, Namespace } from 'socket.io';
-import { Notif, User } from 'src/database';
-import { NotifService } from 'src/users/notifs.service';
-import { UsersService } from 'src/users/users.service';
-import { ChatService } from './chat.service';
-import { NotifData } from '../utils/types';
-import { RoomService } from 'src/game/room.service';
+import {
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from "@nestjs/websockets";
+import { map } from "rxjs";
+import { Socket, Namespace } from "socket.io";
+import { Channel, Notif, User } from "src/database";
+import { NotifService } from "src/users/notifs.service";
+import { UsersService } from "src/users/users.service";
+import { ChatService } from "./chat.service";
+import { ChannelData, NotifData } from "../utils/types";
+import { RoomService } from "src/game/room.service";
+import { ChannelService } from "./channel.service";
 
 @WebSocketGateway(3002, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: "http://localhost:3000",
   },
-  namespace: 'chat',
+  namespace: "chat",
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
@@ -20,15 +28,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly chatService: ChatService,
     private readonly notifService: NotifService,
     private readonly roomService: RoomService,
-  ) { }
+    private readonly channelService: ChannelService
+  ) {}
 
   @WebSocketServer() server: Namespace;
 
-  handleConnection(client: Socket) {
-  }
+  handleConnection(client: Socket) {}
 
-  handleDisconnect(client: any) {
-  }
+  handleDisconnect(client: any) {}
 
   /* LOGIN
   ** description: sauvegarde l'id du socket du client qui vient de s'authentifier
@@ -37,17 +44,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal emis cote client: clientSocket.emit('login', user)
   ** reponse broadcast: 'updateStatus', {user, status}
   ** reponse client: 'loggedIn', {user} */
-  @SubscribeMessage('login')
+  @SubscribeMessage("login")
   async login(client: Socket, user: User) {
     const data = {
       user,
-      status: 'online',
+      status: "online",
     };
-    console.log('chat ws login')
+    console.log("chat ws login");
 
     this.chatService.addUser(user.id, client.id);
-    client.broadcast.emit('updateStatus', data);
-    this.server.to(client.id).emit('loggedIn', user);
+    client.broadcast.emit("updateStatus", data);
+    this.server.to(client.id).emit("loggedIn", user);
   }
 
   /* LOGOUT
@@ -56,19 +63,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal client: clientSocket.emit('logout', user)
   ** reponse broadcast: 'updateStatus', {user, status})
   ** reponse client: 'loggedOut', pas de params */
-  @SubscribeMessage('logout')
+  @SubscribeMessage("logout")
   async logout(client: Socket, user: User) {
     const data = {
       user,
-      status: 'offline',
-    }
-    console.log('chat ws logout')
+      status: "offline",
+    };
+    console.log("chat ws logout");
 
     if (this.chatService.removeUser(user.id))
-      client.broadcast.emit('updateStatus', data);
-    else
-      console.log('error logging out')
-    this.server.to(client.id).emit('loggedOut');
+      client.broadcast.emit("updateStatus", data);
+    else console.log("error logging out");
+    this.server.to(client.id).emit("loggedOut");
   }
 
   /* GET FRIENDS
@@ -83,23 +89,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       Pour utiliser la map de statuts cote client, faire : new Map(JSON.parse(ret.statuses)) pour
       reconvertir la JSON string en map.
   */
-  @SubscribeMessage('getFriends')
+  @SubscribeMessage("getFriends")
   async getFriends(client: Socket, user: User) {
     const friends = await this.usersService.getFriends(user);
     const map = new Map();
 
-    friends.forEach(friend => {
-      if (this.chatService.getUser(friend.id))
-        map.set(friend.id, 'online');
-      else
-        map.set(friend.id, 'offline');
-    })
+    friends.forEach((friend) => {
+      if (this.chatService.getUser(friend.id)) map.set(friend.id, "online");
+      else map.set(friend.id, "offline");
+    });
     const ret = {
       friends: friends,
       statuses: JSON.stringify(Array.from(map)),
-    }
+    };
 
-    this.server.to(client.id).emit('friends', ret);
+    this.server.to(client.id).emit("friends", ret);
   }
 
   /* NOTIF
@@ -116,21 +120,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal client: clientSocket.emit('notif', notif)
   ** reponse destinataire: 'notified', {notifData}
   */
-  @SubscribeMessage('notif')
+  @SubscribeMessage("notif")
   async notify(client: Socket, notif: NotifData) {
-    console.log('chat websocket invite');
+    console.log("chat websocket invite");
 
-    if (notif.type === 'Friend Request') {
-      const friend = await this.usersService.findFriend(notif.from.id, notif.to.id);
+    if (notif.type === "Friend Request") {
+      const friend = await this.usersService.findFriend(
+        notif.from.id,
+        notif.to.id
+      );
       if (friend.length) {
-        this.server.to(client.id).emit('error', `friend ${notif.to.username} already added`)
+        this.server
+          .to(client.id)
+          .emit("error", `friend ${notif.to.username} already added`);
         return;
       }
       await this.notifService.createNotif(notif);
     }
     const to = this.chatService.getUser(notif.to.id);
-    if (to)
-      this.server.to(to).emit('notified', notif);
+    if (to) this.server.to(to).emit("notified", notif);
   }
 
   /* ACCEPT FRIEND
@@ -140,22 +148,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** reponse user to: 'newFriend', {from}
   ** reponse user from: 'newFriend', {to}
   */
-  @SubscribeMessage('acceptFriendRequest')
+  @SubscribeMessage("acceptFriendRequest")
   async addFriend(client: Socket, notif: NotifData) {
-    console.log('addFriend event');
-    console.log('from', notif.from);
-    console.log('to', notif.to);
+    console.log("addFriend event");
+    console.log("from", notif.from);
+    console.log("to", notif.to);
 
     const newFriend = await this.usersService.addFriend(notif.from, notif.to);
     if (newFriend) {
       await this.notifService.deleteNotif(notif);
       const from = this.chatService.getUser(notif.from.id);
-      if (from)
-        this.server.to(from).emit('newFriend', notif.to);
-      this.server.to(client.id).emit('newFriend', notif.from);
-    }
-    else
-      console.log('error adding friend');
+      if (from) this.server.to(from).emit("newFriend", notif.to);
+      this.server.to(client.id).emit("newFriend", notif.from);
+    } else console.log("error adding friend");
   }
 
   /* DECLINE FRIEND
@@ -163,10 +168,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       supprimer la notification de la database et on ne repond rien au client
   ** signal client: clientSocket.emit('declineFriendRequest', notif)
   ** 
-  */ 
-  @SubscribeMessage('declineFriendRequest')
+  */
+  @SubscribeMessage("declineFriendRequest")
   async deleteNotif(client: Socket, notif: NotifData) {
-    console.log('decline friend event');
+    console.log("decline friend event");
 
     await this.notifService.deleteNotif(notif);
   }
@@ -177,20 +182,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal client: clientSocket.emit('deleteFriend', notif)
   ** reponse user to: 'friendDeleted', {notif.from}
   ** reponse user from: 'friendDeleted', {notif.to} */
-  @SubscribeMessage('deleteFriend')
+  @SubscribeMessage("deleteFriend")
   async deleteFriend(client: Socket, notif: NotifData) {
-    console.log('deleteFriend event');
+    console.log("deleteFriend event");
 
     const user1 = await this.usersService.deleteFriend(notif.from, notif.to.id);
-    const user2 = await this.usersService.deleteFriend(notif.to, notif.from.id)
+    const user2 = await this.usersService.deleteFriend(notif.to, notif.from.id);
     if (user1 && user2) {
       const to = this.chatService.getUser(notif.to.id);
-      if (to)
-        this.server.to(to).emit('friendDeleted', notif.from);
-      this.server.to(client.id).emit('friendDeleted', notif.to);
-    }
-    else
-      console.log('error deleting friend');
+      if (to) this.server.to(to).emit("friendDeleted", notif.from);
+      this.server.to(client.id).emit("friendDeleted", notif.to);
+    } else console.log("error deleting friend");
   }
 
   /* ACCEPT INVITE
@@ -202,13 +204,34 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal client: clientSocket.emit('acceptInvite', notif)
   ** reponse user from: 'acceptedInvite', notif.from.id
   ** reponse user to: 'acceptedInvite', notif.from.id */
-  @SubscribeMessage('acceptInvite')
+  @SubscribeMessage("acceptInvite")
   async acceptInvite(client: Socket, notif: NotifData) {
     const from = this.chatService.getUser(notif.from.id);
 
     if (from) {
-      this.server.to(from).emit('acceptedInvite', notif.from.id);
-      this.server.to(client.id).emit('acceptedInvite', notif.from.id);
+      this.server.to(from).emit("acceptedInvite", notif.from.id);
+      this.server.to(client.id).emit("acceptedInvite", notif.from.id);
+    }
+  }
+
+  @SubscribeMessage("getChannels")
+  async getChannels(client: Socket, userId: number) {
+    const privateChans = await this.channelService.getPrivateChannels(userId);
+    const publicChans = await this.channelService.getPublicChannels();
+
+    this.server.to(client.id).emit("channels", { privateChans, publicChans });
+  }
+
+  @SubscribeMessage("createChannel")
+  async createChannel(client: Socket, chanData: ChannelData) {
+    console.log("create channel");
+    const channel = await this.channelService.createChannel(chanData);
+    console.log("returned channel", channel);
+
+    if (!channel) this.server.to(client.id).emit("error", "invalid chan name");
+    else {
+      if (channel.type !== "private") this.server.emit("newChannel", channel);
+      else this.server.to(client.id).emit("newChannel", channel);
     }
   }
 }

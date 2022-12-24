@@ -27,14 +27,21 @@ import { getStorageItem, saveStorageItem } from "./storage/localStorage";
 import { UserContext } from "./context/userContext";
 import { ChatContext, GameContext } from "./context/socketContext";
 import logout from "./components/logout";
+import AddChannel from "./components/addChannel";
 
 function App() {
   const [user, setUser] = useState(getStorageItem("user"));
   const [notifs, setNotifs] = useState([]);
+  const [showChanMenu, setShowChanMenu] = useState(false);
   const [isLogged, setIsLogged] = useState(false);
   const [room, setRoom] = useState(getStorageItem("room"));
   const [error, setError] = useState(null);
   const [chat, setChat] = useState({
+    directMessages: [],
+    publicChans: [],
+    privateChans: [],
+  });
+  /*const [chat, setChat] = useState({
     directMessages: [
       {
         name: "test1",
@@ -80,6 +87,11 @@ function App() {
       {
         name: "chan1",
         type: "private",
+        users: [
+          { username: "test1" },
+          { username: "test2" },
+          { username: "dchheang" },
+        ],
         messages: [
           {
             from: "test1",
@@ -103,20 +115,23 @@ function App() {
       {
         name: "chan2",
         type: "private",
+        users: [{ username: "test1" }],
       },
     ],
     publicChans: [
       {
         name: "chan1",
         type: "public",
+        users: [{ username: "test2" }],
       },
     ],
-  });
+  });*/
 
   const navigate = useNavigate();
   const chatSocket = useContext(ChatContext);
   const gameSocket = useContext(GameContext);
 
+  // login events
   useEffect(() => {
     chatSocket.on("connect", () => {
       if (user) chatSocket.emit("login", user);
@@ -129,6 +144,28 @@ function App() {
 
     chatSocket.on("loggedIn", (data) => {
       console.log("loggedIn");
+      axios
+        .get("http://localhost:3001/api/chat/privateChannels", {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log("privateChans", response.data);
+          setChat({
+            ...chat,
+            privateChans: chat.privateChans.concat(response.data),
+          });
+        });
+      axios
+        .get("http://localhost:3001/api/chat/publicChannels", {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log("publicChans", response.data);
+          setChat({
+            ...chat,
+            publicChans: chat.publicChans.concat(response.data),
+          });
+        });
       axios
         .get("http://localhost:3001/api/users/notifs", {
           withCredentials: true,
@@ -151,10 +188,6 @@ function App() {
       alert(data);
     });
 
-    gameSocket.on("connect", () => {
-      if (room) gameSocket.emit("join", room.id);
-    });
-
     gameSocket.on("clearRoom", () => {
       console.log("me left");
       setRoom(null);
@@ -175,8 +208,9 @@ function App() {
       gameSocket.off("clearRoom");
       gameSocket.off("error");
     };
-  }, [error]);
+  }, [user]);
 
+  // logout and room events
   useEffect(() => {
     chatSocket.on("loggedOut", () => {
       axios
@@ -199,6 +233,10 @@ function App() {
           setIsLogged(false);
           saveStorageItem("user", null);
         });
+    });
+
+    gameSocket.on("connect", () => {
+      if (room) gameSocket.emit("join", room.id);
     });
 
     gameSocket.on("joinedRoom", (data) => {
@@ -236,6 +274,28 @@ function App() {
     };
   }, [user, room]);
 
+  // Chat events
+  useEffect(() => {
+    chatSocket.on("channels", ({ privateChans, publicChans }) => {
+      console.log("privateChans", privateChans);
+      console.log("publicChans", publicChans);
+      setChat({ ...chat, privateChans, publicChans });
+    });
+
+    chatSocket.on("newChannel", (channel) => {
+      console.log("new chan");
+      if (channel.type === "private") {
+        setChat({ ...chat, privateChans: chat.privateChans.concat(channel) });
+      } else {
+        setChat({ ...chat, publicChans: chat.publicChans.concat(channel) });
+      }
+    });
+
+    return () => {
+      chatSocket.off("newChannel");
+    };
+  }, [chat]);
+
   return (
     <div id="main">
       <UserContext.Provider value={user}>
@@ -243,6 +303,7 @@ function App() {
         {isLogged && notifs[0] && (
           <Notif notifs={notifs} setNotifs={setNotifs} />
         )}
+        {showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />}
 
         <div className="main">
           <div className="main-content">
@@ -266,7 +327,13 @@ function App() {
                 <Route path="games" element={<Games />} />
                 <Route
                   path="chat"
-                  element={<Chat chat={chat} setChat={setChat} />}
+                  element={
+                    <Chat
+                      chat={chat}
+                      setChat={setChat}
+                      setShowChanMenu={setShowChanMenu}
+                    />
+                  }
                 />
               </Route>
             </Routes>
