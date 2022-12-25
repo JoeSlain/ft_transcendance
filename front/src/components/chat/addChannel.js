@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import "../styles/notif.css";
-import "../styles/addChannel.css";
-import { UserContext } from "../context/userContext";
-import { ChatContext } from "../context/socketContext";
+import "../../styles/notif.css";
+import "../../styles/addChannel.css";
+import { UserContext } from "../../context/userContext";
+import { ChatContext } from "../../context/socketContext";
 
 const ChanInput = ({ title, chanEntry, setChanEntry }) => {
   return (

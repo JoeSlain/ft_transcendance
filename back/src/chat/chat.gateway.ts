@@ -225,13 +225,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage("createChannel")
   async createChannel(client: Socket, chanData: ChannelData) {
     console.log("create channel");
-    const channel = await this.channelService.createChannel(chanData);
-    console.log("returned channel", channel);
-
-    if (!channel) this.server.to(client.id).emit("error", "invalid chan name");
+    const error = await this.channelService.checkChanData(chanData);
+    console.log("error", error);
+    if (error) this.server.to(client.id).emit("error", error);
     else {
-      if (channel.type !== "private") this.server.emit("newChannel", channel);
-      else this.server.to(client.id).emit("newChannel", channel);
+      const channel = await this.channelService.createChannel(chanData);
+      console.log("returned channel", channel);
+
+      if (!channel)
+        this.server.to(client.id).emit("error", "invalid chan name");
+      else {
+        if (channel.type !== "private") this.server.emit("newChannel", channel);
+        else this.server.to(client.id).emit("newChannel", channel);
+      }
     }
   }
 }

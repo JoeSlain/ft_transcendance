@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Channel, User } from "src/database";
 import { ChannelData } from "src/utils/types";
 import { Repository, createQueryBuilder } from "typeorm";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class ChannelService {
@@ -29,14 +30,16 @@ export class ChannelService {
   }
 
   async getPrivateChannels(userId: number) {
-    const chans = await this.chanRepo
+    const tmp = await this.chanRepo
       .createQueryBuilder("channel")
-      .where("channel.type = :type", { type: "private" })
       .leftJoinAndSelect("channel.owner", "owner")
       .where("channel.owner = :id", { id: userId })
+      .andWhere("channel.type = :type", { type: "private" })
       .getMany();
 
-    console.log("private chans", chans);
+    const chans = tmp.map((chan) => {
+      return { ...chan, password: null };
+    });
     return chans;
   }
 
@@ -49,13 +52,19 @@ export class ChannelService {
     return ret;
   }
 
-  async createChannel(chanData: ChannelData) {
-    if (await this.findChannel(chanData)) return null;
+  async checkChanData(chanData: ChannelData) {
+    if (await this.findChannel(chanData)) return "invalid channel name";
+    if (chanData.type === "protected" && !chanData.password)
+      return "invalid password for protected channel";
+    return null;
+  }
 
+  async createChannel(chanData: ChannelData) {
+    const hashedPassword = await bcrypt.hash(chanData.password, 10);
     const channel = this.chanRepo.create({
       name: chanData.name,
       type: chanData.type,
-      password: chanData.password,
+      password: hashedPassword,
     });
     await this.chanRepo.save(channel);
     await this.chanRepo
@@ -63,6 +72,6 @@ export class ChannelService {
       .relation(Channel, "owner")
       .of(channel)
       .set(chanData.owner);
-    return channel;
+    return { ...channel, password: null };
   }
 }

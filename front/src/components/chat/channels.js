@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { ChanStyle } from "../styles/channels";
-import { ContextMenu } from "../styles/menus";
-import { DmStyle } from "../styles/dms";
+import { useContext, useEffect, useState } from "react";
+import { ChanStyle } from "../../styles/channels";
+import { ContextMenu } from "../../styles/menus";
+import { DmStyle } from "../../styles/dms";
+import { ChatContext } from "../../context/socketContext";
 
 const ChanEntry = ({ channel, show, points, selected }) => {
   const handleDelete = () => {};
@@ -43,6 +44,7 @@ export const DirectMessages = ({ directMessages, selected, setSelected }) => {
 export const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
   const [points, setPoints] = useState({ x: 0, y: 0 });
   const [show, setShow] = useState(false);
+  const socket = useContext(ChatContext);
 
   useEffect(() => {
     window.addEventListener("click", () => {
@@ -70,6 +72,7 @@ export const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
               setPoints({ x: e.pageX, y: e.pageY });
             }}
             onClick={() => {
+              //socket.emit('joinChannel', chan);
               setSelected(chan);
               setShowUsers(true);
             }}
@@ -82,6 +85,36 @@ export const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
             />
           </div>
         ))}
+    </div>
+  );
+};
+
+export const Channels = ({
+  privateChans,
+  publicChans,
+  selected,
+  setSelected,
+  setShowChanMenu,
+  setShowUsers,
+}) => {
+  return (
+    <div className="aside">
+      <h2> Channels </h2>
+      <button onClick={() => setShowChanMenu(true)}> + </button>
+      <h3 className="chanType"> Private </h3>
+      <Channel
+        channel={privateChans}
+        selected={selected}
+        setSelected={setSelected}
+        setShowUsers={setShowUsers}
+      />
+      <h3 className="chanType"> Public </h3>
+      <Channel
+        channel={publicChans}
+        selected={selected}
+        setSelected={setSelected}
+        setShowUsers={setShowUsers}
+      />
     </div>
   );
 };

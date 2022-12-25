@@ -27,7 +27,7 @@ import { getStorageItem, saveStorageItem } from "./storage/localStorage";
 import { UserContext } from "./context/userContext";
 import { ChatContext, GameContext } from "./context/socketContext";
 import logout from "./components/logout";
-import AddChannel from "./components/addChannel";
+import AddChannel from "./components/chat/addChannel";
 
 function App() {
   const [user, setUser] = useState(getStorageItem("user"));
@@ -145,28 +145,6 @@ function App() {
     chatSocket.on("loggedIn", (data) => {
       console.log("loggedIn");
       axios
-        .get("http://localhost:3001/api/chat/privateChannels", {
-          withCredentials: true,
-        })
-        .then((response) => {
-          console.log("privateChans", response.data);
-          setChat({
-            ...chat,
-            privateChans: chat.privateChans.concat(response.data),
-          });
-        });
-      axios
-        .get("http://localhost:3001/api/chat/publicChannels", {
-          withCredentials: true,
-        })
-        .then((response) => {
-          console.log("publicChans", response.data);
-          setChat({
-            ...chat,
-            publicChans: chat.publicChans.concat(response.data),
-          });
-        });
-      axios
         .get("http://localhost:3001/api/users/notifs", {
           withCredentials: true,
         })
@@ -273,28 +251,6 @@ function App() {
       gameSocket.off("leftRoom");
     };
   }, [user, room]);
-
-  // Chat events
-  useEffect(() => {
-    chatSocket.on("channels", ({ privateChans, publicChans }) => {
-      console.log("privateChans", privateChans);
-      console.log("publicChans", publicChans);
-      setChat({ ...chat, privateChans, publicChans });
-    });
-
-    chatSocket.on("newChannel", (channel) => {
-      console.log("new chan");
-      if (channel.type === "private") {
-        setChat({ ...chat, privateChans: chat.privateChans.concat(channel) });
-      } else {
-        setChat({ ...chat, publicChans: chat.publicChans.concat(channel) });
-      }
-    });
-
-    return () => {
-      chatSocket.off("newChannel");
-    };
-  }, [chat]);
 
   return (
     <div id="main">

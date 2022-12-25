@@ -4,9 +4,12 @@ import "../styles/channels.css";
 import "../styles/messages.css";
 import { ContextMenu } from "../styles/menus";
 import { UserContext } from "../context/userContext";
-import { Channel, DirectMessages } from "../components/channels";
-import ChatMessages from "../components/chatMessages";
-import AddChannel from "../components/addChannel";
+import { Channels, DirectMessages } from "../components/chat/channels";
+import ChatMessages from "../components/chat/chatMessages";
+import AddChannel from "../components/chat/addChannel";
+import useChannels from "../hooks/channelHook";
+import axios from "axios";
+import { ChatContext } from "../context/socketContext";
 
 const MessageForm = ({ selected, setSelected }) => {
   const [message, setMessage] = useState("");
@@ -40,35 +43,6 @@ const MessageForm = ({ selected, setSelected }) => {
   }
 };
 
-const Channels = ({
-  chat,
-  selected,
-  setSelected,
-  setShowChanMenu,
-  setShowUsers,
-}) => {
-  return (
-    <div className="aside">
-      <h2> Channels </h2>
-      <button onClick={() => setShowChanMenu(true)}> + </button>
-      <h3 className="chanType"> Private </h3>
-      <Channel
-        channel={chat.privateChans}
-        selected={selected}
-        setSelected={setSelected}
-        setShowUsers={setShowUsers}
-      />
-      <h3 className="chanType"> Public </h3>
-      <Channel
-        channel={chat.publicChans}
-        selected={selected}
-        setSelected={setSelected}
-        setShowUsers={setShowUsers}
-      />
-    </div>
-  );
-};
-
 const Users = ({ selected, setShowUsers }) => {
   if (selected.users) {
     return (
@@ -87,11 +61,42 @@ const Users = ({ selected, setShowUsers }) => {
 const Chat = ({ chat, setChat, setShowChanMenu }) => {
   const [selected, setSelected] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
+  const [privateChans, setPrivateChans] = useState([]);
+  const [publicChans, setPublicChans] = useState([]);
+  const [openTabs, setOpenTabs] = useState([]);
+  const socket = useContext(ChatContext);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3001/api/chat/privateChannels", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log("privateChans", response.data);
+        setPrivateChans(privateChans.concat(response.data));
+      });
+    axios
+      .get("http://localhost:3001/api/chat/publicChannels", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log("publicChans", response.data);
+        setPublicChans(publicChans.concat(response.data));
+      });
+
+    socket.on("newChannel", (channel) => {
+      console.log("new chan");
+      if (channel.type === "private")
+        setPrivateChans((prev) => [...prev, channel]);
+      else setPublicChans((prev) => [...prev, channel]);
+    });
+  }, []);
 
   return (
     <div className="chat">
       <Channels
-        chat={chat}
+        privateChans={privateChans}
+        publicChans={publicChans}
         selected={selected}
         setSelected={setSelected}
         setShowUsers={setShowUsers}
