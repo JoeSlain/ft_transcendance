@@ -1,8 +1,13 @@
 import React from "react";
 import { userType } from "../types/userType";
 
-export default React.createContext<userType>({
-  id: 0,
+type IUserContext = {
+  user : userType,
+  setUser : (arg: userType) => void; 
+}
+
+export default React.createContext<IUserContext>({
+  user : {id: 0,
   username: "",
   email: "",
   twoFactorAuthenticationSecret: "",
@@ -14,5 +19,7 @@ export default React.createContext<userType>({
   n_win: 0,
   n_lose: 0,
   avatar : null,
-  date_of_sign: new Date()
+  date_of_sign: new Date()},
+  setUser : () =>{}
+
 });

@@ -1,14 +1,25 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { User } from 'src/database';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AuthenticatedGuard } from 'src/auth/42auth/42.guard';
-import { TwoFactorGuard } from 'src/auth/2fa/2fa.guard';
-import { UsersService } from './users.service';
-import { NotifService } from './notifs.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from "@nestjs/common";
+import { User } from "src/database";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { AuthenticatedGuard } from "src/auth/42auth/42.guard";
+import { TwoFactorGuard } from "src/auth/2fa/2fa.guard";
+import { UsersService } from "./users.service";
+import { NotifService } from "./notifs.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
 
 class PostDTO {
   content: string;
@@ -33,9 +44,11 @@ export class UsersController {
   }
 
   @Get("userid/:id")
-  @UseGuards(TwoFactorGuard)
+  //@UseGuards(TwoFactorGuard)
   async findOneById(@Param() params): Promise<User | null> {
-    const user = await this.userRepository.findOneBy({ id: params.id });
+    console.log("🚀 ~ file: users.controller.ts:49 ~ UsersController ~ findOneById ~ params", params)
+
+    const user = await this.userRepository.findOneBy({ id: parseInt(params.id) });
 
     /*console.log('get profile', params.id);
         console.log(user);*/
@@ -92,51 +105,57 @@ export class UsersController {
     return notifs;
   }
   @Post("updateUser")
-  @UseGuards(TwoFactorGuard)
+  //@UseGuards(TwoFactorGuard)
   async updateUser(@Req() req) {
-    console.log(req.body);
+    console.log("REQUEST BODY: ", req.body);
     const user = await this.usersService.updateUser(req.user, req.newUser);
+    return user;
   }
 
-    @Post('uploadAvatar')
-    @UseGuards(TwoFactorGuard)
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: './uploads',
-            filename: (req, file, callback) => {
-                if (!file.originalname)
-                    callback(new Error('error uploading avatar'), file.fieldname)
-                else {
-                    console.log('filename', file.originalname)
-                    const filename = file.originalname;
-                    callback(null, filename);
-                }
-            }
-        })
-    }))
-    async uploadAvatar(@Req() req, @Res() res, @UploadedFile() file: Express.Multer.File) {
-        console.log('uploadAvatar');
-        return this.usersService.uploadAvatar(req.user.id, file.filename);
-    }
+  @Post("uploadAvatar")
+  @UseGuards(TwoFactorGuard)
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: diskStorage({
+        destination: "./uploads",
+        filename: (req, file, callback) => {
+          if (!file.originalname)
+            callback(new Error("error uploading avatar"), file.fieldname);
+          else {
+            console.log("filename", file.originalname);
+            const filename = file.originalname;
+            callback(null, filename);
+          }
+        },
+      }),
+    })
+  )
+  async uploadAvatar(
+    @Req() req,
+    @Res() res,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    console.log("uploadAvatar");
+    return this.usersService.uploadAvatar(req.user.id, file.filename);
+  }
 
-    @Get('getAvatar')
-    @UseGuards(TwoFactorGuard)
-    getAvatar(@Req() req, @Res() res) {
-        const path = req.user.avatar;
+  @Get("getAvatar")
+  @UseGuards(TwoFactorGuard)
+  getAvatar(@Req() req, @Res() res) {
+    const path = req.user.avatar;
 
-        console.log('path', path);
-        if (path)
-            return res.sendFile(path, {root: './uploads'});
-        console.log('error geting avatar: invalid file path');
-    }
+    console.log("path", path);
+    if (path) return res.sendFile(path, { root: "./uploads" });
+    console.log("error geting avatar: invalid file path");
+  }
 
-    @Get('getAvatar/:id')
-    @UseGuards(TwoFactorGuard)
-    async getAvatarById(@Param() params, @Res() res) {
-        const user = await this.usersService.getById(params.id);
+  @Get("getAvatar/:id")
+  @UseGuards(TwoFactorGuard)
+  async getAvatarById(@Param() params, @Res() res) {
+    const user = await this.usersService.getById(params.id);
 
-        if (user && user.avatar)
-            return res.sendFile(user.avatar, {root: './uploads'});
-        console.log('error getting avatar: invalid user or file path');
-    }
+    if (user && user.avatar)
+      return res.sendFile(user.avatar, { root: "./uploads" });
+    console.log("error getting avatar: invalid user or file path");
+  }
 }

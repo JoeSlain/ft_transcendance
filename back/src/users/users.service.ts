@@ -118,10 +118,18 @@ export class UsersService {
     const modifiedUser = await this.getById(userId);
     return modifiedUser;
   }
-  async updateUser(id: number, newUser: User) : Promise<User>{
+  async updateUser(id: number, newUser: User) : Promise<User>
+  {
+    console.log(
+       "🚀 ~ file: users.service.ts:135 ~ UsersService ~ newUser",
+       newUser
+     );
+      await this.usersRepository.update(id, newUser);
+            return this.getById(id);
+/*
     let user = await this.getById(id);
     user = newUser;
-    return this.usersRepository.save(user);
+    return this.usersRepository.save(user); */
   }
 
     async uploadAvatar(userId: number, url: string) {

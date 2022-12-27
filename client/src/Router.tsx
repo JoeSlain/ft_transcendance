@@ -15,18 +15,19 @@ import User from "./hooks/User";
 import AuthRoute from "./pages/login/AuthRoute";
 import { getSavedItem } from "./utils/storage";
 import { useQuery } from "@tanstack/react-query";
+import { userType } from "./types/userType";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
     getSavedItem("isLogged") || false
   );
-  const [user, setUser] = useState(getSavedItem("user"));
+  const [user, setUser] = useState<userType>(getSavedItem("user"));
 
   console.log("islogged", isLogged);
 
   return (
     <Auth.Provider value={isLogged}>
-      <User.Provider value={user}>
+      <User.Provider value={{user, setUser}}>
         <Navbar userKey={"isLogged"} />
         <Routes>
           <Route path="/login" element={<Login />} />

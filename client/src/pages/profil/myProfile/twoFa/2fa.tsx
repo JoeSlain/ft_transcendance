@@ -2,17 +2,19 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useContext, useState } from "react";
 import ReactCodeInput from "react-code-input";
+import User from "../../../../hooks/User";
 import { generate2fa } from "../../../../services/2FA/Generate2FA";
 import { getUser } from "../../../../services/User/GetUser";
 
 export default function TwoFa() {
+  const {user} = useContext(User);
   const {
     isLoading: isUserLoading,
     error: userError,
     data: userData,
   } = useQuery({
-    queryKey: ["userData", "userId"],
-    queryFn: ({ queryKey }) => getUser(queryKey[1]),
+    queryKey: ["userData", user.id],
+    queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
   });
 
   const { isError, data, error, refetch } = useQuery({

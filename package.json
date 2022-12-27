@@ -24,6 +24,5 @@
     "eslint-plugin-react": "^7.31.11"
   },
   "dependencies": {
-    "jotai": "^1.11.2"
   }
 }
