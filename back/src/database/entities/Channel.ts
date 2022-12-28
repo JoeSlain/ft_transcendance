@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from "typeorm";
 import { User } from "./User";
 import { Message } from "./Message";
 
@@ -20,18 +28,22 @@ export class Channel {
   @ManyToOne(() => User)
   owner: User;
 
-  @ManyToOne(() => User)
-  users: User;
+  @ManyToMany(() => User)
+  @JoinTable()
+  users: User[];
 
-  @ManyToOne(() => User)
-  admins: User;
+  @ManyToMany(() => User)
+  @JoinTable()
+  admins: User[];
 
-  @ManyToOne(() => User)
-  banned: User;
+  @ManyToMany(() => User)
+  @JoinTable()
+  banned: User[];
 
-  @ManyToOne(() => User)
-  muted: User;
+  @ManyToMany(() => User)
+  @JoinTable()
+  muted: User[];
 
-  @ManyToOne(() => Message)
-  messages: Message;
+  @OneToMany(() => Message, (message) => message.channel)
+  messages: Message[];
 }

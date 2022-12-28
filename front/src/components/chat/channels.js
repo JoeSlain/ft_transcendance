@@ -3,6 +3,10 @@ import { ChanStyle } from "../../styles/channels";
 import { ContextMenu } from "../../styles/menus";
 import { DmStyle } from "../../styles/dms";
 import { ChatContext } from "../../context/socketContext";
+import AddChannel from "./addChannel";
+import { Button, Modal } from "react-bootstrap";
+import ReactCodeInput from "react-code-input";
+import { UserContext } from "../../context/userContext";
 
 const ChanEntry = ({ channel, show, points, selected }) => {
   const handleDelete = () => {};
@@ -41,19 +45,67 @@ export const DirectMessages = ({ directMessages, selected, setSelected }) => {
   );
 };
 
-export const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
-  const [points, setPoints] = useState({ x: 0, y: 0 });
-  const [show, setShow] = useState(false);
+const PasswordDialog = ({ channel, setProtectedChan }) => {
   const socket = useContext(ChatContext);
+  const user = useContext(UserContext);
+  const [pass, setPass] = useState("");
+
+  const handleAccept = () => {
+    channel.password = pass;
+    socket.emit("joinChannel", { channel, user });
+    setProtectedChan(null);
+  };
+
+  return (
+    <Modal show={true}>
+      <div className="notif">
+        <div className="header">
+          <Modal.Title id="contained-modal-title-vcenter">
+            {`Enter ${channel.name} password`}
+          </Modal.Title>
+        </div>
+        <div className="body">
+          <input onChange={(e) => setPass(e.target.value)} />
+        </div>
+        <div className="buttons">
+          <Button variant="primary" onClick={handleAccept}>
+            Confirm
+          </Button>
+          <Button variant="secondary" onClick={() => setProtectedChan(null)}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
+  const [points, setPoints] = useState({ x: 0, y: 0 });
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [protectedChan, setProtectedChan] = useState(null);
+  const socket = useContext(ChatContext);
+  const user = useContext(UserContext);
+
+  const handleClick = (channel) => {
+    //socket.emit('joinChannel', chan);
+    if (channel.type === "protected") {
+      setProtectedChan(channel);
+    } else {
+      setSelected(channel);
+      setShowUsers(true);
+      socket.emit("joinChannel", { user, channel });
+    }
+  };
 
   useEffect(() => {
     window.addEventListener("click", () => {
-      setShow(false);
+      setShowContextMenu(false);
     });
 
     return () => {
       window.removeEventListener("click", () => {
-        setShow(false);
+        setShowContextMenu(false);
       });
     };
   }, []);
@@ -67,24 +119,25 @@ export const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
             onContextMenu={(e) => {
               e.preventDefault();
               console.log(`${chan.name} clicked`);
-              console.log("show in div", show);
-              setShow(true);
+              setShowContextMenu(true);
               setPoints({ x: e.pageX, y: e.pageY });
             }}
-            onClick={() => {
-              //socket.emit('joinChannel', chan);
-              setSelected(chan);
-              setShowUsers(true);
-            }}
+            onClick={() => handleClick(chan)}
           >
             <ChanEntry
               channel={chan}
-              show={show}
+              show={showContextMenu}
               points={points}
               selected={selected}
             />
           </div>
         ))}
+      {protectedChan && (
+        <PasswordDialog
+          channel={protectedChan}
+          setProtectedChan={setProtectedChan}
+        />
+      )}
     </div>
   );
 };
@@ -94,9 +147,10 @@ export const Channels = ({
   publicChans,
   selected,
   setSelected,
-  setShowChanMenu,
   setShowUsers,
 }) => {
+  const [showChanMenu, setShowChanMenu] = useState(false);
+
   return (
     <div className="aside">
       <h2> Channels </h2>
@@ -115,6 +169,7 @@ export const Channels = ({
         setSelected={setSelected}
         setShowUsers={setShowUsers}
       />
+      {showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />}
     </div>
   );
 };

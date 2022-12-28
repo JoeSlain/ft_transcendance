@@ -8,7 +8,8 @@ import * as bcrypt from "bcrypt";
 @Injectable()
 export class ChannelService {
   constructor(
-    @InjectRepository(Channel) private chanRepo: Repository<Channel>
+    @InjectRepository(Channel) private chanRepo: Repository<Channel>,
+    @InjectRepository(User) private userRepo: Repository<User>
   ) {}
 
   async findChannel(chanData: ChannelData) {
@@ -19,6 +20,18 @@ export class ChannelService {
       },
     });
 
+    return channel[0];
+  }
+
+  async findChannelById(id: number) {
+    const channel = await this.chanRepo.find({
+      where: {
+        id,
+      },
+      relations: {
+        users: true,
+      },
+    });
     return channel[0];
   }
 
@@ -60,7 +73,9 @@ export class ChannelService {
   }
 
   async createChannel(chanData: ChannelData) {
-    const hashedPassword = await bcrypt.hash(chanData.password, 10);
+    let hashedPassword = null;
+    if (chanData.type === "protected")
+      hashedPassword = await bcrypt.hash(chanData.password, 10);
     const channel = this.chanRepo.create({
       name: chanData.name,
       type: chanData.type,
@@ -72,6 +87,27 @@ export class ChannelService {
       .relation(Channel, "owner")
       .of(channel)
       .set(chanData.owner);
+
     return { ...channel, password: null };
+  }
+
+  findUserInChan(userId: number, channel: Channel) {
+    const found = channel.users.find((user) => user.id === userId);
+
+    console.log("users", channel.users);
+    console.log("found", found);
+    return found;
+  }
+
+  async addUserChan(user: User, chan: Channel) {
+    if (!this.findUserInChan(user.id, chan)) {
+      console.log(`adding user ${user.username} to chan ${chan.name}`);
+      await this.chanRepo
+        .createQueryBuilder()
+        .relation(Channel, "users")
+        .of(chan)
+        .add(user);
+    }
+    return chan;
   }
 }

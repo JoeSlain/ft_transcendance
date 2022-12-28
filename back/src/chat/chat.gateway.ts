@@ -15,6 +15,7 @@ import { ChatService } from "./chat.service";
 import { ChannelData, NotifData } from "../utils/types";
 import { RoomService } from "src/game/room.service";
 import { ChannelService } from "./channel.service";
+import * as bcrypt from "bcrypt";
 
 @WebSocketGateway(3002, {
   cors: {
@@ -226,7 +227,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async createChannel(client: Socket, chanData: ChannelData) {
     console.log("create channel");
     const error = await this.channelService.checkChanData(chanData);
-    console.log("error", error);
     if (error) this.server.to(client.id).emit("error", error);
     else {
       const channel = await this.channelService.createChannel(chanData);
@@ -239,5 +239,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         else this.server.to(client.id).emit("newChannel", channel);
       }
     }
+  }
+
+  @SubscribeMessage("joinChannel")
+  async joinChannel(client: Socket, data: any) {
+    console.log("joinChannel");
+    const channel = await this.channelService.findChannelById(data.channel.id);
+
+    console.log("current channel", data.channel);
+    if (!channel) client.to(client.id).emit("error", "invalid channel");
+    else if (channel.type === "protected") {
+      const check = await bcrypt.compare(
+        data.channel.password,
+        channel.password
+      );
+      if (!check) {
+        this.server.to(client.id).emit("error", "invalid password");
+        return;
+      }
+    }
+    const chanId = `${data.channel.type}/${data.channel.id}`;
+    client.join(chanId);
+    await this.channelService.addUserChan(data.user, channel);
+    this.server.to(chanId).emit("joinedChannel", data);
   }
 }

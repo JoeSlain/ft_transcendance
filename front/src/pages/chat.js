@@ -44,7 +44,9 @@ const MessageForm = ({ selected, setSelected }) => {
 };
 
 const Users = ({ selected, setShowUsers }) => {
-  if (selected.users) {
+  console.log("selected", selected);
+  console.log("users", selected.users);
+  if (selected && selected.users) {
     return (
       <div className="chanUsers">
         <h2>Users</h2>
@@ -58,11 +60,12 @@ const Users = ({ selected, setShowUsers }) => {
   }
 };
 
-const Chat = ({ chat, setChat, setShowChanMenu }) => {
+const Chat = () => {
   const [selected, setSelected] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
   const [privateChans, setPrivateChans] = useState([]);
   const [publicChans, setPublicChans] = useState([]);
+  const [directMessages, setDirectMessages] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
   const socket = useContext(ChatContext);
 
@@ -90,23 +93,33 @@ const Chat = ({ chat, setChat, setShowChanMenu }) => {
         setPrivateChans((prev) => [...prev, channel]);
       else setPublicChans((prev) => [...prev, channel]);
     });
+
+    socket.on("joinedChannel", (data) => {
+      setSelected(data.channel);
+    });
+
+    return () => {
+      socket.off("newChannel");
+      socket.off("joinedChannel");
+    };
   }, []);
 
   return (
     <div className="chat">
+      {/*showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />*/}
+
       <Channels
         privateChans={privateChans}
         publicChans={publicChans}
         selected={selected}
         setSelected={setSelected}
         setShowUsers={setShowUsers}
-        setShowChanMenu={setShowChanMenu}
       />
       {showUsers && <Users selected={selected} setShowUsers={setShowUsers} />}
 
       <div className="chatMain">
         <DirectMessages
-          directMessages={chat.directMessages}
+          directMessages={directMessages}
           selected={selected}
           setSelected={setSelected}
         />

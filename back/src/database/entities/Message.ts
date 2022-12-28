@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
+import { Channel } from "./Channel";
 
 @Entity({ name: "messages" })
 export class Message {
@@ -12,4 +13,7 @@ export class Message {
   // relations
   @ManyToOne(() => User)
   from: User;
+
+  @ManyToOne(() => Channel)
+  channel: Channel;
 }

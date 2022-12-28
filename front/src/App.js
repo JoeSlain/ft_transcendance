@@ -32,15 +32,10 @@ import AddChannel from "./components/chat/addChannel";
 function App() {
   const [user, setUser] = useState(getStorageItem("user"));
   const [notifs, setNotifs] = useState([]);
-  const [showChanMenu, setShowChanMenu] = useState(false);
   const [isLogged, setIsLogged] = useState(false);
   const [room, setRoom] = useState(getStorageItem("room"));
   const [error, setError] = useState(null);
-  const [chat, setChat] = useState({
-    directMessages: [],
-    publicChans: [],
-    privateChans: [],
-  });
+
   /*const [chat, setChat] = useState({
     directMessages: [
       {
@@ -259,7 +254,7 @@ function App() {
         {isLogged && notifs[0] && (
           <Notif notifs={notifs} setNotifs={setNotifs} />
         )}
-        {showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />}
+        {/*showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />*/}
 
         <div className="main">
           <div className="main-content">
@@ -281,16 +276,7 @@ function App() {
                   element={<Play room={room} setRoom={setRoom} />}
                 />
                 <Route path="games" element={<Games />} />
-                <Route
-                  path="chat"
-                  element={
-                    <Chat
-                      chat={chat}
-                      setChat={setChat}
-                      setShowChanMenu={setShowChanMenu}
-                    />
-                  }
-                />
+                <Route path="chat" element={<Chat />} />
               </Route>
             </Routes>
           </div>

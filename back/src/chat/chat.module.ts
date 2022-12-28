@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
-import { Channel, Notif } from "src/database";
+import { Channel, Notif, User } from "src/database";
 import { GameModule } from "src/game/game.module";
 import { RoomService } from "src/game/room.service";
 import { NotifService } from "src/users/notifs.service";
@@ -17,7 +17,7 @@ import { ChatController } from "./chat.controller";
     UsersModule,
     AuthModule,
     GameModule,
-    TypeOrmModule.forFeature([Notif, Channel]),
+    TypeOrmModule.forFeature([Notif, Channel, User]),
   ],
   providers: [
     ChatGateway,
