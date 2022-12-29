@@ -45,13 +45,12 @@ export class UsersController {
 
   @Get("userid/:id")
   //@UseGuards(TwoFactorGuard)
-  async findOneById(@Param() params): Promise<User | null> {
+  async findOneById(@Param() params : {id :string}): Promise<User | null> {
     console.log("🚀 ~ file: users.controller.ts:49 ~ UsersController ~ findOneById ~ params", params)
 
     const user = await this.userRepository.findOneBy({ id: parseInt(params.id) });
 
-    /*console.log('get profile', params.id);
-        console.log(user);*/
+    console.log('get profile', user.username);
     return user;
   }
 
@@ -108,7 +107,7 @@ export class UsersController {
   //@UseGuards(TwoFactorGuard)
   async updateUser(@Req() req) {
     console.log("REQUEST BODY: ", req.body);
-    const user = await this.usersService.updateUser(req.user, req.newUser);
+    const user = await this.usersService.updateUser(req.body.user);
     return user;
   }
 

@@ -118,14 +118,14 @@ export class UsersService {
     const modifiedUser = await this.getById(userId);
     return modifiedUser;
   }
-  async updateUser(id: number, newUser: User) : Promise<User>
+  async updateUser(newUser: User) : Promise<User>
   {
     console.log(
-       "🚀 ~ file: users.service.ts:135 ~ UsersService ~ newUser",
+       "🚀 ~ file: users.service.ts:135 ~ UsersService ~ newUser.id",
        newUser
      );
-      await this.usersRepository.update(id, newUser);
-            return this.getById(id);
+      await this.usersRepository.update(newUser.id, newUser);
+          return this.getById(newUser.id);
 /*
     let user = await this.getById(id);
     user = newUser;

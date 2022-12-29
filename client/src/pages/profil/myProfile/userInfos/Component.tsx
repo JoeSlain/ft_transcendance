@@ -1,40 +1,46 @@
-import { useQuery } from "@tanstack/react-query";
 import { useContext, useState } from "react";
-import { useFormAction } from "react-router-dom";
 import User from "../../../../hooks/User";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { getSavedItem, saveItem } from "../../../../utils/storage";
 
-//TODO: onSubmit
+//Username and avatar component
 export default function UserInfos() {
-  const { user, setUser } = useContext(User); //use data to print
-  const [inputValue, setInputValue] = useState<string>(user.username); //username input
-  /* const [qrcode, setQrCode] = useState(""); //2fa qr code to print
-  const [code, setCode] = useState(); // ?
-  const [enabled, setEnabled] = useState(user.isTwoFactorAuthenticationEnabled); // Is QrCode enabled ?
+  const { user } = useContext(User); //user data to print
+  const { register, handleSubmit } = useForm();
+  const [avatar, setAvatar] = useState({
+    //State to update avatar when user uploads img
+    url: user.avatar != null ? user.avatar : user.profile_pic,
+    file: "",
+  });
 
-
-     const { isLoading, error, data } = useQuery({
-      queryKey: ["userData", userId],
-      queryFn: ({ queryKey }) => updateUser(queryKey[1]),
-    }); */
-  //Username field changing
-  function handleInputChange(e: React.FormEvent<HTMLInputElement>): void {
-    setInputValue(e.currentTarget.value);
-  }
-
-  const { register, control, handleSubmit } = useForm();
-  async function onSave(formValue: any) {
-    console.log("🚀 ~ file: Component.tsx:28 ~ onSave ~ formValue", formValue)
-    setUser({...user, username : formValue.username});
-    console.log("🚀 ~ file: Component.tsx:30 ~ onSave ~ user", user)
-    
+  async function onSave(formValue: any) { //sends form to back
+    console.log("🚀 formValue", formValue);
+    user.username = formValue.username;
     await axios
-      .post("http://localhost:3001/api/users/updateUser", {user}, {
-        withCredentials: true,
+      .post("http://localhost/api/users/uploadAvatar", {
+        user,
+        fileName: avatar,
       })
-      .then((res) => {
-        console.log("🚀 ~ file: Component.tsx:30 ~ onSave ~ res", res);
+      .then(() => {
+        console.log("avatar pusher");
+      })
+      .catch((e) => {
+        console.log("failed uplaoding avatar: ", e.message);
+      });
+    console.log("avatar is: ", avatar);
+    saveItem("user", user);
+    await getSavedItem("user");
+    await axios
+      .post(
+        "http://localhost:3001/api/users/updateUser",
+        { user },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((data) => {
+        console.log("avatar res", data);
       })
       .catch((err) => {
         console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ err", err);
@@ -43,6 +49,14 @@ export default function UserInfos() {
       "🚀 ~ file: Component.tsx:54 ~ UserInfos ~ formValue",
       formValue
     );
+  }
+  function handleAvatar(data: any) { //Handles avatar upload
+    console.log("🚀 ~ file: Component.tsx:58 ~ handleAvatar ~ data", data);
+
+    setAvatar({
+      url: URL.createObjectURL(data.target.files[0]),
+      file: data.target.files[0],
+    });
   }
   return (
     <>
@@ -54,15 +68,18 @@ export default function UserInfos() {
 
         <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
           <img
-            src={user.avatar != null ? user.avatar : user.profile_pic}
+            src={avatar.url}
             alt="Avatar"
             className="w-32 sm:w-64 avatar cursor-pointer rounded-full"
           />
           <p className="avatar-txt text-xs md:text-md cursor-pointer">
             Change profile picture.
           </p>
-          <input {...register("avatar")} type="file" className="hidden" />
+          <input onChange={handleAvatar} type="file" className="hidden" />
         </label>
+        <button className="text-slate-200 center" type="submit">
+          Submit
+        </button>
       </form>
     </>
   );
