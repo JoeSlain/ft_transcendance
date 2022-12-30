@@ -4,24 +4,44 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
 
+type avatarState = {
+  url : string,
+  file : any
+}
+
 //Username and avatar component
 export default function UserInfos() {
   const { user } = useContext(User); //user data to print
   const { register, handleSubmit } = useForm();
-  const [avatar, setAvatar] = useState({
+  const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
     url: user.avatar != null ? user.avatar : user.profile_pic,
-    file: "",
+    file: null,
   });
 
-  async function onSave(formValue: any) { //sends form to back
+  async function onSave(formValue: any) {
+    //sends form to back
     console.log("🚀 formValue", formValue);
+    console.log("🚀 ~ file: Component.tsx:16 ~ UserInfos ~ avatar", avatar);
+
     user.username = formValue.username;
+    let formData = new FormData();
+    const ext = avatar.file.name.split(".").pop();
+    if (ext !== "jpg" && ext !== "jpeg" && ext !== "png")
+      console.log("error: image extension not supported");
+      else {
+          formData.append('file', avatar.file, `${user.username}.avatar.jpg`); 
+      }
+     //  console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ formData", formData)
+      
     await axios
-      .post("http://localhost/api/users/uploadAvatar", {
-        user,
-        fileName: avatar,
-      })
+      .post(
+        "http://localhost:3001/api/users/uploadAvatar",
+        {
+          formData
+        },
+        { withCredentials: true }
+      )
       .then(() => {
         console.log("avatar pusher");
       })
@@ -50,7 +70,8 @@ export default function UserInfos() {
       formValue
     );
   }
-  function handleAvatar(data: any) { //Handles avatar upload
+  function handleAvatar(data: any) {
+    //Handles avatar upload
     console.log("🚀 ~ file: Component.tsx:58 ~ handleAvatar ~ data", data);
 
     setAvatar({

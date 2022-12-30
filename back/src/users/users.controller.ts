@@ -44,8 +44,7 @@ export class UsersController {
   }
 
   @Get("userid/:id")
-  //@UseGuards(TwoFactorGuard)
-  async findOneById(@Param() params : {id :string}): Promise<User | null> {
+  @UseGuards(TwoFactorGuard)  async findOneById(@Param() params : {id :string}): Promise<User | null> {
     console.log("🚀 ~ file: users.controller.ts:49 ~ UsersController ~ findOneById ~ params", params)
 
     const user = await this.userRepository.findOneBy({ id: parseInt(params.id) });
@@ -104,8 +103,7 @@ export class UsersController {
     return notifs;
   }
   @Post("updateUser")
-  //@UseGuards(TwoFactorGuard)
-  async updateUser(@Req() req) {
+  @UseGuards(TwoFactorGuard)  async updateUser(@Req() req) {
     console.log("REQUEST BODY: ", req.body);
     const user = await this.usersService.updateUser(req.body.user);
     return user;
@@ -134,7 +132,8 @@ export class UsersController {
     @Res() res,
     @UploadedFile() file: Express.Multer.File
   ) {
-    console.log("uploadAvatar");
+    console.log("🚀 ~ file: users.controller.ts:135 ~ UsersController ~ req", req)
+    
     return this.usersService.uploadAvatar(req.user.id, file.filename);
   }
 
