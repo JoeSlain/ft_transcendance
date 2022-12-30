@@ -244,11 +244,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage("joinChannel")
   async joinChannel(client: Socket, data: any) {
     console.log("joinChannel");
-    const channel = await this.channelService.findChannelById(data.channel.id);
+    let channel = await this.channelService.findChannelById(data.channel.id);
 
-    console.log("current channel", data.channel);
-    if (!channel) client.to(client.id).emit("error", "invalid channel");
-    else if (channel.type === "protected") {
+    if (!channel) {
+      client.to(client.id).emit("error", "invalid channel");
+      return;
+    }
+    if (channel.type === "protected") {
       const check = await bcrypt.compare(
         data.channel.password,
         channel.password
@@ -258,9 +260,44 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
     }
+    if (!this.channelService.findUserInChan(data.user.id, channel)) {
+      channel = await this.channelService.addUserChan(
+        data.user,
+        channel,
+        "users"
+      );
+    }
+    data.channel = { ...channel, password: null };
     const chanId = `${data.channel.type}/${data.channel.id}`;
-    client.join(chanId);
-    await this.channelService.addUserChan(data.user, channel);
+    await client.join(chanId);
     this.server.to(chanId).emit("joinedChannel", data);
+  }
+
+  @SubscribeMessage("deleteChannel")
+  async deleteChannel(client: Socket, data: any) {
+    console.log("delete channel");
+    console.log("preleave", data.channel);
+
+    const channel = await this.channelService.leaveChan(
+      data.user,
+      data.channel
+    );
+    const chanId = `${data.channel.type}/${data.channel.id}`;
+    console.log("postleave", data.channel);
+
+    this.server.to(client.id).emit("removeChannel", data.channel);
+    client.leave(chanId);
+    if (channel) {
+      console.log("returned channel", channel);
+      this.server.to(chanId).emit("leftChannel", channel);
+    }
+  }
+
+  @SubscribeMessage("chanInvite")
+  async chanInvite(client: Socket, notif: NotifData) {
+    const to = this.chatService.getUser(notif.to.id);
+
+    if (!to) await this.notifService.createNotif(notif);
+    else this.server.to(to).emit("notified", notif);
   }
 }

@@ -1,3 +1,4 @@
+import { Channel } from "diagnostics_channel";
 import { string } from "joi";
 import { User } from "src/database/entities/User";
 
@@ -17,6 +18,7 @@ export type NotifData = {
   type: string;
   from: User;
   to: User;
+  channel?: Channel;
 };
 
 export type RoomUser = {

@@ -7,23 +7,8 @@ import AddChannel from "./addChannel";
 import { Button, Modal } from "react-bootstrap";
 import ReactCodeInput from "react-code-input";
 import { UserContext } from "../../context/userContext";
-
-const ChanEntry = ({ channel, show, points, selected }) => {
-  const handleDelete = () => {};
-
-  return (
-    <ChanStyle color={selected === channel ? "lightgrey" : "white"}>
-      {channel.type === "private" && show && (
-        <ContextMenu top={points.y} left={points.x}>
-          <ul>
-            <li onClick={handleDelete}> Delete </li>
-          </ul>
-        </ContextMenu>
-      )}
-      {channel.name}
-    </ChanStyle>
-  );
-};
+import PasswordDialog from "./passwordDialog";
+import { ChanContextMenu, ChanEntry } from "./chanUtils";
 
 export const DirectMessages = ({ directMessages, selected, setSelected }) => {
   return (
@@ -45,91 +30,55 @@ export const DirectMessages = ({ directMessages, selected, setSelected }) => {
   );
 };
 
-const PasswordDialog = ({ channel, setProtectedChan }) => {
-  const socket = useContext(ChatContext);
-  const user = useContext(UserContext);
-  const [pass, setPass] = useState("");
-
-  const handleAccept = () => {
-    channel.password = pass;
-    socket.emit("joinChannel", { channel, user });
-    setProtectedChan(null);
-  };
-
-  return (
-    <Modal show={true}>
-      <div className="notif">
-        <div className="header">
-          <Modal.Title id="contained-modal-title-vcenter">
-            {`Enter ${channel.name} password`}
-          </Modal.Title>
-        </div>
-        <div className="body">
-          <input onChange={(e) => setPass(e.target.value)} />
-        </div>
-        <div className="buttons">
-          <Button variant="primary" onClick={handleAccept}>
-            Confirm
-          </Button>
-          <Button variant="secondary" onClick={() => setProtectedChan(null)}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </Modal>
-  );
-};
-
 const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
   const [points, setPoints] = useState({ x: 0, y: 0 });
-  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextChan, setContextChan] = useState(null);
   const [protectedChan, setProtectedChan] = useState(null);
   const socket = useContext(ChatContext);
   const user = useContext(UserContext);
 
-  const handleClick = (channel) => {
-    //socket.emit('joinChannel', chan);
-    if (channel.type === "protected") {
-      setProtectedChan(channel);
-    } else {
-      setSelected(channel);
-      setShowUsers(true);
-      socket.emit("joinChannel", { user, channel });
+  const handleClick = (e, channel) => {
+    console.log(e.detail);
+    if (e.detail === 2) {
+      console.log("left click", channel);
+      if (channel.type === "protected") {
+        setProtectedChan(channel);
+      } else socket.emit("joinChannel", { user, channel });
     }
   };
 
   useEffect(() => {
     window.addEventListener("click", () => {
-      setShowContextMenu(false);
+      setContextChan(null);
     });
 
     return () => {
       window.removeEventListener("click", () => {
-        setShowContextMenu(false);
+        setContextChan(null);
       });
     };
   }, []);
 
   return (
     <div>
+      <ChanContextMenu
+        channel={contextChan}
+        setChannel={setContextChan}
+        points={points}
+      />
       {channel &&
         channel.map((chan) => (
           <div
             key={chan.name}
             onContextMenu={(e) => {
               e.preventDefault();
-              console.log(`${chan.name} clicked`);
-              setShowContextMenu(true);
+              console.log("right clicked", chan);
+              setContextChan(chan);
               setPoints({ x: e.pageX, y: e.pageY });
             }}
-            onClick={() => handleClick(chan)}
+            onClick={(e) => handleClick(e, chan)}
           >
-            <ChanEntry
-              channel={chan}
-              show={showContextMenu}
-              points={points}
-              selected={selected}
-            />
+            <ChanEntry channel={chan} selected={selected} />
           </div>
         ))}
       {protectedChan && (

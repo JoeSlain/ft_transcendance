@@ -15,7 +15,6 @@ export class ChatController {
   async getPrivateChannels(@Req() req) {
     const chans = await this.channelService.getPrivateChannels(req.user.id);
 
-    console.log("privateChans", chans);
     return chans;
   }
 
@@ -24,7 +23,6 @@ export class ChatController {
   async getPublicChannels(@Req() req) {
     const chans = await this.channelService.getPublicChannels();
 
-    console.log("publicChans", chans);
     return chans;
   }
 }

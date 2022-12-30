@@ -30,26 +30,58 @@ export class ChannelService {
       },
       relations: {
         users: true,
+        owner: true,
+        banned: true,
+        admins: true,
+        muted: true,
+        messages: true,
       },
     });
+    console.log("chanfound", channel);
     return channel[0];
   }
 
   async getPublicChannels() {
     const chans = await this.chanRepo.find({
       where: [{ type: "public" }, { type: "protected" }],
+      relations: {
+        users: true,
+        owner: true,
+        banned: true,
+        admins: true,
+        muted: true,
+        messages: true,
+      },
     });
     return chans;
   }
 
   async getPrivateChannels(userId: number) {
-    const tmp = await this.chanRepo
+    /*const tmp = await this.chanRepo
       .createQueryBuilder("channel")
       .leftJoinAndSelect("channel.owner", "owner")
       .where("channel.owner = :id", { id: userId })
       .andWhere("channel.type = :type", { type: "private" })
-      .getMany();
+      .getMany();*/
 
+    const tmp = await this.chanRepo.find({
+      relations: {
+        users: true,
+        owner: true,
+        banned: true,
+        admins: true,
+        muted: true,
+        messages: true,
+      },
+      where: {
+        type: "private",
+        users: {
+          id: userId,
+        },
+      },
+    });
+
+    console.log("tmpPrivateChans", tmp);
     const chans = tmp.map((chan) => {
       return { ...chan, password: null };
     });
@@ -72,41 +104,91 @@ export class ChannelService {
     return null;
   }
 
+  async setChanOwner(user: User, channel: Channel) {
+    await this.chanRepo
+      .createQueryBuilder()
+      .relation(Channel, "owner")
+      .of(channel)
+      .set(user);
+    return await this.addUserChan(user, channel, "admins");
+  }
+
   async createChannel(chanData: ChannelData) {
     let hashedPassword = null;
     if (chanData.type === "protected")
       hashedPassword = await bcrypt.hash(chanData.password, 10);
-    const channel = this.chanRepo.create({
+    let channel = this.chanRepo.create({
       name: chanData.name,
       type: chanData.type,
       password: hashedPassword,
     });
     await this.chanRepo.save(channel);
-    await this.chanRepo
-      .createQueryBuilder()
-      .relation(Channel, "owner")
-      .of(channel)
-      .set(chanData.owner);
+    await this.setChanOwner(chanData.owner, channel);
+    await this.addUserChan(chanData.owner, channel, "users");
+    channel = await this.findChannelById(channel.id);
 
     return { ...channel, password: null };
   }
 
   findUserInChan(userId: number, channel: Channel) {
+    if (!channel.users) return false;
     const found = channel.users.find((user) => user.id === userId);
 
-    console.log("users", channel.users);
-    console.log("found", found);
     return found;
   }
 
-  async addUserChan(user: User, chan: Channel) {
-    if (!this.findUserInChan(user.id, chan)) {
-      console.log(`adding user ${user.username} to chan ${chan.name}`);
+  async addUserChan(user: User, chan: Channel, role: string) {
+    await this.chanRepo
+      .createQueryBuilder()
+      .relation(Channel, role)
+      .of(chan)
+      .add(user);
+    chan = await this.findChannelById(chan.id);
+    return chan;
+  }
+
+  async removeUserChan(user: User, chan: Channel) {
+    if (chan.admins.find((u) => u.id === user.id)) {
+      await this.chanRepo
+        .createQueryBuilder()
+        .relation(Channel, "admins")
+        .of(chan)
+        .remove(user);
+    }
+    if (chan.users.find((u) => u.id === user.id)) {
       await this.chanRepo
         .createQueryBuilder()
         .relation(Channel, "users")
         .of(chan)
-        .add(user);
+        .remove(user);
+    }
+  }
+
+  async deleteChan(chan: Channel) {
+    await this.chanRepo
+      .createQueryBuilder("channels")
+      .delete()
+      .from(Channel)
+      .where("id = :id", { id: chan.id })
+      .execute();
+  }
+
+  async leaveChan(user: User, chan: Channel) {
+    console.log("chan1", chan);
+    await this.removeUserChan(user, chan);
+    chan = await this.findChannelById(chan.id);
+
+    console.log("chan2", chan);
+
+    if (chan.owner.id === user.id) {
+      if (chan.admins && chan.admins[0])
+        chan = await this.setChanOwner(chan.admins[0], chan);
+      else if (chan.users && chan.users[0])
+        chan = await this.setChanOwner(chan.users[0], chan);
+      else {
+        await this.deleteChan(chan);
+        return null;
+      }
     }
     return chan;
   }

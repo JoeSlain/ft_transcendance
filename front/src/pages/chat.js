@@ -2,12 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import "../styles/chat.css";
 import "../styles/channels.css";
 import "../styles/messages.css";
-import { ContextMenu } from "../styles/menus";
 import { UserContext } from "../context/userContext";
 import { Channels, DirectMessages } from "../components/chat/channels";
 import ChatMessages from "../components/chat/chatMessages";
-import AddChannel from "../components/chat/addChannel";
-import useChannels from "../hooks/channelHook";
 import axios from "axios";
 import { ChatContext } from "../context/socketContext";
 
@@ -46,10 +43,42 @@ const MessageForm = ({ selected, setSelected }) => {
 const Users = ({ selected, setShowUsers }) => {
   console.log("selected", selected);
   console.log("users", selected.users);
+
+  const socket = useContext(ChatContext);
+  const user = useContext(UserContext);
+  const [name, setName] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .get(`http://localhost:3001/api/users/username/${name}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data) {
+          socket.emit("chanInvite", {
+            type: "Chan Invite",
+            from: user,
+            to: response.data,
+            channel: selected,
+          });
+        } else alert("user not found");
+      });
+    setName("");
+  };
+
   if (selected && selected.users) {
     return (
       <div className="chanUsers">
         <h2>Users</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form">
+            <div className="formInput">
+              <input value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <button type="submit"> + </button>
+          </div>
+        </form>
         {selected.users.map((user) => (
           <div className="userEntry" key={user.username}>
             {user.username}
@@ -68,6 +97,24 @@ const Chat = () => {
   const [directMessages, setDirectMessages] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
   const socket = useContext(ChatContext);
+
+  const updateChannel = (newChan) => {
+    if (newChan.type === "private")
+      setPrivateChans((prev) =>
+        prev.map((chan) => {
+          if (chan.id === newChan.id) return newChan;
+          return chan;
+        })
+      );
+    else {
+      setPublicChans((prev) =>
+        prev.map((chan) => {
+          if (chan.id === newChan.id) return newChan;
+          return chan;
+        })
+      );
+    }
+  };
 
   useEffect(() => {
     axios
@@ -95,7 +142,25 @@ const Chat = () => {
     });
 
     socket.on("joinedChannel", (data) => {
+      console.log("joined channel", data.channel);
+      updateChannel(data.channel);
       setSelected(data.channel);
+      setShowUsers(true);
+    });
+
+    socket.on("removeChannel", (channel) => {
+      console.log("removeChan", channel);
+      if (channel.type === "private")
+        setPrivateChans((prev) =>
+          prev.filter((chan) => chan.id !== channel.id)
+        );
+      else
+        setPublicChans((prev) => prev.filter((chan) => chan.id !== channel.id));
+    });
+
+    socket.on("leftChannel", (data) => {
+      console.log(`${data.user.username} left ${data.channel.name}`);
+      updateChannel(data.channel);
     });
 
     return () => {
