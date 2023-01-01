@@ -275,7 +275,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     data.channel = { ...channel, password: null };
     client.join(data.channel.socketId);
-    this.server.to(data.channel.socketId).emit("joinedChannel", data);
+    client.to(data.channel.socketId).emit("updateSelected", data);
+    this.server.to(client.id).emit("joinedChannel", data);
     return data.channel;
   }
 

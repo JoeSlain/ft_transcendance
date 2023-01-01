@@ -95,6 +95,16 @@ const Chat = () => {
   const [openTabs, setOpenTabs] = useState([]);
   const socket = useContext(ChatContext);
 
+  const updateSelected = (newChan) => {
+    setSelected((prev) => {
+      if (prev && prev.id === newChan.id) {
+        console.log("update selected");
+        return newChan;
+      }
+      return prev;
+    });
+  };
+
   const updateChannel = (newChan) => {
     console.log("channel in updateChan", newChan);
     if (newChan.type === "private") {
@@ -116,13 +126,7 @@ const Chat = () => {
         })
       );
     }
-    setSelected((prev) => {
-      if (prev && prev.id === newChan.id) {
-        console.log("update selected");
-        return newChan;
-      }
-      return prev;
-    });
+    updateSelected(newChan);
   };
 
   useEffect(() => {
@@ -152,8 +156,17 @@ const Chat = () => {
 
     socket.on("joinedChannel", (data) => {
       console.log("joined channel", data.channel);
-      updateChannel(data.channel);
       setSelected(data.channel);
+    });
+
+    socket.on("updateChannel", (data) => {
+      console.log("updating channel");
+      updateChannel(data.channel);
+    });
+
+    socket.on("updateSelected", (data) => {
+      console.log("updating selected");
+      updateSelected(data.channel);
     });
 
     socket.on("removeChannel", (channel) => {

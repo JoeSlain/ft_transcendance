@@ -172,6 +172,11 @@ export class ChannelService {
 
   async deleteChan(chan: Channel) {
     await this.chanRepo
+      .createQueryBuilder()
+      .relation(Channel, "messages")
+      .of(chan)
+      .remove(chan.messages);
+    await this.chanRepo
       .createQueryBuilder("channels")
       .delete()
       .from(Channel)

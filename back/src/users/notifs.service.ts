@@ -13,7 +13,7 @@ export class NotifService {
   ) {}
 
   async createNotif(data: NotifData) {
-    const notifs = await this.findOne(data);
+    const notifs = await this.findNotif(data);
 
     if (!notifs.length) {
       console.log("notif not found, creating new");
@@ -25,8 +25,32 @@ export class NotifService {
     return null;
   }
 
-  async findOne(data: NotifData) {
+  async findChanInvite(data: NotifData) {
+    return this.notifRepository.find({
+      relations: {
+        to: true,
+        from: true,
+        channel: true,
+      },
+      where: {
+        to: {
+          id: data.to.id,
+        },
+        from: {
+          id: data.from.id,
+        },
+        channel: {
+          id: data.channel.id,
+        },
+        type: data.type,
+      },
+    });
+  }
+
+  async findNotif(data: NotifData) {
     console.log("find one notif");
+
+    if (data.channel) return this.findChanInvite(data);
     return this.notifRepository.find({
       relations: {
         to: true,
@@ -61,7 +85,7 @@ export class NotifService {
   }
 
   async deleteNotif(data: NotifData) {
-    const notif = await this.findOne(data);
+    const notif = await this.findNotif(data);
 
     console.log("deleting notif", notif);
     if (notif.length) await this.notifRepository.remove(notif[0]);
