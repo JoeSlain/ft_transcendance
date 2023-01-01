@@ -58,6 +58,7 @@ const Friend = ({ setNotifs }) => {
     // notif received
     socket.on("notified", (data) => {
       console.log("invitation received");
+      console.log("data", data);
       if (data.from.id !== me.id) {
         console.log(`${data.from.username} invited you`);
         setNotifs((prev) => [...prev, data]);

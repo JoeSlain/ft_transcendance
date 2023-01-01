@@ -30,7 +30,7 @@ export const DirectMessages = ({ directMessages, selected, setSelected }) => {
   );
 };
 
-const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
+const Channel = ({ channel, selected }) => {
   const [points, setPoints] = useState({ x: 0, y: 0 });
   const [contextChan, setContextChan] = useState(null);
   const [protectedChan, setProtectedChan] = useState(null);
@@ -69,7 +69,7 @@ const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
       {channel &&
         channel.map((chan) => (
           <div
-            key={chan.name}
+            key={chan.id}
             onContextMenu={(e) => {
               e.preventDefault();
               console.log("right clicked", chan);
@@ -91,33 +91,19 @@ const Channel = ({ channel, selected, setSelected, setShowUsers }) => {
   );
 };
 
-export const Channels = ({
-  privateChans,
-  publicChans,
-  selected,
-  setSelected,
-  setShowUsers,
-}) => {
+export const Channels = ({ privateChans, publicChans, selected }) => {
   const [showChanMenu, setShowChanMenu] = useState(false);
 
   return (
     <div className="aside">
       <h2> Channels </h2>
       <button onClick={() => setShowChanMenu(true)}> + </button>
+
       <h3 className="chanType"> Private </h3>
-      <Channel
-        channel={privateChans}
-        selected={selected}
-        setSelected={setSelected}
-        setShowUsers={setShowUsers}
-      />
+      <Channel channel={privateChans} selected={selected} />
       <h3 className="chanType"> Public </h3>
-      <Channel
-        channel={publicChans}
-        selected={selected}
-        setSelected={setSelected}
-        setShowUsers={setShowUsers}
-      />
+      <Channel channel={publicChans} selected={selected} />
+
       {showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />}
     </div>
   );

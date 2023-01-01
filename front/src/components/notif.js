@@ -28,15 +28,15 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.body = `${notif.from.username} invited you to play a game`;
       notif.accept = "Accept";
       notif.decline = "Decline";
-      notif.acceptEvent = "acceptInvite";
+      notif.acceptEvent = "acceptGameInvite";
       notif.socket = chatSocket;
       break;
     case "Chan Invite":
-      notif.data = { user: notif.to, channel: notif.channel };
-      notif.body = `${notif.from.username} invited you to join chat channel ${notif.channel}`;
+      notif.data = { from: notif.from, to: notif.to, channel: notif.channel };
+      notif.body = `${notif.from.username} invited you to join chat channel ${notif.channel.name}`;
       notif.accept = "Accept";
       notif.decline = "Decline";
-      notif.acceptEvent = "joinChannel";
+      notif.acceptEvent = "acceptChannelInvite";
       notif.socket = chatSocket;
       break;
     default:

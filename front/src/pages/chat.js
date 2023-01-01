@@ -40,10 +40,7 @@ const MessageForm = ({ selected, setSelected }) => {
   }
 };
 
-const Users = ({ selected, setShowUsers }) => {
-  console.log("selected", selected);
-  console.log("users", selected.users);
-
+const Users = ({ selected }) => {
   const socket = useContext(ChatContext);
   const user = useContext(UserContext);
   const [name, setName] = useState("");
@@ -56,6 +53,7 @@ const Users = ({ selected, setShowUsers }) => {
       })
       .then((response) => {
         if (response.data) {
+          console.log("sending chan", selected);
           socket.emit("chanInvite", {
             type: "Chan Invite",
             from: user,
@@ -99,14 +97,19 @@ const Chat = () => {
   const socket = useContext(ChatContext);
 
   const updateChannel = (newChan) => {
-    if (newChan.type === "private")
+    console.log("channel in updateChan", newChan);
+    if (newChan.type === "private") {
       setPrivateChans((prev) =>
         prev.map((chan) => {
-          if (chan.id === newChan.id) return newChan;
+          if (chan.id === newChan.id) {
+            console.log("updating private");
+            return newChan;
+          }
           return chan;
         })
       );
-    else {
+    } else {
+      console.log("updating public");
       setPublicChans((prev) =>
         prev.map((chan) => {
           if (chan.id === newChan.id) return newChan;
@@ -114,6 +117,13 @@ const Chat = () => {
         })
       );
     }
+    setSelected((prev) => {
+      if (prev && prev.id === newChan.id) {
+        console.log("update selected");
+        return newChan;
+      }
+      return prev;
+    });
   };
 
   useEffect(() => {
@@ -135,7 +145,7 @@ const Chat = () => {
       });
 
     socket.on("newChannel", (channel) => {
-      console.log("new chan");
+      console.log("new chan", channel);
       if (channel.type === "private")
         setPrivateChans((prev) => [...prev, channel]);
       else setPublicChans((prev) => [...prev, channel]);
@@ -156,16 +166,23 @@ const Chat = () => {
         );
       else
         setPublicChans((prev) => prev.filter((chan) => chan.id !== channel.id));
+      setSelected((prev) => {
+        if (prev && prev.id === channel.id) return null;
+        return prev;
+      });
     });
 
-    socket.on("leftChannel", (data) => {
-      console.log(`${data.user.username} left ${data.channel.name}`);
-      updateChannel(data.channel);
+    socket.on("leftChannel", (channel) => {
+      console.log(`client left ${channel.name}`);
+      console.log("channel in event", channel);
+      updateChannel(channel);
     });
 
     return () => {
       socket.off("newChannel");
       socket.off("joinedChannel");
+      socket.off("removeChannel");
+      socket.off("leftChannel");
     };
   }, []);
 
@@ -177,10 +194,8 @@ const Chat = () => {
         privateChans={privateChans}
         publicChans={publicChans}
         selected={selected}
-        setSelected={setSelected}
-        setShowUsers={setShowUsers}
       />
-      {showUsers && <Users selected={selected} setShowUsers={setShowUsers} />}
+      <Users selected={selected} />
 
       <div className="chatMain">
         <DirectMessages

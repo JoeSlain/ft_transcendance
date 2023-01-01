@@ -100,7 +100,7 @@ export class ChannelService {
   async checkChanData(chanData: ChannelData) {
     if (await this.findChannel(chanData)) return "invalid channel name";
     if (chanData.type === "protected" && !chanData.password)
-      return "invalid password for protected channel";
+      return "invalid password";
     return null;
   }
 
@@ -113,6 +113,16 @@ export class ChannelService {
     return await this.addUserChan(user, channel, "admins");
   }
 
+  async addUserChan(user: User, chan: Channel, role: string) {
+    await this.chanRepo
+      .createQueryBuilder()
+      .relation(Channel, role)
+      .of(chan)
+      .add(user);
+    chan = await this.findChannelById(chan.id);
+    return chan;
+  }
+
   async createChannel(chanData: ChannelData) {
     let hashedPassword = null;
     if (chanData.type === "protected")
@@ -122,10 +132,9 @@ export class ChannelService {
       type: chanData.type,
       password: hashedPassword,
     });
-    await this.chanRepo.save(channel);
-    await this.setChanOwner(chanData.owner, channel);
-    await this.addUserChan(chanData.owner, channel, "users");
-    channel = await this.findChannelById(channel.id);
+    channel = await this.chanRepo.save(channel);
+    channel = await this.setChanOwner(chanData.owner, channel);
+    channel = await this.addUserChan(chanData.owner, channel, "users");
 
     return { ...channel, password: null };
   }
@@ -135,16 +144,6 @@ export class ChannelService {
     const found = channel.users.find((user) => user.id === userId);
 
     return found;
-  }
-
-  async addUserChan(user: User, chan: Channel, role: string) {
-    await this.chanRepo
-      .createQueryBuilder()
-      .relation(Channel, role)
-      .of(chan)
-      .add(user);
-    chan = await this.findChannelById(chan.id);
-    return chan;
   }
 
   async removeUserChan(user: User, chan: Channel) {

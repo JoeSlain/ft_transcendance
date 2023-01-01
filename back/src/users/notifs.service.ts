@@ -7,61 +7,62 @@ import { UsersService } from "./users.service";
 
 @Injectable()
 export class NotifService {
-    constructor(
-        @InjectRepository(Notif) private notifRepository: Repository<Notif>,
-        private readonly userService: UsersService
-    ) { }
+  constructor(
+    @InjectRepository(Notif) private notifRepository: Repository<Notif>,
+    private readonly userService: UsersService
+  ) {}
 
+  async createNotif(data: NotifData) {
+    const notifs = await this.findOne(data);
 
-    async createNotif(data: NotifData) {
-        const notifs = await this.findOne(data);
-
-        if (notifs.length === 0) {
-            console.log('notif not found, creating new')
-            const newNotif = this.notifRepository.create(data);
-            return this.notifRepository.save(newNotif);
-        }
-        console.log('notif not created')
-        return null;
+    if (!notifs.length) {
+      console.log("notif not found, creating new");
+      const newNotif = this.notifRepository.create(data);
+      console.log("newNotif", newNotif);
+      return this.notifRepository.save(newNotif);
     }
+    console.log("notif not created");
+    return null;
+  }
 
-    async findOne(data: NotifData) {
-        console.log('find one notif');
-        return this.notifRepository.find({
-            relations: {
-                to: true,
-                from: true,
-            },
-            where: {
-                to: {
-                    id: data.to.id
-                },
-                from: {
-                    id: data.from.id
-                }
-            }
-        })
-    }
+  async findOne(data: NotifData) {
+    console.log("find one notif");
+    return this.notifRepository.find({
+      relations: {
+        to: true,
+        from: true,
+      },
+      where: {
+        to: {
+          id: data.to.id,
+        },
+        from: {
+          id: data.from.id,
+        },
+      },
+    });
+  }
 
-    async getNotifs(userId: number) {
-        console.log('getNotifs');
-        return this.notifRepository.find({
-            relations: {
-                to: true,
-                from: true,
-            },
-            where: {
-                to: {
-                    id: userId,
-                }
-            }
-        })
-    }
+  async getNotifs(userId: number) {
+    console.log("getNotifs");
+    return this.notifRepository.find({
+      relations: {
+        to: true,
+        from: true,
+        channel: true,
+      },
+      where: {
+        to: {
+          id: userId,
+        },
+      },
+    });
+  }
 
-    async deleteNotif(data: NotifData) {
-        const notif = await this.findOne(data);
+  async deleteNotif(data: NotifData) {
+    const notif = await this.findOne(data);
 
-        if (notif.length)
-            await this.notifRepository.remove(notif);
-    }
+    console.log("deleting notif", notif);
+    if (notif.length) await this.notifRepository.remove(notif[0]);
+  }
 }

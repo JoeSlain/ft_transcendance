@@ -125,6 +125,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async notify(client: Socket, notif: NotifData) {
     console.log("chat websocket invite");
 
+    if (notif.from.id === notif.to.id) {
+      this.server.to(client.id).emit("error", "invalid target");
+      return;
+    }
     if (notif.type === "Friend Request") {
       const friend = await this.usersService.findFriend(
         notif.from.id,
@@ -205,7 +209,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal client: clientSocket.emit('acceptInvite', notif)
   ** reponse user from: 'acceptedInvite', notif.from.id
   ** reponse user to: 'acceptedInvite', notif.from.id */
-  @SubscribeMessage("acceptInvite")
+  @SubscribeMessage("acceptGameInvite")
   async acceptInvite(client: Socket, notif: NotifData) {
     const from = this.chatService.getUser(notif.from.id);
 
@@ -269,8 +273,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     data.channel = { ...channel, password: null };
     const chanId = `${data.channel.type}/${data.channel.id}`;
-    await client.join(chanId);
+    client.join(chanId);
     this.server.to(chanId).emit("joinedChannel", data);
+    return data.channel;
   }
 
   @SubscribeMessage("deleteChannel")
@@ -295,9 +300,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("chanInvite")
   async chanInvite(client: Socket, notif: NotifData) {
+    console.log(notif);
+    if (this.channelService.findUserInChan(notif.to.id, notif.channel)) {
+      this.server.to(client.id).emit("error", "user already in chan");
+      return;
+    }
     const to = this.chatService.getUser(notif.to.id);
-
+    console.log("notif chan data", notif.channel);
     if (!to) await this.notifService.createNotif(notif);
     else this.server.to(to).emit("notified", notif);
+  }
+
+  @SubscribeMessage("acceptChannelInvite")
+  async acceptChanInvite(client: Socket, notif: NotifData) {
+    console.log("notif", notif);
+    await this.notifService.deleteNotif(notif);
+    const channel = await this.joinChannel(client, {
+      user: notif.to,
+      channel: notif.channel,
+    });
+    this.server.to(client.id).emit("newChannel", channel);
   }
 }

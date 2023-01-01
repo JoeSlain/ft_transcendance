@@ -1,5 +1,5 @@
-import { Channel } from "diagnostics_channel";
 import { string } from "joi";
+import { Channel } from "src/database";
 import { User } from "src/database/entities/User";
 
 // done type for serializer

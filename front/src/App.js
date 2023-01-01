@@ -144,6 +144,7 @@ function App() {
           withCredentials: true,
         })
         .then((response) => {
+          console.log("data", response.data);
           setNotifs(response.data);
           if (!user) {
             console.log("user null");
