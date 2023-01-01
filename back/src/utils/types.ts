@@ -13,7 +13,7 @@ export type UserDetails = {
   img_url: string;
 };
 
-// notif type
+// notif data
 export type NotifData = {
   type: string;
   from: User;
@@ -21,12 +21,13 @@ export type NotifData = {
   channel?: Channel;
 };
 
+// room user
 export type RoomUser = {
   infos: User;
   ready: boolean;
 };
 
-// room type
+// room
 export type Room = {
   id: string;
   host: RoomUser;
@@ -35,10 +36,17 @@ export type Room = {
   gameStarted: boolean;
 };
 
-// channel type
+// channel data
 export type ChannelData = {
   name: string;
   type: string;
   password?: string;
   owner: User;
+};
+
+// message data
+export type MessageData = {
+  content: string;
+  from: User;
+  channel: any;
 };

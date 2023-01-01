@@ -8,14 +8,15 @@ import {
 } from "@nestjs/websockets";
 import { map } from "rxjs";
 import { Socket, Namespace } from "socket.io";
-import { Channel, Notif, User } from "src/database";
+import { ChanMessage, Channel, Notif, User } from "src/database";
 import { NotifService } from "src/users/notifs.service";
 import { UsersService } from "src/users/users.service";
 import { ChatService } from "./chat.service";
-import { ChannelData, NotifData } from "../utils/types";
+import { ChannelData, MessageData, NotifData } from "../utils/types";
 import { RoomService } from "src/game/room.service";
 import { ChannelService } from "./channel.service";
 import * as bcrypt from "bcrypt";
+import { MessageService } from "./message.service";
 
 @WebSocketGateway(3002, {
   cors: {
@@ -29,7 +30,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly chatService: ChatService,
     private readonly notifService: NotifService,
     private readonly roomService: RoomService,
-    private readonly channelService: ChannelService
+    private readonly channelService: ChannelService,
+    private readonly messageService: MessageService
   ) {}
 
   @WebSocketServer() server: Namespace;
@@ -174,9 +176,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** signal client: clientSocket.emit('declineFriendRequest', notif)
   ** 
   */
-  @SubscribeMessage("declineFriendRequest")
+  @SubscribeMessage("deleteNotif")
   async deleteNotif(client: Socket, notif: NotifData) {
-    console.log("decline friend event");
+    console.log("decline event");
 
     await this.notifService.deleteNotif(notif);
   }
@@ -251,7 +253,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let channel = await this.channelService.findChannelById(data.channel.id);
 
     if (!channel) {
-      client.to(client.id).emit("error", "invalid channel");
+      this.server.to(client.id).emit("error", "invalid channel");
       return;
     }
     if (channel.type === "protected") {
@@ -272,9 +274,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
     }
     data.channel = { ...channel, password: null };
-    const chanId = `${data.channel.type}/${data.channel.id}`;
-    client.join(chanId);
-    this.server.to(chanId).emit("joinedChannel", data);
+    client.join(data.channel.socketId);
+    this.server.to(data.channel.socketId).emit("joinedChannel", data);
     return data.channel;
   }
 
@@ -287,14 +288,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.user,
       data.channel
     );
-    const chanId = `${data.channel.type}/${data.channel.id}`;
     console.log("postleave", data.channel);
-
     this.server.to(client.id).emit("removeChannel", data.channel);
-    client.leave(chanId);
+    client.leave(data.channel.socketId);
     if (channel) {
       console.log("returned channel", channel);
-      this.server.to(chanId).emit("leftChannel", channel);
+      this.server.to(data.channel.socketId).emit("leftChannel", channel);
     }
   }
 
@@ -320,5 +319,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       channel: notif.channel,
     });
     this.server.to(client.id).emit("newChannel", channel);
+  }
+
+  @SubscribeMessage("chanMessage")
+  async message(client: Socket, data: ChanMessage) {
+    const message = await this.messageService.createChanMessage({
+      content: data.content,
+      from: data.from,
+      channel: data.channel,
+    });
+    console.log("ret msg", message);
+    if (!message)
+      this.server.to(client.id).emit("error", "error creating message");
+    else this.server.to(data.channel.socketId).emit("newMessage", message);
   }
 }

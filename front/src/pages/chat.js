@@ -11,13 +11,13 @@ import { ChatContext } from "../context/socketContext";
 const MessageForm = ({ selected, setSelected }) => {
   const [message, setMessage] = useState("");
   const user = useContext(UserContext);
+  const socket = useContext(ChatContext);
 
   const submitMessage = (e) => {
     e.preventDefault();
-    const newMessages = selected.messages;
-    newMessages.push({ from: user.username, content: message });
-    setSelected({ ...selected, messages: newMessages });
+    const newMessage = { from: user, content: message, channel: selected };
     setMessage("");
+    socket.emit("chanMessage", newMessage);
   };
 
   if (selected) {
@@ -89,7 +89,6 @@ const Users = ({ selected }) => {
 
 const Chat = () => {
   const [selected, setSelected] = useState(null);
-  const [showUsers, setShowUsers] = useState(false);
   const [privateChans, setPrivateChans] = useState([]);
   const [publicChans, setPublicChans] = useState([]);
   const [directMessages, setDirectMessages] = useState([]);
@@ -155,7 +154,6 @@ const Chat = () => {
       console.log("joined channel", data.channel);
       updateChannel(data.channel);
       setSelected(data.channel);
-      setShowUsers(true);
     });
 
     socket.on("removeChannel", (channel) => {
@@ -178,11 +176,22 @@ const Chat = () => {
       updateChannel(channel);
     });
 
+    socket.on("newMessage", (message) => {
+      console.log("newmessage", message);
+
+      setSelected((prev) => {
+        if (prev && prev.id === message.channel.id)
+          return { ...prev, messages: prev.messages.concat(message) };
+        return prev;
+      });
+    });
+
     return () => {
       socket.off("newChannel");
       socket.off("joinedChannel");
       socket.off("removeChannel");
       socket.off("leftChannel");
+      socket.off("newMessage");
     };
   }, []);
 
@@ -206,7 +215,7 @@ const Chat = () => {
         <div className="chatBody">
           <h2>{selected ? selected.name : "CHAT"} </h2>
           {selected && selected.messages && (
-            <ChatMessages messages={selected.messages} />
+            <ChatMessages selected={selected} />
           )}
         </div>
         <MessageForm selected={selected} setSelected={setSelected} />

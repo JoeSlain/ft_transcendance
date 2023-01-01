@@ -39,6 +39,7 @@ export class NotifService {
         from: {
           id: data.from.id,
         },
+        type: data.type,
       },
     });
   }

@@ -1,16 +1,18 @@
 import { useContext } from "react";
 import { UserContext } from "../../context/userContext";
 
-const ChatMessages = ({ messages }) => {
-  let id = 0;
+const ChatMessages = ({ selected }) => {
   const me = useContext(UserContext);
+  const messages = selected.messages;
+  console.log("selected", selected);
 
   return (
     <div className="chatMessages">
       {messages.map((message) => {
-        if (message.from === me.username) {
+        console.log("message", message);
+        if (message.from.id === me.id) {
           return (
-            <div key={id++} className="messageWrapper">
+            <div key={message.id} className="messageWrapper">
               <div className="myUsername"> me</div>
               <div className="myMessage">
                 <div className="content">{message.content}</div>
@@ -19,8 +21,8 @@ const ChatMessages = ({ messages }) => {
           );
         } else {
           return (
-            <div key={id++} className="messageWrapper">
-              <div className="theirUsername">{message.from}</div>
+            <div key={message.id} className="messageWrapper">
+              <div className="theirUsername">{message.from.username}</div>
               <div className="theirMessage">
                 <div className="content"> {message.content}</div>
               </div>

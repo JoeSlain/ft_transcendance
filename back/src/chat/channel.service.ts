@@ -34,7 +34,9 @@ export class ChannelService {
         banned: true,
         admins: true,
         muted: true,
-        messages: true,
+        messages: {
+          from: true,
+        },
       },
     });
     console.log("chanfound", channel);
@@ -50,7 +52,9 @@ export class ChannelService {
         banned: true,
         admins: true,
         muted: true,
-        messages: true,
+        messages: {
+          from: true,
+        },
       },
     });
     return chans;
@@ -71,7 +75,9 @@ export class ChannelService {
         banned: true,
         admins: true,
         muted: true,
-        messages: true,
+        messages: {
+          from: true,
+        },
       },
       where: {
         type: "private",
@@ -130,6 +136,7 @@ export class ChannelService {
     let channel = this.chanRepo.create({
       name: chanData.name,
       type: chanData.type,
+      socketId: `${chanData.type}/${chanData.name}`,
       password: hashedPassword,
     });
     channel = await this.chanRepo.save(channel);

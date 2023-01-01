@@ -8,12 +8,15 @@ import {
   OneToMany,
 } from "typeorm";
 import { User } from "./User";
-import { Message } from "./Message";
+import { ChanMessage } from "./ChanMessage";
 
 @Entity({ name: "channels" })
 export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  socketId: string;
 
   @Column()
   name: string;
@@ -44,6 +47,6 @@ export class Channel {
   @JoinTable()
   muted: User[];
 
-  @OneToMany(() => Message, (message) => message.channel)
-  messages: Message[];
+  @OneToMany(() => ChanMessage, (message) => message.channel)
+  messages: ChanMessage[];
 }

@@ -12,7 +12,7 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.accept = "Accept";
       notif.decline = "Decline";
       notif.acceptEvent = "acceptFriendRequest";
-      notif.declineEvent = "declineFriendRequest";
+      notif.declineEvent = "deleteNotif";
       notif.socket = chatSocket;
       break;
     case "Delete Friend":
@@ -37,6 +37,7 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.accept = "Accept";
       notif.decline = "Decline";
       notif.acceptEvent = "acceptChannelInvite";
+      notif.declineEvent = "deleteNotif";
       notif.socket = chatSocket;
       break;
     default:

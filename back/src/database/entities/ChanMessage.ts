@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { User } from "./User";
 import { Channel } from "./Channel";
+import { User } from "./User";
 
-@Entity({ name: "messages" })
-export class Message {
+@Entity({ name: "chanMessages" })
+export class ChanMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -11,9 +11,9 @@ export class Message {
   content: string;
 
   // relations
-  @ManyToOne(() => User)
-  from: User;
-
   @ManyToOne(() => Channel)
   channel: Channel;
+
+  @ManyToOne(() => User)
+  from: User;
 }
