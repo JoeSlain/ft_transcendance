@@ -1,10 +1,12 @@
 import { useContext } from "react";
 import "../styles/notif.css";
-import { ChatContext, GameContext } from "../context/socketContext";
+import { ChatContext } from "../context/socketContext";
 import { Modal } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 
-const getNotif = (notif, chatSocket, gameSocket) => {
+const getNotif = (data) => {
+  let notif = { ...data };
+
   switch (notif.type) {
     case "Friend Request":
       notif.data = { from: notif.from, to: notif.to };
@@ -13,7 +15,6 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.decline = "Decline";
       notif.acceptEvent = "acceptFriendRequest";
       notif.declineEvent = "deleteNotif";
-      notif.socket = chatSocket;
       break;
     case "Delete Friend":
       notif.data = { from: notif.from, to: notif.to };
@@ -21,7 +22,6 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.accept = "Yes";
       notif.decline = "No";
       notif.acceptEvent = "deleteFriend";
-      notif.socket = chatSocket;
       break;
     case "Game Invite":
       notif.data = { from: notif.from, to: notif.to };
@@ -29,7 +29,6 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.accept = "Accept";
       notif.decline = "Decline";
       notif.acceptEvent = "acceptGameInvite";
-      notif.socket = chatSocket;
       break;
     case "Chan Invite":
       notif.data = { from: notif.from, to: notif.to, channel: notif.channel };
@@ -38,7 +37,6 @@ const getNotif = (notif, chatSocket, gameSocket) => {
       notif.decline = "Decline";
       notif.acceptEvent = "acceptChannelInvite";
       notif.declineEvent = "deleteNotif";
-      notif.socket = chatSocket;
       break;
     default:
       break;
@@ -47,27 +45,26 @@ const getNotif = (notif, chatSocket, gameSocket) => {
 };
 
 const Notif = ({ notifs, setNotifs }) => {
-  const chatSocket = useContext(ChatContext);
-  const gameSocket = useContext(GameContext);
-  const notif = getNotif(notifs[0], chatSocket, gameSocket);
+  const socket = useContext(ChatContext);
+  const notif = getNotif(notifs[0]);
 
   const handleAccept = () => {
     if (notif.acceptEvent) {
       console.log(notif.acceptEvent);
-      notif.socket.emit(notif.acceptEvent, notif.data);
+      socket.emit(notif.acceptEvent, notif.data);
     } else console.log("accept event undefined");
-    setNotifs(notifs.filter((n) => n.id !== notif.id));
+    setNotifs(notifs.filter((n) => n.id));
   };
 
   const handleDecline = () => {
     if (notif.declineEvent) {
       console.log(notif.declineEvent);
-      notif.socket.emit(notif.declineEvent, {
+      socket.emit(notif.declineEvent, {
         from: notif.from,
         to: notif.to,
       });
     } else console.log("decline event undefined");
-    setNotifs(notifs.filter((n) => n.id !== notif.id));
+    setNotifs(notifs.filter((n) => n.id));
   };
 
   return (
