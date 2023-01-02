@@ -102,10 +102,17 @@ export class UsersController {
     //console.log('notifs', notifs);
     return notifs;
   }
+  /**
+   * @brief Updates user in database
+   * @param req : userType
+   * @returns updated user
+   */
   @Post("updateUser")
   @UseGuards(TwoFactorGuard)  async updateUser(@Req() req) {
     console.log("REQUEST BODY: ", req.body);
     const user = await this.usersService.updateUser(req.body.user);
+    console.log("🚀 ~ file: users.controller.ts:109  UPDATEUSER", user)
+    
     return user;
   }
 
@@ -129,12 +136,13 @@ export class UsersController {
   )
   async uploadAvatar(
     @Req() req,
-    @Res() res,
     @UploadedFile() file: Express.Multer.File
   ) {
     console.log("🚀 ~ file: users.controller.ts:135 ~ UsersController ~ req", req)
     
-    return this.usersService.uploadAvatar(req.user.id, file.filename);
+    const ret = await this.usersService.uploadAvatar(req.user.id, file.filename);
+    console.log("🚀 ~ file: users.controller.ts:138 ~ UsersController ~ ret", ret)
+    return ret;
   }
 
   @Get("getAvatar")
@@ -151,7 +159,6 @@ export class UsersController {
   @UseGuards(TwoFactorGuard)
   async getAvatarById(@Param() params, @Res() res) {
     const user = await this.usersService.getById(params.id);
-
     if (user && user.avatar)
       return res.sendFile(user.avatar, { root: "./uploads" });
     console.log("error getting avatar: invalid user or file path");

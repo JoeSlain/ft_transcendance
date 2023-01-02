@@ -3,76 +3,91 @@ import User from "../../../../hooks/User";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
+import { userType } from "../../../../types/userType";
+import { BACK_ROUTE } from "../../../../services/back_route";
+import { blob } from "node:stream/consumers";
 
 type avatarState = {
-  url : string,
-  file : any
+  url: string;
+  file: any;
+};
+
+async function getAvatar(userId: number) {
+  const res = await fetch(`${BACK_ROUTE}users/getAvatar/${userId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
 }
 
 //Username and avatar component
 export default function UserInfos() {
-  const { user } = useContext(User); //user data to print
+  let { user, setUser } = useContext(User); //user data to print
   const { register, handleSubmit } = useForm();
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
     url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
-
+  console.log(
+    "avatar start componenent: ",
+    avatar,
+    " user.avatar: ",
+    user.avatar
+  );
   async function onSave(formValue: any) {
     //sends form to back
     console.log("🚀 formValue", formValue);
-    console.log("🚀 ~ file: Component.tsx:16 ~ UserInfos ~ avatar", avatar);
+    console.log("🚀 ~ line:26 ~ AVATAR START ", avatar);
 
-    user.username = formValue.username;
-    let formData = new FormData();
-    const ext = avatar.file.name.split(".").pop();
-    if (ext !== "jpg" && ext !== "jpeg" && ext !== "png")
-      console.log("error: image extension not supported");
+    if (avatar.file != null) {
+      let formData = new FormData();
+      const ext = avatar.file.name.split(".").pop();
+      if (ext !== "jpg" && ext !== "jpeg" && ext !== "png")
+        console.log("error: image extension not supported");
       else {
-          formData.append('file', avatar.file, `${user.username}.avatar.jpg`); 
+        formData.append("file", avatar.file, `${user.username}.avatar.jpg`);
       }
-     //  console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ formData", formData)
-      
-    await axios
-      .post(
-        "http://localhost:3001/api/users/uploadAvatar",
-        {
-          formData
-        },
-        { withCredentials: true }
-      )
-      .then(() => {
-        console.log("avatar pusher");
-      })
-      .catch((e) => {
-        console.log("failed uplaoding avatar: ", e.message);
-      });
+      console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ formData", formData);
+      await axios
+        .post(`${BACK_ROUTE}users/uploadAvatar`, formData, {
+          withCredentials: true,
+        })
+        .then((res: any) => {
+          console.log("then res ", res);
+        })
+        .catch((e) => {
+          console.log("failed uplaoding avatar: ", e.message);
+        });
+        user.avatar = await getAvatar(user.id);
+        avatar.url = user.avatar;
+    }
     console.log("avatar is: ", avatar);
     saveItem("user", user);
+    console.log("🚀 ~ file: Component.tsx:74 ~ onSave ~ userAFTERCALL", user);
+    if (formValue.username !== user.username) {
+      user.username = formValue.username;
+      await axios
+        .post(
+          `${BACK_ROUTE}users/updateUser`,
+          { user },
+          {
+            withCredentials: true,
+          }
+        )
+        .then((data) => {
+          console.log("Username changed: ", data);
+        })
+        .catch((err) => {
+          console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ err", err);
+        });
+    }
     await getSavedItem("user");
-    await axios
-      .post(
-        "http://localhost:3001/api/users/updateUser",
-        { user },
-        {
-          withCredentials: true,
-        }
-      )
-      .then((data) => {
-        console.log("avatar res", data);
-      })
-      .catch((err) => {
-        console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ err", err);
-      });
-    console.log(
-      "🚀 ~ file: Component.tsx:54 ~ UserInfos ~ formValue",
-      formValue
-    );
   }
   function handleAvatar(data: any) {
     //Handles avatar upload
-    console.log("🚀 ~ file: Component.tsx:58 ~ handleAvatar ~ data", data);
+    // console.log("🚀 ~ file: Component.tsx:58 ~ handleAvatar ~ data", data);
 
     setAvatar({
       url: URL.createObjectURL(data.target.files[0]),
@@ -102,6 +117,7 @@ export default function UserInfos() {
           Submit
         </button>
       </form>
+      {user.avatar != null && <h1>AVATAR</h1>}
     </>
   );
 }

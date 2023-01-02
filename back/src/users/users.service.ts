@@ -133,9 +133,9 @@ export class UsersService {
   }
 
     async uploadAvatar(userId: number, url: string) {
-        await this.usersRepository.update(userId, {
-             avatar: url,
-        });
+      await this.usersRepository.update(userId, {
+        avatar: url,
+      });
         return this.getById(userId);
     }
 }
