@@ -45,7 +45,7 @@ export class UsersController {
 
   @Get("userid/:id")
   @UseGuards(TwoFactorGuard)
-  async findOneById(@Param() params): Promise<User | null> {
+  async findOneById(@Param() params: { id: string }): Promise<User | null> {
     console.log(
       "🚀 ~ file: users.controller.ts:49 ~ UsersController ~ findOneById ~ params",
       params

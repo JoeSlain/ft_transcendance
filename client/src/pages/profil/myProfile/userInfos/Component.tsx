@@ -60,8 +60,8 @@ export default function UserInfos() {
         .catch((e) => {
           console.log("failed uplaoding avatar: ", e.message);
         });
-        user.avatar = await getAvatar(user.id);
-        avatar.url = user.avatar;
+      user.avatar = await getAvatar(user.id);
+      setAvatar({ ...avatar, url: user.avatar });
     }
     console.log("avatar is: ", avatar);
     saveItem("user", user);
