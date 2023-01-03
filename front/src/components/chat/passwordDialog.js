@@ -23,6 +23,7 @@ const PasswordDialog = ({ channel, setProtectedChan }) => {
           </Modal.Title>
         </div>
         <div className="body">
+          <div> Password : </div>
           <input onChange={(e) => setPass(e.target.value)} />
         </div>
         <div className="buttons">

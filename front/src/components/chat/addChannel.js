@@ -29,7 +29,6 @@ const ChanType = ({ setSelected }) => {
         >
           <option value="public">public</option>
           <option value="private">private</option>
-          <option value="protected">protected</option>
         </select>
       </div>
     </>
@@ -69,13 +68,11 @@ const AddChannel = ({ setShowChanMenu }) => {
             setChanEntry={setChanName}
           />
           <ChanType setSelected={setSelected} />
-          {selected === "protected" && (
-            <ChanInput
-              title="Password"
-              chanEntry={password}
-              setChanEntry={setPassword}
-            />
-          )}
+          <ChanInput
+            title="Password"
+            chanEntry={password}
+            setChanEntry={setPassword}
+          />
         </div>
         <div className="buttons">
           <Button variant="primary" onClick={createChannel}>

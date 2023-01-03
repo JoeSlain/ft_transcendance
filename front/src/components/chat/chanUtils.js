@@ -4,7 +4,7 @@ import { UserContext } from "../../context/userContext";
 import { ContextMenu } from "../../styles/menus";
 import { ChanStyle } from "../../styles/channels";
 
-export const ChanContextMenu = ({ channel, setChannel, points }) => {
+const PrivateContextMenu = ({ channel, setChannel }) => {
   const socket = useContext(ChatContext);
   const user = useContext(UserContext);
 
@@ -14,14 +14,39 @@ export const ChanContextMenu = ({ channel, setChannel, points }) => {
     setChannel(null);
   };
 
-  if (channel && channel.type === "private") {
-    return (
-      <ContextMenu top={points.y} left={points.x}>
-        <ul>
-          <li onClick={handleDelete}> Delete </li>
-        </ul>
-      </ContextMenu>
-    );
+  return (
+    <ul>
+      <li onClick={handleDelete}> Delete </li>
+    </ul>
+  );
+};
+
+const PublicContextMenu = ({ channel, setChannel }) => {
+  const setPassword = () => {
+    setChannel(null);
+  };
+
+  return (
+    <ul>
+      <li onClick={setPassword}> Change Password </li>
+    </ul>
+  );
+};
+
+export const ChanContextMenu = ({ channel, setChannel, points }) => {
+  if (channel) {
+    if (channel.type === "private")
+      return (
+        <ContextMenu top={points.y} left={points.x}>
+          <PrivateContextMenu channel={channel} setChannel={setChannel} />
+        </ContextMenu>
+      );
+    else if (channel.type === "protected")
+      return (
+        <ContextMenu top={points.y} left={points.x}>
+          <PublicContextMenu channel={channel} setChannel={setChannel} />
+        </ContextMenu>
+      );
   }
 };
 

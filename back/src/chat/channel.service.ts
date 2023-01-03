@@ -110,7 +110,8 @@ export class ChannelService {
   }
 
   async checkChanData(chanData: ChannelData) {
-    if (await this.findChannel(chanData)) return "invalid channel name";
+    if (!chanData.name || (await this.findChannel(chanData)))
+      return "invalid channel name";
     if (chanData.type === "protected" && !chanData.password)
       return "invalid password";
     return null;
