@@ -41,7 +41,7 @@ export class GameGateway {
     let room = this.roomService.usersRooms.get(data.user.id);
 
     if (room) {
-      if (room.id !== data.roomId) {
+      if (room.id !== data.roomId && !room.gameStarted) {
         console.log("leaving previous room", room.id);
 
         const leaveData = {

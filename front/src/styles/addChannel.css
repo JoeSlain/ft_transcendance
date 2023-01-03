@@ -1,0 +1,14 @@
+.notifEntry {
+  display: flex;
+  width: 300px;
+}
+
+.entryTitle {
+  width: 25%;
+}
+
+.entryInput {
+  width: 75%;
+  margin-left: 20px;
+  margin-bottom: 5px;
+}

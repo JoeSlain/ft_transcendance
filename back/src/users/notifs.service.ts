@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Notif, User } from "src/database";
+import { Channel, Notif, User } from "src/database";
 import { NotifData } from "src/utils/types";
 import { Repository } from "typeorm";
 import { UsersService } from "./users.service";
@@ -13,20 +13,48 @@ export class NotifService {
   ) {}
 
   async createNotif(data: NotifData) {
-    const notifs = await this.findOne(data);
+    const notifs = await this.findNotif(data);
 
-    if (notifs.length === 0) {
+    if (!notifs.length) {
       console.log("notif not found, creating new");
       const newNotif = this.notifRepository.create(data);
+      console.log("newNotif", newNotif);
       return this.notifRepository.save(newNotif);
     }
     console.log("notif not created");
     return null;
   }
 
-  async findOne(data: NotifData) {
+  async findChanInvite(data: NotifData) {
+    const notif = await this.notifRepository.find({
+      relations: {
+        to: true,
+        from: true,
+        channel: true,
+      },
+      where: {
+        to: {
+          id: data.to.id,
+        },
+        from: {
+          id: data.from.id,
+        },
+        channel: {
+          id: data.channel.id,
+        },
+        type: data.type,
+      },
+    });
+
+    console.log("chanNotif", notif);
+    return notif;
+  }
+
+  async findNotif(data: NotifData) {
     console.log("find one notif");
-    return this.notifRepository.find({
+
+    if (data.channel) return await this.findChanInvite(data);
+    const notif = await this.notifRepository.find({
       relations: {
         to: true,
         from: true,
@@ -38,16 +66,20 @@ export class NotifService {
         from: {
           id: data.from.id,
         },
+        type: data.type,
       },
     });
+    console.log("friendNotif", notif);
+    return notif;
   }
 
   async getNotifs(userId: number) {
     console.log("getNotifs");
-    return this.notifRepository.find({
+    return await this.notifRepository.find({
       relations: {
         to: true,
         from: true,
+        channel: true,
       },
       where: {
         to: {
@@ -57,9 +89,21 @@ export class NotifService {
     });
   }
 
-  async deleteNotif(data: NotifData) {
-    const notif = await this.findOne(data);
+  async getChanNotifs(channel: Channel) {
+    const notifs = await this.notifRepository.find({
+      relations: {
+        channel: true,
+      },
+      where: {
+        channel: {
+          id: channel.id,
+        },
+      },
+    });
+    return notifs;
+  }
 
-    if (notif.length) await this.notifRepository.remove(notif);
+  async deleteNotif(notif: Notif) {
+    await this.notifRepository.remove(notif);
   }
 }

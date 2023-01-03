@@ -19,22 +19,18 @@ const AddFriend = ({ me, friends, setFriends }) => {
   const addFriend = (e) => {
     e.preventDefault();
 
-    if (
-      name === "" ||
-      name === me.username
-      //|| friends.find(friend => friend.username === name)
-    ) {
-      console.log("invalid username");
-      setName("");
-      return;
+    if (name === "") {
+      alert("invalid username");
+    } else {
+      axios
+        .get(`http://localhost:3001/api/users/username/${name}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data) notify(response.data);
+          else alert("invalid username");
+        });
     }
-    axios
-      .get(`http://localhost:3001/api/users/username/${name}`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.data) notify(response.data);
-      });
     setName("");
   };
 

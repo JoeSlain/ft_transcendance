@@ -1,3 +1,5 @@
+import { string } from "joi";
+import { Channel } from "src/database";
 import { User } from "src/database/entities/User";
 
 // done type for serializer
@@ -11,22 +13,40 @@ export type UserDetails = {
   img_url: string;
 };
 
-// notif type
+// notif data
 export type NotifData = {
   type: string;
   from: User;
   to: User;
+  channel?: Channel;
 };
 
+// room user
 export type RoomUser = {
   infos: User;
   ready: boolean;
 };
 
-// room type
+// room
 export type Room = {
   id: string;
   host: RoomUser;
   guest: RoomUser;
   spectators: Array<User>;
+  gameStarted: boolean;
+};
+
+// channel data
+export type ChannelData = {
+  name: string;
+  type: string;
+  password?: string;
+  owner: User;
+};
+
+// message data
+export type MessageData = {
+  content: string;
+  from: User;
+  channel: any;
 };
