@@ -44,12 +44,18 @@ export class UsersController {
   }
 
   @Get("userid/:id")
-  @UseGuards(TwoFactorGuard)  async findOneById(@Param() params : {id :string}): Promise<User | null> {
-    console.log("🚀 ~ file: users.controller.ts:49 ~ UsersController ~ findOneById ~ params", params)
+  @UseGuards(TwoFactorGuard)
+  async findOneById(@Param() params): Promise<User | null> {
+    console.log(
+      "🚀 ~ file: users.controller.ts:49 ~ UsersController ~ findOneById ~ params",
+      params
+    );
 
-    const user = await this.userRepository.findOneBy({ id: parseInt(params.id) });
+    const user = await this.userRepository.findOneBy({
+      id: parseInt(params.id),
+    });
 
-    console.log('get profile', user.username);
+    console.log("get profile", user.username);
     return user;
   }
 
@@ -108,11 +114,12 @@ export class UsersController {
    * @returns updated user
    */
   @Post("updateUser")
-  @UseGuards(TwoFactorGuard)  async updateUser(@Req() req) {
+  @UseGuards(TwoFactorGuard)
+  async updateUser(@Req() req) {
     console.log("REQUEST BODY: ", req.body);
     const user = await this.usersService.updateUser(req.body.user);
-    console.log("🚀 ~ file: users.controller.ts:109  UPDATEUSER", user)
-    
+    console.log("🚀 ~ file: users.controller.ts:109  UPDATEUSER", user);
+
     return user;
   }
 
@@ -134,14 +141,20 @@ export class UsersController {
       }),
     })
   )
-  async uploadAvatar(
-    @Req() req,
-    @UploadedFile() file: Express.Multer.File
-  ) {
-    console.log("🚀 ~ file: users.controller.ts:135 ~ UsersController ~ req", req)
-    
-    const ret = await this.usersService.uploadAvatar(req.user.id, file.filename);
-    console.log("🚀 ~ file: users.controller.ts:138 ~ UsersController ~ ret", ret)
+  async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    console.log(
+      "🚀 ~ file: users.controller.ts:135 ~ UsersController ~ req",
+      req
+    );
+
+    const ret = await this.usersService.uploadAvatar(
+      req.user.id,
+      file.filename
+    );
+    console.log(
+      "🚀 ~ file: users.controller.ts:138 ~ UsersController ~ ret",
+      ret
+    );
     return ret;
   }
 
