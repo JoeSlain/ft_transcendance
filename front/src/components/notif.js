@@ -29,6 +29,7 @@ const getNotif = (data) => {
       notif.accept = "Accept";
       notif.decline = "Decline";
       notif.acceptEvent = "acceptGameInvite";
+      notif.declineEvent = "deleteNotif";
       break;
     case "Chan Invite":
       notif.data = { from: notif.from, to: notif.to, channel: notif.channel };
@@ -51,43 +52,42 @@ const Notif = ({ notifs, setNotifs }) => {
   const handleAccept = () => {
     if (notif.acceptEvent) {
       console.log(notif.acceptEvent);
-      socket.emit(notif.acceptEvent, notif.data);
+      socket.emit(notif.acceptEvent, notifs[0]);
     } else console.log("accept event undefined");
-    setNotifs(notifs.filter((n) => n.id));
+    setNotifs((prev) => {
+      const tmp = [...prev];
+      tmp.shift();
+      return tmp;
+    });
   };
 
   const handleDecline = () => {
     if (notif.declineEvent) {
       console.log(notif.declineEvent);
-      socket.emit(notif.declineEvent, {
-        from: notif.from,
-        to: notif.to,
-      });
+      socket.emit(notif.declineEvent, notifs[0]);
     } else console.log("decline event undefined");
-    setNotifs(notifs.filter((n) => n.id));
+    setNotifs((prev) => {
+      const tmp = [...prev];
+      tmp.shift();
+      return tmp;
+    });
   };
 
   return (
-    <Modal show={true}>
-      <div className="notif">
-        <div className="header">
-          <Modal.Title id="contained-modal-title-vcenter">
-            {notif.type}
-          </Modal.Title>
-        </div>
-        <div className="body">{notif.body}</div>
-        <div className="buttons">
-          <Button variant="primary" onClick={handleAccept}>
-            {" "}
-            {notif.accept}{" "}
-          </Button>
-          <Button variant="secondary" onClick={handleDecline}>
-            {" "}
-            {notif.decline}{" "}
-          </Button>
-        </div>
+    <div className="notif">
+      <div className="header">{notif.type}</div>
+      <div className="body">{notif.body}</div>
+      <div className="buttons">
+        <Button variant="primary" onClick={handleAccept}>
+          {" "}
+          {notif.accept}{" "}
+        </Button>
+        <Button variant="secondary" onClick={handleDecline}>
+          {" "}
+          {notif.decline}{" "}
+        </Button>
       </div>
-    </Modal>
+    </div>
   );
 };
 

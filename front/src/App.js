@@ -248,6 +248,8 @@ function App() {
     };
   }, [user, room]);
 
+  console.log("notifs", notifs);
+
   return (
     <div id="main">
       <UserContext.Provider value={user}>

@@ -71,10 +71,11 @@ export class RoomService {
         console.log("host left");
         room.host = room.guest;
         room.guest = null;
-        if (this.isEmptyRoom(room)) {
+        if (!room.host) {
           console.log("room empty, deleting room");
           return this.deleteRoom(id);
         }
+        room.id = room.host.infos.id.toString();
       } else if (room.guest && room.guest.infos.id === userId) {
         console.log("guest left");
         room.guest = null;

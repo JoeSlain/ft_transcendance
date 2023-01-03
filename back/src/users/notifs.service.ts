@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Notif, User } from "src/database";
+import { Channel, Notif, User } from "src/database";
 import { NotifData } from "src/utils/types";
 import { Repository } from "typeorm";
 import { UsersService } from "./users.service";
@@ -26,7 +26,7 @@ export class NotifService {
   }
 
   async findChanInvite(data: NotifData) {
-    return this.notifRepository.find({
+    const notif = await this.notifRepository.find({
       relations: {
         to: true,
         from: true,
@@ -45,13 +45,16 @@ export class NotifService {
         type: data.type,
       },
     });
+
+    console.log("chanNotif", notif);
+    return notif;
   }
 
   async findNotif(data: NotifData) {
     console.log("find one notif");
 
-    if (data.channel) return this.findChanInvite(data);
-    return this.notifRepository.find({
+    if (data.channel) return await this.findChanInvite(data);
+    const notif = await this.notifRepository.find({
       relations: {
         to: true,
         from: true,
@@ -66,11 +69,13 @@ export class NotifService {
         type: data.type,
       },
     });
+    console.log("friendNotif", notif);
+    return notif;
   }
 
   async getNotifs(userId: number) {
     console.log("getNotifs");
-    return this.notifRepository.find({
+    return await this.notifRepository.find({
       relations: {
         to: true,
         from: true,
@@ -84,10 +89,21 @@ export class NotifService {
     });
   }
 
-  async deleteNotif(data: NotifData) {
-    const notif = await this.findNotif(data);
+  async getChanNotifs(channel: Channel) {
+    const notifs = await this.notifRepository.find({
+      relations: {
+        channel: true,
+      },
+      where: {
+        channel: {
+          id: channel.id,
+        },
+      },
+    });
+    return notifs;
+  }
 
-    console.log("deleting notif", notif);
-    if (notif.length) await this.notifRepository.remove(notif[0]);
+  async deleteNotif(notif: Notif) {
+    await this.notifRepository.remove(notif);
   }
 }

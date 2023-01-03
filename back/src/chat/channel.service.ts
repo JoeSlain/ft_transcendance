@@ -4,12 +4,14 @@ import { Channel, User } from "src/database";
 import { ChannelData } from "src/utils/types";
 import { Repository, createQueryBuilder } from "typeorm";
 import * as bcrypt from "bcrypt";
+import { NotifService } from "src/users/notifs.service";
 
 @Injectable()
 export class ChannelService {
   constructor(
     @InjectRepository(Channel) private chanRepo: Repository<Channel>,
-    @InjectRepository(User) private userRepo: Repository<User>
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private readonly notifService: NotifService
   ) {}
 
   async findChannel(chanData: ChannelData) {
@@ -39,12 +41,12 @@ export class ChannelService {
         },
       },
     });
-    console.log("chanfound", channel);
+    //console.log("chanfound", channel);
     return channel[0];
   }
 
   async getPublicChannels() {
-    const chans = await this.chanRepo.find({
+    const tmp = await this.chanRepo.find({
       where: [{ type: "public" }, { type: "protected" }],
       relations: {
         users: true,
@@ -56,6 +58,10 @@ export class ChannelService {
           from: true,
         },
       },
+    });
+    const chans = tmp.map((chan) => {
+      chan.password = null;
+      return chan;
     });
     return chans;
   }
@@ -87,7 +93,7 @@ export class ChannelService {
       },
     });
 
-    console.log("tmpPrivateChans", tmp);
+    //console.log("tmpPrivateChans", tmp);
     const chans = tmp.map((chan) => {
       return { ...chan, password: null };
     });
@@ -99,7 +105,7 @@ export class ChannelService {
     const privateChans = await this.getPrivateChannels(userId);
     const ret = publicChans.concat(privateChans);
 
-    console.log("concat chans", ret);
+    //console.log("concat chans", ret);
     return ret;
   }
 
@@ -171,6 +177,11 @@ export class ChannelService {
   }
 
   async deleteChan(chan: Channel) {
+    const notifs = await this.notifService.getChanNotifs(chan);
+
+    notifs.forEach(async (notif) => {
+      await this.notifService.deleteNotif(notif);
+    });
     await this.chanRepo
       .createQueryBuilder()
       .relation(Channel, "messages")
@@ -185,11 +196,11 @@ export class ChannelService {
   }
 
   async leaveChan(user: User, chan: Channel) {
-    console.log("chan1", chan);
+    //console.log("chan1", chan);
     await this.removeUserChan(user, chan);
     chan = await this.findChannelById(chan.id);
 
-    console.log("chan2", chan);
+    //console.log("chan2", chan);
 
     if (chan.owner.id === user.id) {
       if (chan.admins && chan.admins[0])
