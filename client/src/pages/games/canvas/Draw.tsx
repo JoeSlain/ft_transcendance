@@ -24,7 +24,7 @@ export class Game {
   public static player2Score: number = 0;
   private player1: Paddle = new Paddle(0, 0, 0, 0);
   private player2: Paddle2 = new Paddle2(0, 0, 0, 0);
-
+  private ball2: Ball = new Ball(5, 5, 5, 5);
   private ball: Ball = new Ball(0, 0, 0, 0);
 
   constructor(canvas: HTMLCanvasElement) {
@@ -90,6 +90,11 @@ export class Game {
       this.gameCanvas.width / 2 - ballSize / 2,
       this.gameCanvas.height / 2 - ballSize / 2
     );
+    this.ball2 = new Ball(
+      ballSize, 
+      ballSize,
+      this.gameCanvas.width / 2 - ballSize / 2,
+    this.gameCanvas.height / 2 - ballSize / 2);
   }
 
   drawBoardDetails() {
@@ -144,6 +149,40 @@ export class Game {
     this.player2.update(this.gameCanvas);
     this.ball.speedUpdate(this.player1, this.player2, this.gameCanvas);
   }
+  update2Ball() {
+    console.log("update2ball called");
+    if (!this.gameCanvas) {
+      console.error("Unable to find gamecanvas element");
+      return;
+    }
+    this.player1.update(this.gameCanvas);
+    this.player2.update(this.gameCanvas);
+    this.ball.update(this.player1, this.player2, this.gameCanvas);
+    this.ball2.update(this.player1, this.player2, this.gameCanvas);
+  }
+  draw2ball()
+  {
+    if (!this.gameContext) {
+      return;
+    }
+    if (!this.gameCanvas) {
+      return;
+    }
+
+    this.gameContext.fillStyle = "#000";
+    this.gameContext.fillRect(
+      0,
+      0,
+      this.gameCanvas.width,
+      this.gameCanvas.height
+    );
+
+    this.drawBoardDetails();
+    this.player1.draw(this.gameContext);
+    this.player2.draw(this.gameContext);
+    this.ball.draw(this.gameContext);
+    this.ball2.draw(this.gameContext);
+  }
   draw() {
     if (!this.gameContext) {
       return;
@@ -179,6 +218,11 @@ export class Game {
     this.gameLoopSpeed();
   }
 
+  public Start2Ball(): void {
+    this.running = true;
+    this.gameLoop2Ball();
+  }
+
   public resetScore(): void {
     console.log("reset score");
     Game.player1Score = 0;
@@ -204,6 +248,20 @@ export class Game {
       this.updateSpeed();
       this.draw();
       requestAnimationFrame(this.gameLoopSpeed.bind(this));
+      if (Game.player1Score === 20 || Game.player2Score === 20)
+      {
+        this.stop();
+      }
+    }
+  }
+  private gameLoop2Ball(): void {
+
+    console.log("gameLoop2ball called");
+    if (this.running) {
+      // mettre à jour l'état du jeu et dessiner le canvas
+      this.update2Ball();
+      this.draw2ball();
+      requestAnimationFrame(this.gameLoop2Ball.bind(this));
       if (Game.player1Score === 20 || Game.player2Score === 20)
       {
         this.stop();
@@ -271,6 +329,8 @@ class Paddle2 extends Paddle {
     this.y += this.yVel * this.speed;
   }
 }
+
+
 
 class Ball extends Entity {
   private speed: number = 3;
