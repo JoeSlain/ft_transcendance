@@ -186,7 +186,9 @@ export class Game {
     this.player2.draw(this.gameContext);
     this.ball.draw(this.gameContext);
     this.ball2.drawYellow(this.gameContext);
+    
   }
+
   draw() {
     if (!this.gameContext) {
       return;
@@ -209,6 +211,18 @@ export class Game {
     this.ball.draw(this.gameContext);
   }
 
+  win(message: string) {
+    if (!this.gameContext) {
+      return;
+    }
+    if (!this.gameCanvas) {
+      return;
+    }
+    this.gameContext.font = "bold 42x Orbitron";
+    this.gameContext.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+    this.gameContext.fillText(message, this.gameCanvas.width / 2.7, this.gameCanvas.height / 2);
+  }
+  
   public start(): void {
     this.running = true;
     this.gameLoop();
@@ -241,6 +255,15 @@ export class Game {
       this.update();
       this.draw();
       requestAnimationFrame(this.gameLoop.bind(this));
+      if (Game.player1Score === 10 || Game.player2Score === 10)
+      {
+        if (Game.player1Score === 10) {
+          this.win("Joueur 1 a gagné!");
+        } else if (Game.player2Score === 10) {
+          this.win("Joueur 2 a gagné!");
+        }
+        this.stop();
+      }
     }
   }
 
@@ -252,8 +275,13 @@ export class Game {
       this.updateSpeed();
       this.draw();
       requestAnimationFrame(this.gameLoopSpeed.bind(this));
-      if (Game.player1Score === 20 || Game.player2Score === 20)
+      if (Game.player1Score === 10 || Game.player2Score === 10)
       {
+        if (Game.player1Score === 10) {
+          this.win("Joueur 1 a gagné!");
+        } else if (Game.player2Score === 10) {
+          this.win("Joueur 2 a gagné!");
+        }
         this.stop();
       }
     }
@@ -266,8 +294,13 @@ export class Game {
       this.update2Ball();
       this.draw2ball();
       requestAnimationFrame(this.gameLoop2Ball.bind(this));
-      if (Game.player1Score === 20 || Game.player2Score === 20)
+      if (Game.player1Score === 10 || Game.player2Score === 10)
       {
+        if (Game.player1Score === 10) {
+          this.win("Joueur 1 a gagné!");
+        } else if (Game.player2Score === 10) {
+          this.win("Joueur 2 a gagné!");
+        }
         this.stop();
       }
     }
@@ -302,12 +335,12 @@ class Paddle extends Entity {
   public speed: number = 7;
 
   update(canvas: HTMLElement) {
-    if (Game.keysPressed[KeyBindings.UP]) {
+    if (Game.keysPressed[KeyBindings.A]) {
       this.yVel = -1;
       if (this.y <= 20) {
         this.yVel = 0;
       }
-    } else if (Game.keysPressed[KeyBindings.DOWN]) {
+    } else if (Game.keysPressed[KeyBindings.Q]) {
       this.yVel = 1;
       if (this.y + this.height >= canvas.height - 20) {
         this.yVel = 0;
@@ -322,12 +355,12 @@ class Paddle extends Entity {
 
 class Paddle2 extends Paddle {
   update(canvas: HTMLElement) {
-    if (Game.keysPressed[KeyBindings.A]) {
+    if (Game.keysPressed[KeyBindings.UP]) {
       this.yVel = -1;
       if (this.y <= 20) {
         this.yVel = 0;
       }
-    } else if (Game.keysPressed[KeyBindings.Q]) {
+    } else if (Game.keysPressed[KeyBindings.DOWN]) {
       this.yVel = 1;
       if (this.y + this.height >= canvas.height - 20) {
         this.yVel = 0;
