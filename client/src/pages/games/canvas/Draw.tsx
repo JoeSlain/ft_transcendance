@@ -94,11 +94,12 @@ export class Game {
       1
     );
     this.ball2 = new Ball(
-      ballSize, 
+      ballSize,
       ballSize,
       this.gameCanvas.width / 2 - ballSize / 2,
-    this.gameCanvas.height / 2 - ballSize / 2,
-    -1);
+      this.gameCanvas.height / 2 - ballSize / 2,
+      -1
+    );
   }
 
   drawBoardDetails() {
@@ -164,8 +165,7 @@ export class Game {
     this.ball.update(this.player1, this.player2, this.gameCanvas);
     this.ball2.update(this.player1, this.player2, this.gameCanvas);
   }
-  draw2ball()
-  {
+  draw2ball() {
     if (!this.gameContext) {
       return;
     }
@@ -186,7 +186,6 @@ export class Game {
     this.player2.draw(this.gameContext);
     this.ball.draw(this.gameContext);
     this.ball2.drawYellow(this.gameContext);
-    
   }
 
   draw() {
@@ -219,10 +218,19 @@ export class Game {
       return;
     }
     this.gameContext.font = "bold 42x Orbitron";
-    this.gameContext.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
-    this.gameContext.fillText(message, this.gameCanvas.width / 2.7, this.gameCanvas.height / 2);
+    this.gameContext.clearRect(
+      0,
+      0,
+      this.gameCanvas.width,
+      this.gameCanvas.height
+    );
+    this.gameContext.fillText(
+      message,
+      this.gameCanvas.width / 2.7,
+      this.gameCanvas.height / 2
+    );
   }
-  
+
   public start(): void {
     this.running = true;
     this.gameLoop();
@@ -248,15 +256,13 @@ export class Game {
   }
 
   private gameLoop(): void {
-
     console.log("gameLoop called1");
     if (this.running) {
       // mettre à jour l'état du jeu et dessiner le canvas
       this.update();
       this.draw();
       requestAnimationFrame(this.gameLoop.bind(this));
-      if (Game.player1Score === 10 || Game.player2Score === 10)
-      {
+      if (Game.player1Score === 10 || Game.player2Score === 10) {
         if (Game.player1Score === 10) {
           this.win("Joueur 1 a gagné!");
         } else if (Game.player2Score === 10) {
@@ -268,15 +274,13 @@ export class Game {
   }
 
   private gameLoopSpeed(): void {
-
     console.log("gameLoopSpeed called");
     if (this.running) {
       // mettre à jour l'état du jeu et dessiner le canvas
       this.updateSpeed();
       this.draw();
       requestAnimationFrame(this.gameLoopSpeed.bind(this));
-      if (Game.player1Score === 10 || Game.player2Score === 10)
-      {
+      if (Game.player1Score === 10 || Game.player2Score === 10) {
         if (Game.player1Score === 10) {
           this.win("Joueur 1 a gagné!");
         } else if (Game.player2Score === 10) {
@@ -287,15 +291,13 @@ export class Game {
     }
   }
   private gameLoop2Ball(): void {
-
     console.log("gameLoop2ball called");
     if (this.running) {
       // mettre à jour l'état du jeu et dessiner le canvas
       this.update2Ball();
       this.draw2ball();
       requestAnimationFrame(this.gameLoop2Ball.bind(this));
-      if (Game.player1Score === 10 || Game.player2Score === 10)
-      {
+      if (Game.player1Score === 10 || Game.player2Score === 10) {
         if (Game.player1Score === 10) {
           this.win("Joueur 1 a gagné!");
         } else if (Game.player2Score === 10) {
@@ -372,8 +374,6 @@ class Paddle2 extends Paddle {
   }
 }
 
-
-
 class Ball extends Entity {
   private speed: number = 3;
 
@@ -381,9 +381,9 @@ class Ball extends Entity {
     super(w, h, x, y, xVel);
     // var randomDirection = Math.floor(Math.random() * 2) + 1;
     // if (randomDirection % 2) {
-     this.xVel = xVel;
+    this.xVel = xVel;
     // } else {
-      // this.xVel = -1;
+    // this.xVel = -1;
     // }
     this.yVel = 1;
   }
@@ -442,7 +442,6 @@ class Ball extends Entity {
     if (this.x <= 0) {
       this.x = canvas.width / 2 - this.width / 2;
       Game.player2Score += 1;
-      
     }
     //vérifier les limites du canvas droit et score+1
     if (this.x + this.width >= canvas.width) {
