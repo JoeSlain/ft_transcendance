@@ -22,10 +22,10 @@ export class Game {
   public static keysPressed: boolean[] = [];
   public static player1Score: number = 0;
   public static player2Score: number = 0;
-  private player1: Paddle = new Paddle(0, 0, 0, 0);
-  private player2: Paddle2 = new Paddle2(0, 0, 0, 0);
-  private ball2: Ball = new Ball(5, 5, 5, 5);
-  private ball: Ball = new Ball(0, 0, 0, 0);
+  private player1: Paddle = new Paddle(0, 0, 0, 0, 1);
+  private player2: Paddle2 = new Paddle2(0, 0, 0, 0, 1);
+  private ball2: Ball = new Ball(0, 0, 0, 0, -1);
+  private ball: Ball = new Ball(0, 0, 0, 0, 1);
 
   constructor(canvas: HTMLCanvasElement) {
     // Récupération de l'objet canvas
@@ -76,25 +76,29 @@ export class Game {
       paddleWidth,
       paddleHeight,
       wallOffset,
-      this.gameCanvas.height / 2 - paddleHeight / 2
+      this.gameCanvas.height / 2 - paddleHeight / 2,
+      1
     );
     this.player2 = new Paddle2(
       paddleWidth,
       paddleHeight,
       this.gameCanvas.width - (wallOffset + paddleWidth),
-      this.gameCanvas.height / 2 - paddleHeight / 2
+      this.gameCanvas.height / 2 - paddleHeight / 2,
+      1
     );
     this.ball = new Ball(
       ballSize,
       ballSize,
       this.gameCanvas.width / 2 - ballSize / 2,
-      this.gameCanvas.height / 2 - ballSize / 2
+      this.gameCanvas.height / 2 - ballSize / 2,
+      1
     );
     this.ball2 = new Ball(
       ballSize, 
       ballSize,
       this.gameCanvas.width / 2 - ballSize / 2,
-    this.gameCanvas.height / 2 - ballSize / 2);
+    this.gameCanvas.height / 2 - ballSize / 2,
+    -1);
   }
 
   drawBoardDetails() {
@@ -181,7 +185,7 @@ export class Game {
     this.player1.draw(this.gameContext);
     this.player2.draw(this.gameContext);
     this.ball.draw(this.gameContext);
-    this.ball2.draw(this.gameContext);
+    this.ball2.drawYellow(this.gameContext);
   }
   draw() {
     if (!this.gameContext) {
@@ -277,14 +281,19 @@ class Entity {
   y: number;
   xVel: number = 0;
   yVel: number = 0;
-  constructor(w: number, h: number, x: number, y: number) {
+  constructor(w: number, h: number, x: number, y: number, xVel: number) {
     this.width = w;
     this.height = h;
     this.x = x;
     this.y = y;
+    this.xVel = xVel;
   }
   draw(context: CanvasRenderingContext2D) {
     context.fillStyle = "#fff";
+    context.fillRect(this.x, this.y, this.width, this.height);
+  }
+  drawYellow(context: CanvasRenderingContext2D) {
+    context.fillStyle = "#ffc300";
     context.fillRect(this.x, this.y, this.width, this.height);
   }
 }
@@ -335,14 +344,14 @@ class Paddle2 extends Paddle {
 class Ball extends Entity {
   private speed: number = 3;
 
-  constructor(w: number, h: number, x: number, y: number) {
-    super(w, h, x, y);
-    var randomDirection = Math.floor(Math.random() * 2) + 1;
-    if (randomDirection % 2) {
-      this.xVel = 1;
-    } else {
-      this.xVel = -1;
-    }
+  constructor(w: number, h: number, x: number, y: number, xVel: number) {
+    super(w, h, x, y, xVel);
+    // var randomDirection = Math.floor(Math.random() * 2) + 1;
+    // if (randomDirection % 2) {
+     this.xVel = xVel;
+    // } else {
+      // this.xVel = -1;
+    // }
     this.yVel = 1;
   }
 
