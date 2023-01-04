@@ -1,11 +1,10 @@
 .contact {
-  border: 2px solid #ffc300;
-  color: aliceblue;
+  border: 2px solid ;
+  
   border-radius: 10px;
   flex-direction: column;
   margin-left: 30px;
   min-width: 300px;
   position: relative;
   height: 720px;
-  background-color: #003566;
 }

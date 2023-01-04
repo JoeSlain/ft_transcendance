@@ -3,9 +3,7 @@ import User from "../../../../hooks/User";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
-import { userType } from "../../../../types/userType";
 import { BACK_ROUTE } from "../../../../services/back_route";
-import { blob } from "node:stream/consumers";
 
 type avatarState = {
   url: string;
@@ -23,19 +21,14 @@ async function getAvatar(userId: number) {
 
 //Username and avatar component
 export default function UserInfos() {
-  let { user, setUser } = useContext(User); //user data to print
+  let { user } = useContext(User); //user data to print
   const { register, handleSubmit } = useForm();
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
-    url: user.avatar != null ? user.avatar : user.profile_pic,
+    url: user.profile_pic,
     file: null,
   });
-  console.log(
-    "avatar start componenent: ",
-    avatar,
-    " user.avatar: ",
-    user.avatar
-  );
+   if (user.avatar != null) {getAvatar(user.id).then((res)=>{avatar.url = res})} 
   async function onSave(formValue: any) {
     //sends form to back
     console.log("🚀 formValue", formValue);
@@ -97,12 +90,8 @@ export default function UserInfos() {
   return (
     <>
       <form onSubmit={handleSubmit(onSave)}>
-        <div>
-          <p className="text-slate-200">Username</p>
-          <input defaultValue={user.username} {...register("username")} />
-        </div>
 
-        <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
+        <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
           <img
             src={avatar.url}
             alt="Avatar"
@@ -113,11 +102,14 @@ export default function UserInfos() {
           </p>
           <input onChange={handleAvatar} type="file" className="hidden" />
         </label>
+        <div>
+          <p className="text-slate-200">Username</p>
+          <input defaultValue={user.username} {...register("username")} />
+        </div>
         <button className="text-slate-200 center" type="submit">
           Submit
         </button>
       </form>
-      {user.avatar != null && <h1>AVATAR</h1>}
     </>
   );
 }
