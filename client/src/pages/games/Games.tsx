@@ -1,6 +1,6 @@
 import { Game } from "./canvas/Draw";
 import "../../styles/games.css";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
 function Games() {
   const canvasRef = useRef(null);
@@ -10,6 +10,7 @@ function Games() {
     if (canvasRef.current) {
       const newGame = new Game(canvasRef.current);
       setGame(newGame);
+      // socket.emit("startGame", { roomId: 123 });
       newGame.resetScore();
       newGame.start();
     }
