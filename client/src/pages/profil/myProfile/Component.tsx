@@ -9,7 +9,7 @@ import UserInfos from "./userInfos/Component";
 //TODO : mettre à jour userauth
 
 export default function MyProfile() {
-  const {user} = useContext(User);
+  const { user } = useContext(User);
   return (
     <>
       <ProfileNavbar userId={user.id} />

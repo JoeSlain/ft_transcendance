@@ -1,17 +1,19 @@
-.container {
+.main {
   display: flex;
-  vertical-align: baseline;
+  flex-direction: row;
+  width: 100%;
 }
 
-/*.main {
+.center {
+  border: 2px solid #ffc300;
   color: aliceblue;
   flex-direction: column;
   border-radius: 10px;
-  //min-width: 800px;
-  width: 100%;
+  /*min-width: 800px;*/
+  width: 80%;
   vertical-align: baseline;
   background-color: #003566;
   flex-grow: 1;
   display: flex;
   border-right: 2%;
-}*/
+}

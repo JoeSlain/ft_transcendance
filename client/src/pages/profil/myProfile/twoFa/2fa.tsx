@@ -7,7 +7,7 @@ import { generate2fa } from "../../../../services/2FA/Generate2FA";
 import { getUser } from "../../../../services/User/GetUser";
 
 export default function TwoFa() {
-  const {user} = useContext(User);
+  const { user } = useContext(User);
   const {
     isLoading: isUserLoading,
     error: userError,
