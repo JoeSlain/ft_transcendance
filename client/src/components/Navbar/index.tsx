@@ -18,21 +18,21 @@ export default function Navbar(props: { userKey: string }) {
   return (
     <>
       <nav className="navigation">
-        <div className="navigation-menu">
+        <div className="navigation-menu bg-ata-back">
           <ul>
-            <li>
+            <li className="text-ata-red">
               <NavLink to="/Home">Home</NavLink>
             </li>
-            <li>
+            <li className="text-ata-red">
               <NavLink to="/play">Play</NavLink>
             </li>
-            <li>
+            <li className="text-ata-red">
               <NavLink to="/games">Games</NavLink>
             </li>
-            <li>
+            <li className="text-ata-red">
               <NavLink to="/chat">Chat</NavLink>
             </li>
-            <li>
+            <li className="text-ata-red">
               <NavLink
                 className="navlink"
                 to="/login"
