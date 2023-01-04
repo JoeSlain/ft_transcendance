@@ -1,13 +1,21 @@
 import { useEffect } from "react";
 
-export default function useClickListener(
-  setShowContext: (props: boolean) => void
-) {
+type IProps = {
+  show: boolean;
+  setShow: (props: boolean) => void;
+};
+
+export default function useClickListener({ show, setShow }: IProps) {
+  const handleClick = () => setShow(false);
+
   useEffect(() => {
-    const handleClick = () => setShowContext(false);
-    window.addEventListener("click", handleClick);
+    setTimeout(() => {
+      if (show) {
+        window.addEventListener("click", handleClick);
+      }
+    }, 0);
     return () => {
       window.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [show]);
 }

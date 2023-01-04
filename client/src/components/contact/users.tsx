@@ -18,13 +18,13 @@ const getColor = (status?: string) => {
 };
 
 export default function Users() {
-  const [showContext, setShowContext] = useState(false);
+  const [show, setShow] = useState(false);
   const [point, setPoint] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState<userType>();
   const [friends, setFriends] = useState<userType[]>([]);
   const [statuses, setStatuses] = useState(new Map<number, string>());
 
-  useClickListener(setShowContext);
+  useClickListener({ show, setShow });
   useFriendsEvent({ setFriends, setStatuses });
 
   return (
@@ -36,7 +36,7 @@ export default function Users() {
             className="userEntry"
             onContextMenu={(e) => {
               e.preventDefault();
-              setShowContext(true);
+              setShow(true);
               setClicked(friend);
               setPoint({ x: e.pageX, y: e.pageY });
             }}
@@ -45,7 +45,7 @@ export default function Users() {
             <DotStyle color={getColor(statuses.get(friend.id))} />
           </div>
         ))}
-      {showContext && (
+      {show && (
         <ContextMenu top={point.y} left={point.x}>
           <UserContextList user={clicked} />
         </ContextMenu>

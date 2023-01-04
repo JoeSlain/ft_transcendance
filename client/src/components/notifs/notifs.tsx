@@ -27,36 +27,27 @@ export default function Notif() {
       acceptEvent: "acceptGameInvite",
     },
   ]);
-
-  useClickListener(setShow);
+  useClickListener({ show, setShow });
+  console.log("show", show);
 
   return (
     <div className="notifs">
-      <div
-        className="notifIcon"
-        onClick={(e) => {
-          console.log("icon clicked");
-          setPoint({ x: e.pageX, y: e.pageY });
-          setShow(true);
-        }}
-      >
-        {" "}
-        !{" "}
-      </div>
-      <ContextMenu top={point.y} left={point.x}>
-        {show &&
-          notifs &&
-          notifs.map((notif) => (
-            <div key={notif.id} className="notifEntry">
+      <button onClick={() => setShow(true)} className="notifIcon">
+        !
+      </button>
+      {show && notifs && (
+        <div className="dropdown-content">
+          {notifs.map((notif) => (
+            <div className="notifEntry" key={notif.id}>
               <div className={"notifBody"}> {notif.type} </div>
               <div className={"notifButtons"}>
                 <ReadyStyle color="green"> ✓ </ReadyStyle>
                 <ReadyStyle color="red"> x </ReadyStyle>
-                <span className="crossMark"></span>
               </div>
             </div>
           ))}
-      </ContextMenu>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,3 +2,4 @@
 */node_modules/
 /back/dist/
 /back/.env
+/database-data
