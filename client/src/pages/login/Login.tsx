@@ -1,8 +1,9 @@
 import axios from "axios";
 import "../../styles/global.css";
 import "../../styles/login.css";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChatContext } from "../../context/socketContext";
 
 export function VerifLogged() {
   return false;
@@ -12,6 +13,7 @@ export default function Login() {
   const [devlog, setDevLog] = useState(false);
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
+  const socket = useContext(ChatContext);
 
   const buttonAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -29,29 +31,40 @@ export default function Login() {
         },
         { withCredentials: true }
       )
-      .then(() => {
+      .then((response) => {
         console.log("redirecting");
-        navigate("/login/redirect");
+        socket.emit("login", response.data);
       });
   };
 
   if (devlog) {
     return (
-      <div>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        <button className="button-auth" onClick={handleDevLogin}>
-          {" "}
-          Connect{" "}
-        </button>
-        <button
-          className="button-auth"
-          onClick={() => {
-            setUsername("");
-            setDevLog(false);
-          }}
-        >
-          Cancel
-        </button>
+      <div className="center">
+        <div className="inlineForm">
+          <div className="inlineInput">
+            <div className="inputName"> Username </div>
+            <input
+              className="inputValue"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="buttons">
+            <button className="button-auth" onClick={handleDevLogin}>
+              {" "}
+              Connect{" "}
+            </button>
+            <button
+              className="button-auth"
+              onClick={() => {
+                setUsername("");
+                setDevLog(false);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
     );
   } else {

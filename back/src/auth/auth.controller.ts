@@ -6,7 +6,7 @@ import {
   Res,
   Post,
   Body,
-  UnauthorizedException
+  UnauthorizedException,
 } from "@nestjs/common";
 import { FortyTwoAuthGuard, AuthenticatedGuard } from "./42auth/42.guard";
 import { TwoFactorAuthenticationService } from "./2fa/2fa.service";
@@ -31,10 +31,11 @@ export class AuthController {
   }
 
   @Post("logout")
-  @UseGuards(TwoFactorGuard)
+  //@UseGuards(TwoFactorGuard)
   logout(@Req() req) {
     const cookie = this.authService.getLogoutCookie();
 
+    console.log("logout");
     req.res.setHeader("Set-Cookie", cookie);
     return;
   }
@@ -52,8 +53,8 @@ export class AuthController {
       res.redirect(`http://localhost:3000/login/2fa`);
     else {
       res.redirect("http://localhost:3000/login/redirect");
-      console.log("2fa is off, redirected ")
-  }
+      console.log("2fa is off, redirected ");
+    }
   }
 
   // test for devs only

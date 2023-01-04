@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import Login from "./Login";
 import Auth from "../../hooks/Auth";
 
 const AuthRoute: React.FC = () => {

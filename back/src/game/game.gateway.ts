@@ -35,6 +35,13 @@ export class GameGateway {
     this.gameService.users.delete(userId);
   }
 
+  @SubscribeMessage("getRoom")
+  getRoom(client: Socket, userId: number) {
+    const room = this.roomService.getUserRoom(userId);
+
+    if (room) this.server.to(client.id).emit("newRoom", room);
+  }
+
   @SubscribeMessage("joinRoom")
   joinRoom(client: Socket, data: any) {
     console.log("join event");

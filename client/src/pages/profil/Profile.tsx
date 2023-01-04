@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import ProfileNavbar from "./Navbar";
 
 export default function Profile() {
-  const {user} = useContext(User);
+  const { user } = useContext(User);
   const userId = useParams().id || "";
   console.log("In profile by id");
   const { isLoading, error, data } = useQuery({
