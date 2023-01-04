@@ -22,6 +22,7 @@ import Chat from "./pages/chat/Chat";
 import { ChatContext } from "./context/socketContext";
 import useLogginEvent from "./hooks/chatEvents/useLogginEvent";
 import { notifType } from "./types/notifType";
+import Notif from "./components/notifs/notifs";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -35,7 +36,10 @@ export default function Router() {
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={{ user, setUser }}>
-        <Navbar setIsLogged={setIsLogged} />
+        <div className="header">
+          <Notif />
+          <Navbar setIsLogged={setIsLogged} />
+        </div>
         <div className="main">
           <Routes>
             <Route path="/login" element={<Login />} />

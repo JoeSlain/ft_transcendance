@@ -1,3 +1,7 @@
+.header {
+  display: flex;
+}
+
 .main {
   display: flex;
   flex-direction: row;
