@@ -6,5 +6,7 @@ export type notifType = {
   type: string;
   from: userType;
   to: userType;
-  channel: channelType;
+  acceptEvent: string;
+  declineEvent?: string;
+  channel?: channelType;
 };

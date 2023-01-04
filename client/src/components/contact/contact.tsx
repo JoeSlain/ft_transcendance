@@ -7,9 +7,11 @@ export default function Contact() {
   const isLogged = useContext(Auth);
 
   return (
-    <div className="contacts">
-      <h1 className="header">Contact</h1>
-      {isLogged && <Users />}
+    <div className="contactBar">
+      <div className="contacts">
+        <h1 className="header">Contact</h1>
+        {isLogged && <Users />}
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { saveItem } from "../../utils/storage";
 import { userType } from "../../types/userType";
 import { useNavigate } from "react-router-dom";
 import { notifType } from "../../types/notifType";
+import Auth from "../Auth";
 
 type IProps = {
   user: userType | null;
@@ -20,6 +21,7 @@ export default function useLogginEvent({
   setNotifs,
 }: IProps) {
   const chatSocket = useContext(ChatContext);
+  const isLogged = useContext(Auth);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,15 +34,11 @@ export default function useLogginEvent({
         .then((response) => {
           console.log("data", response.data);
           setNotifs(response.data);
-          if (!user) {
-            console.log("user null");
-            setUser(data);
-            saveItem("user", data);
-            setIsLogged(true);
-            navigate("/profile");
-          }
-          console.log("user", data);
+          setUser(data);
+          saveItem("user", data);
           setIsLogged(true);
+          saveItem("isLogged", true);
+          if (!isLogged) navigate("/profile");
         });
     });
 

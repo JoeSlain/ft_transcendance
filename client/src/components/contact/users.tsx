@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { ContextMenu } from "../../styles/menus";
 import useClickListener from "../../hooks/useClickListener";
-import { UserContextList } from "./userContextList";
 import useFriendsEvent from "../../hooks/chatEvents/useFriendsEvent";
 import { DotStyle } from "../../styles/dot";
 import { userType } from "../../types/userType";
+import { ContextMenu } from "../../styles/menus";
+import { UserContextList } from "./userContextList";
 
 const getColor = (status?: string) => {
   switch (status) {
     case "online":
-      console.log("green");
       return "green";
-    case "offline":
-      console.log("grey");
-      return "grey";
-    default:
-      console.log("yellow");
+    case "ingame":
       return "yellow";
+    default:
+      return "grey";
   }
 };
 

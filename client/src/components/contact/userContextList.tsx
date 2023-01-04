@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { userType } from "../../types/userType";
 import { ChatContext } from "../../context/socketContext";
+import { userType } from "../../types/userType";
 
 export type UserProps = {
   user?: userType;

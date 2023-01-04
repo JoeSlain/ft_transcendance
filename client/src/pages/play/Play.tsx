@@ -58,7 +58,10 @@ export default function Play() {
         </div>
         <div className="playBody"></div>
         <div className="playFooter">
-          <button onClick={searchOpponent}> Search opponent </button>
+          <button className="customButton" onClick={searchOpponent}>
+            {" "}
+            Search opponent{" "}
+          </button>
         </div>
       </div>
     </div>

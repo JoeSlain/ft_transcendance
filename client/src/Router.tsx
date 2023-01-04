@@ -59,9 +59,7 @@ export default function Router() {
               <Route path="*" element={<PageNotFound />} />
             </Route>
           </Routes>
-          <div className="contactBar">
-            <Contact />
-          </div>
+          <Contact />
         </div>
       </User.Provider>
     </Auth.Provider>

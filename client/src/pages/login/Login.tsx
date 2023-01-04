@@ -39,21 +39,32 @@ export default function Login() {
 
   if (devlog) {
     return (
-      <div>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        <button className="button-auth" onClick={handleDevLogin}>
-          {" "}
-          Connect{" "}
-        </button>
-        <button
-          className="button-auth"
-          onClick={() => {
-            setUsername("");
-            setDevLog(false);
-          }}
-        >
-          Cancel
-        </button>
+      <div className="center">
+        <div className="inlineForm">
+          <div className="inlineInput">
+            <div className="inputName"> Username </div>
+            <input
+              className="inputValue"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="buttons">
+            <button className="button-auth" onClick={handleDevLogin}>
+              {" "}
+              Connect{" "}
+            </button>
+            <button
+              className="button-auth"
+              onClick={() => {
+                setUsername("");
+                setDevLog(false);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
     );
   } else {
