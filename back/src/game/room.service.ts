@@ -49,6 +49,10 @@ export class RoomService {
     return this.rooms.get(id.toString());
   }
 
+  getUserRoom(id: number) {
+    return this.usersRooms.get(id);
+  }
+
   joinRoom(data: any) {
     console.log("join room");
     let room = this.findRoom(data.hostId);

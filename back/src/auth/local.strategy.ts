@@ -17,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       username
     );
 
-    //console.log('user after validate', user)
+    //console.log("user after validate", user);
     return user;
   }
 }

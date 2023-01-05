@@ -5,8 +5,13 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 0.5rem 0rem;
-  padding-top: 2%;
+  padding: 0rem 0rem;
+}
+
+.navigation-menu {
+  width: 100%;
+  padding : 0;
+  margin: 0;
 }
 
 .navigation-menu ul {
@@ -20,18 +25,15 @@
 }
 
 .navigation-menu li {
-  color: #ffc300;
   font-size: 26px;
   font-style: bold;
   margin: 0 1rem;
   padding-left: 3%;
   padding-right: 3%;
   border-radius: 5px;
-  background-color: #003566;
 }
 
 .navigation-menu2 li {
-  color: #ffc300;
   font-size: 20px;
   font-style: bold;
   margin: 0 1rem;
@@ -41,7 +43,7 @@
 
 .navigation-menu2 li a:hover {
   opacity: 0.8;
-  border-bottom: 2px solid #ffc300;
+  border-bottom: 2px solid #ef7021;
 }
 
 .navigation-menu li:last-child {

@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: ./docker/
+      dockerfile: Dockerfile-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./back:/app_backend
+    networks:
+      - webapp
+      - database
+    restart: always
+    container_name: backend_app
+
+  webapp:
+    build:
+      context: ./docker/
+      dockerfile: Dockerfile-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app_frontend
+    networks:
+      - webapp
+    restart: always
+    container_name: frontend_app
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test
+    ports:
+      - "31415:5432"
+    volumes:
+      - ./database-data:/var/lib/postgresql/data
+    networks:
+      - database
+    restart: always
+    container_name: db_app
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - database
+    restart: always
+    container_name: pgadmin
+
+networks:
+  webapp:
+    driver: bridge
+  database:
+    driver: bridge

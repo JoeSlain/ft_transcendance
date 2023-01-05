@@ -1,0 +1,34 @@
+.play {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.playBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 50%;
+}
+
+.playerEntry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.playFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+}
+
+.spectators {
+  margin-top: 10%;
+}
+
+h1 {
+  font-size: 30px;
+}

@@ -1,24 +1,17 @@
-.center {
-  margin: auto;
-  max-width: 1290px;
-  margin-top: 2%;
-}
-
 .container {
   display: flex;
   vertical-align: baseline;
 }
 
-.main {
-  border: 2px solid #ffc300;
+/*.main {
   color: aliceblue;
   flex-direction: column;
   border-radius: 10px;
-  min-width: 600px;
-  width: 25%;
+  //min-width: 800px;
+  width: 100%;
   vertical-align: baseline;
   background-color: #003566;
   flex-grow: 1;
   display: flex;
   border-right: 2%;
-}
+}*/
