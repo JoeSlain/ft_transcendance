@@ -3,6 +3,7 @@ import { getUser } from "../../services/User/GetUser";
 import "../../styles/global.css"
 import CSS from 'csstype';
 import History from "./History";
+import ProfileNavbar from "../profil/Navbar";
 
 const win : CSS.Properties = {
   backgroundColor: '#4ade80'
@@ -54,6 +55,8 @@ export default function Stats(props: { userId: number }) {
     data.n_lose = 3;
     return (
       <>
+        <ProfileNavbar userId={props.userId} />
+
         <div className="flex flex-col justify-center gap-10 items-center heightMinusNavProfile ">
           <div className="stats shadow mb-5 justify-center max-w-[25%] ">
             <div className="stat min-w-[33%]" style={win}>

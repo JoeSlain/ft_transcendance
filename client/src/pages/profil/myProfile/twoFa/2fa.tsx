@@ -25,7 +25,10 @@ export default function TwoFa() {
 
   return (
     <>
-      <button className="bg-white" onClick={() => refetch()}>
+      <button
+        className="btn btn-sm md:btn-md gap-1  normal-case lg:gap-3 text-slate-200 center"
+        onClick={() => refetch()}
+      >
         {" "}
         generate 2fa{" "}
       </button>

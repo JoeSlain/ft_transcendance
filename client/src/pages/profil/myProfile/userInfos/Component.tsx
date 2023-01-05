@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import User from "../../../../hooks/User";
 import { useForm } from "react-hook-form";
 import axios from "axios";
@@ -28,10 +28,17 @@ export default function UserInfos() {
     url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
+  useEffect(() => {
+    if (user.avatar != null) {
+      console.log("effect");
+      getAvatar(user.id).then((res) => {
+        setAvatar({ url: res, file: null });
+      });
+      console.log("avatar modified?: ", avatar.url);
+    }
+  }, []);
   async function onSave(formValue: any) {
     //sends form to back
-    console.log("🚀 formValue", formValue);
-    console.log("🚀 ~ line:26 ~ AVATAR START ", avatar);
 
     if (avatar.file != null) {
       let formData = new FormData();
@@ -55,9 +62,7 @@ export default function UserInfos() {
       user.avatar = await getAvatar(user.id);
       setAvatar({ ...avatar, url: user.avatar });
     }
-    console.log("avatar is: ", avatar);
     saveItem("user", user);
-    console.log("🚀 ~ file: Component.tsx:74 ~ onSave ~ userAFTERCALL", user);
     if (formValue.username !== user.username) {
       user.username = formValue.username;
       await axios
@@ -89,7 +94,6 @@ export default function UserInfos() {
   return (
     <>
       <form onSubmit={handleSubmit(onSave)}>
-
         <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
           <img
             src={avatar.url}
@@ -101,13 +105,18 @@ export default function UserInfos() {
           </p>
           <input onChange={handleAvatar} type="file" className="hidden" />
         </label>
-        <div>
-          <p className="text-slate-200">Username</p>
-          <input defaultValue={user.username} {...register("username")} />
+        <div className="flex flex-col items-center justify-center">
+          <div>
+            <p className="text-slate-200">Username</p>
+            <input defaultValue={user.username} {...register("username")} />
+          </div>
+          <button
+            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 text-slate-200 center"
+            type="submit"
+          >
+            Submit
+          </button>
         </div>
-        <button className="text-slate-200 center" type="submit">
-          Submit
-        </button>
       </form>
     </>
   );

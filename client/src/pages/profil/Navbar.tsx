@@ -5,17 +5,17 @@ export default function ProfileNavbar(props: { userId: number }) {
     <>
       <nav className="navigation mt-5 ">
         <div className=" ml-8">
-          <ul className="flex justify-center space-x-10 text-slate-100 text-xl">
+          <ul className="flex justify-center space-x-10 text-slate-100 text-xl ">
             <li>
               <NavLink
-                className="navlink"
+                className="navlink font-retro"
                 to={`/profile/${props.userId}`}
               >
                 Account
               </NavLink>
             </li>
             <li>
-              <NavLink className="navlink" to="/profile/stats">
+              <NavLink className="navlink  font-retro" to="/profile/stats">
                 Statistics
               </NavLink>
             </li>
