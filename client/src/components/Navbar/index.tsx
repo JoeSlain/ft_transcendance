@@ -26,9 +26,6 @@ export default function Navbar(props: { userKey: string }) {
               <NavLink to="/play">PLAY</NavLink>
             </li>
             <li className=" font-retro text-ata-yellow">
-              <NavLink to="/games">GAMES</NavLink>
-            </li>
-            <li className=" font-retro text-ata-yellow">
               <NavLink to="/chat">CHAT</NavLink>
             </li>
             <li className=" font-retro text-ata-yellow">
