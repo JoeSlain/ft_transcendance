@@ -1,1 +1,3 @@
-export default function Chat() {}
+export default function Chat() {
+    return <></>
+}

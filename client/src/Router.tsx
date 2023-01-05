@@ -14,6 +14,7 @@ import User from "./hooks/User";
 import AuthRoute from "./pages/login/AuthRoute";
 import { getSavedItem } from "./utils/storage";
 import { userType } from "./types/userType";
+import Chat from "./pages/chat/Chat";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -37,6 +38,7 @@ export default function Router() {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/play" element={<Play />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/profile">
               <Route index element={<MyProfile />} />
               <Route path=":id" element={<Profile />} />
