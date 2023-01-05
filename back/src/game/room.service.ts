@@ -94,4 +94,9 @@ export class RoomService {
     }
     return null;
   }
+
+  // Méthode pour récupérer une salle à partir de son identifiant
+  get(roomId: string): Room {
+    return this.rooms.get(roomId);
+  }
 }

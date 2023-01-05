@@ -106,4 +106,16 @@ export class GameGateway {
       this.server.to(room.id).emit("joinedRoom", room);
     }
   }
+
+
+  @SubscribeMessage("startGame")
+  startGame(client: Socket, data: any) {
+    const room = this.roomService.get(data.roomId);
+    if (!room) return;
+
+    this.gameService.resetGame(room);
+    this.server.to(room.id).emit("startGame");
+  }
+
+
 }
