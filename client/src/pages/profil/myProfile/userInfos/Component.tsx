@@ -25,10 +25,9 @@ export default function UserInfos() {
   const { register, handleSubmit } = useForm();
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
-    url: user.profile_pic,
+    url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
-   if (user.avatar != null) {getAvatar(user.id).then((res)=>{avatar.url = res})} 
   async function onSave(formValue: any) {
     //sends form to back
     console.log("🚀 formValue", formValue);

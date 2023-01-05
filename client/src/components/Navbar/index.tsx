@@ -44,7 +44,7 @@ export default function Navbar(props: { userKey: string }) {
               <NavLink to="/profile">
                 <img
                   className="profile bg-ata-red"
-                  src={profile}
+                  src={profile} 
                   alt="Profile"
                 />
               </NavLink>

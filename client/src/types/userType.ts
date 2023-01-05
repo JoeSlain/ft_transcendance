@@ -1,3 +1,5 @@
+import { gameType } from "./gameType";
+
 export type userType = {
   id: number;
   username: string;
@@ -7,9 +9,10 @@ export type userType = {
   id42: number;
   winratio: string;
   profile_pic: string;
-  avatar : string | null,
+  avatar: string | null;
   elo: number;
   n_win: number;
   n_lose: number;
   date_of_sign: Date;
+  games: gameType[];
 };
