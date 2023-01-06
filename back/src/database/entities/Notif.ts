@@ -19,9 +19,6 @@ export class Notif {
   @Column()
   acceptEvent: string;
 
-  @Column({ nullable: true })
-  declineEvent: string;
-
   @ManyToOne(() => User)
   from: User;
 

@@ -29,6 +29,10 @@
   margin-top: 10%;
 }
 
+#searchOpponentButton {
+  width: 200px;
+}
+
 h1 {
   font-size: 30px;
 }

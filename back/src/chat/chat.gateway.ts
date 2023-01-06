@@ -54,6 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       status: "online",
     };
     console.log("chat ws login");
+    console.log("user", user);
 
     this.chatService.addUser(user.id, client.id);
     client.broadcast.emit("updateStatus", data);
@@ -144,8 +145,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
     const notif = await this.notifService.createNotif(data);
+    console.log("notif", notif);
     if (notif) {
       const to = this.chatService.getUser(notif.to.id);
+      console.log("to", to);
       if (to) this.server.to(to).emit("notified", notif);
     }
   }
@@ -191,16 +194,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ** reponse user to: 'friendDeleted', {notif.from}
   ** reponse user from: 'friendDeleted', {notif.to} */
   @SubscribeMessage("deleteFriend")
-  async deleteFriend(client: Socket, notif: NotifData) {
+  async deleteFriend(client: Socket, data: any) {
     console.log("deleteFriend event");
 
-    const user1 = await this.usersService.deleteFriend(notif.from, notif.to.id);
-    const user2 = await this.usersService.deleteFriend(notif.to, notif.from.id);
+    const user1 = await this.usersService.deleteFriend(data.user, data.friend);
+    const user2 = await this.usersService.deleteFriend(data.friend, data.user);
     if (user1 && user2) {
-      const to = this.chatService.getUser(notif.to.id);
-      if (to) this.server.to(to).emit("friendDeleted", notif.from);
-      this.server.to(client.id).emit("friendDeleted", notif.to);
-    } else console.log("error deleting friend");
+      const to = this.chatService.getUser(data.friend.id);
+      if (to) this.server.to(to).emit("friendDeleted", data.user);
+      this.server.to(client.id).emit("friendDeleted", data.friend);
+    } else this.server.to(client.id).emit("error", "error deleting friend");
   }
 
   /* ACCEPT INVITE

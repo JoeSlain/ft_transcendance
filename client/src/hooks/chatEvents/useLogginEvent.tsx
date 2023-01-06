@@ -6,43 +6,38 @@ import { userType } from "../../types/userType";
 import { useNavigate } from "react-router-dom";
 import { notifType } from "../../types/notifType";
 import Auth from "../Auth";
+import User from "../User";
 
 type IProps = {
   user: userType | null;
+  isLogged: boolean;
   setUser: (props: userType) => void;
   setIsLogged: (props: boolean) => void;
-  setNotifs: (props: notifType[]) => void;
 };
 
 export default function useLogginEvent({
   user,
+  isLogged,
   setUser,
   setIsLogged,
-  setNotifs,
 }: IProps) {
   const chatSocket = useContext(ChatContext);
-  const isLogged = useContext(Auth);
   const navigate = useNavigate();
 
   useEffect(() => {
+    chatSocket.on("connect", () => {
+      if (user) chatSocket.emit("login", user);
+    });
     chatSocket.on("loggedIn", (data) => {
-      console.log("loggedIn");
-      axios
-        .get("http://localhost:3001/api/users/notifs", {
-          withCredentials: true,
-        })
-        .then((response) => {
-          console.log("data", response.data);
-          setNotifs(response.data);
-          setUser(data);
-          saveItem("user", data);
-          setIsLogged(true);
-          saveItem("isLogged", true);
-          if (!isLogged) navigate("/profile");
-        });
+      setUser(data);
+      saveItem("user", data);
+      setIsLogged(true);
+      saveItem("isLogged", true);
+      if (!isLogged) navigate("/profile");
     });
 
     return () => {
+      chatSocket.off("connect");
       chatSocket.off("loggedIn");
     };
   }, []);

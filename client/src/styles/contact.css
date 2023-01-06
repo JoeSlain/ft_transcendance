@@ -35,6 +35,21 @@
   background-color: grey;
 }
 
-.form {
+.contactForm {
   display: flex;
+}
+
+.contactFormInput {
+  width: 80%;
+}
+
+.contactFormButtons {
+  width: 20%;
+}
+
+#contactButton {
+  width: 100%;
+  font-size: large;
+  margin-left: 5px;
+  border-radius: 0px;
 }

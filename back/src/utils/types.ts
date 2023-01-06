@@ -18,6 +18,7 @@ export type NotifData = {
   type: string;
   from: User;
   to: User;
+  acceptEvent: string;
   channel?: Channel;
 };
 

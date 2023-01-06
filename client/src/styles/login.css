@@ -41,28 +41,28 @@
   border: 1px solid #ffc300;
 }
 
-.Form {
+.form {
   display: flex;
   margin: auto;
   flex-direction: column;
   align-items: center;
 }
 
-.FormInput {
+.formInput {
   display: flex;
   width: 80%;
 }
 
-.FormInputName {
+.formInputName {
   width: 30%;
   margin-right: 10px;
 }
 
-.FormInputValue {
+.formInputValue {
   width: 60%;
 }
 
-.FormButtons {
+.formButtons {
   display: flex;
   margin-top: 10px;
   width: 80%;

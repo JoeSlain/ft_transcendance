@@ -17,6 +17,7 @@ export default function Navbar({ setIsLogged }: IProps) {
 
   function logout() {
     deleteItem("user");
+    deleteItem("isLogged");
     axios
       .post("http://localhost:3001/api/auth/logout", {
         withCredentials: true,

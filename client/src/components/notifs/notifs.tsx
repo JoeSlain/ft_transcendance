@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { notifType } from "../../types/notifType";
 import "../../styles/notifs.css";
 import User from "../../hooks/User";
 import { ReadyStyle } from "../../styles/readyStyle";
-import { ContextMenu } from "../../styles/menus";
 import useClickListener from "../../hooks/useClickListener";
+import { notifType } from "../../types/notifType";
+import useNotifsEvent from "../../hooks/chatEvents/useNotifsEvent";
+import { ChatContext } from "../../context/socketContext";
 
 type notif = {
   id: number;
@@ -14,21 +15,26 @@ type notif = {
   acceptEvent: string;
 };
 
-export default function Notif() {
+export default function Notifs() {
   const user = useContext(User);
   const [show, setShow] = useState(false);
-  const [point, setPoint] = useState({ x: 0, y: 0 });
-  const [notifs, setNotifs] = useState<notif[]>([
-    {
-      id: 0,
-      type: "Game Invite",
-      from: "dchheang",
-      to: "safernan",
-      acceptEvent: "acceptGameInvite",
-    },
-  ]);
+  const [notifs, setNotifs] = useState<notifType[]>([]);
+  const socket = useContext(ChatContext);
+
   useClickListener({ show, setShow });
+  useNotifsEvent(setNotifs);
+
   console.log("show", show);
+
+  const handleAccept = (notif: notifType) => {
+    socket.emit(notif.acceptEvent, notif);
+    setNotifs(notifs.filter((n) => n.id !== notif.id));
+  };
+
+  const handleDecline = (notif: notifType) => {
+    socket.emit("deleteNotif", notif);
+    setNotifs(notifs.filter((n) => n.id !== notif.id));
+  };
 
   return (
     <div className="notifs">
@@ -39,10 +45,19 @@ export default function Notif() {
         <div className="dropdown-content">
           {notifs.map((notif) => (
             <div className="notifEntry" key={notif.id}>
-              <div className={"notifBody"}> {notif.type} </div>
+              <div className={"notifBody"}>
+                {" "}
+                {notif.type} from {notif.from.username}{" "}
+              </div>
               <div className={"notifButtons"}>
-                <ReadyStyle color="green"> ✓ </ReadyStyle>
-                <ReadyStyle color="red"> x </ReadyStyle>
+                <ReadyStyle color="green" onClick={() => handleAccept(notif)}>
+                  {" "}
+                  ✓{" "}
+                </ReadyStyle>
+                <ReadyStyle color="red" onClick={() => handleDecline(notif)}>
+                  {" "}
+                  x{" "}
+                </ReadyStyle>
               </div>
             </div>
           ))}

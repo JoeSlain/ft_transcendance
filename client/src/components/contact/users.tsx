@@ -6,6 +6,7 @@ import { userType } from "../../types/userType";
 import { ContextMenu } from "../../styles/menus";
 import { UserContextList } from "./userContextList";
 import "../../styles/contact.css";
+import AddFriend from "./addFriendForm";
 
 const getColor = (status?: string) => {
   switch (status) {
@@ -25,24 +26,12 @@ export default function Users() {
   const [friends, setFriends] = useState<userType[]>([]);
   const [statuses, setStatuses] = useState(new Map<number, string>());
 
-  const [name, setName] = useState("");
-
   useClickListener({ show, setShow });
   useFriendsEvent({ setFriends, setStatuses });
 
-  const addFriend = () => {};
-
   return (
     <div className="users">
-      <div className="form">
-        <div className="formInput">
-          <input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <div className="formButtons">
-          <button onClick={addFriend}> + </button>
-        </div>
-      </div>
-
+      <AddFriend />
       {friends &&
         friends.map((friend) => (
           <div
@@ -59,9 +48,9 @@ export default function Users() {
             <DotStyle color={getColor(statuses.get(friend.id))} />
           </div>
         ))}
-      {show && (
+      {show && clicked && (
         <ContextMenu top={point.y} left={point.x}>
-          <UserContextList user={clicked} />
+          <UserContextList friend={clicked} />
         </ContextMenu>
       )}
     </div>

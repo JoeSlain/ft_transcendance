@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import Users from "./users";
-import User from "../../hooks/User";
 import Auth from "../../hooks/Auth";
 
 export default function Contact() {
