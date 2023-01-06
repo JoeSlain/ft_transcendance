@@ -35,6 +35,13 @@ export class GameGateway {
     this.gameService.users.delete(userId);
   }
 
+  @SubscribeMessage("getRoom")
+  getRoom(client: Socket, userId: number) {
+    const room = this.roomService.getUserRoom(userId);
+
+    if (room) this.server.to(client.id).emit("newRoom", room);
+  }
+
   @SubscribeMessage("joinRoom")
   joinRoom(client: Socket, data: any) {
     console.log("join event");
@@ -99,4 +106,16 @@ export class GameGateway {
       this.server.to(room.id).emit("joinedRoom", room);
     }
   }
+
+
+  @SubscribeMessage("startGame")
+  startGame(client: Socket, data: any) {
+    const room = this.roomService.get(data.roomId);
+    if (!room) return;
+
+    this.gameService.resetGame(room);
+    this.server.to(room.id).emit("startGame");
+  }
+
+
 }

@@ -6,6 +6,8 @@ services:
       context: ./docker/
       dockerfile: Dockerfile-backend
     ports:
+      - "3003:3003"
+      - "3002:3002"
       - "3001:3001"
     volumes:
       - ./back:/app_backend

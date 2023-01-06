@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  PrimaryColumnCannotBeNullableError,
+} from "typeorm";
 import { User } from "./User";
 import { Channel } from "./Channel";
 
@@ -9,6 +15,12 @@ export class Notif {
 
   @Column()
   type: string;
+
+  @Column()
+  acceptEvent: string;
+
+  @Column({ nullable: true })
+  declineEvent: string;
 
   @ManyToOne(() => User)
   from: User;

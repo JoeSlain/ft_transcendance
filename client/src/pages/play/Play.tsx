@@ -1,84 +1,68 @@
-import { Game } from "./canvas/Draw";
-import "../../styles/games.css";
-import { useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ChatContext, GameContext } from "../../context/socketContext";
+import User from "../../hooks/User";
+import { roomType } from "../../types/roomType";
+import PlayerEntry from "./playerEntry";
+import Spectators from "./spectators";
+import useLobbyEvents from "../../hooks/gameEvents/useLobbyEvents";
+import "../../styles/play.css";
 
 export default function Play() {
-  const canvasRef = useRef(null);
-  const [game, setGame] = useState<Game | null>(null);
+  const [room, setRoom] = useState<roomType | null>(null);
+  const [hostReady, setHostReady] = useState(false);
+  const [guestReady, setGuestReady] = useState(false);
 
-  function startGame() {
-    if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current);
-      setGame(newGame);
-      newGame.resetScore();
-      newGame.start();
-    }
-  }
+  useLobbyEvents({ setRoom });
 
-  function stopGame() {
-    if (game) {
-      game.stop();
-      game.resetScore();
-      setGame(null);
-    }
-  }
+  const startGame = () => {};
+  const searchOpponent = () => {};
 
-  function startSpeed() {
-    if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current);
-      setGame(newGame);
-      newGame.resetScore();
-      newGame.StartSpeed();
-    }
-  }
-
-  function start2Ball() {
-    if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current);
-      setGame(newGame);
-      newGame.resetScore();
-      newGame.Start2Ball();
-    }
-  }
-
-  return (
-    <div className="game">
-      <div className="game-buttons-container">
-        {game && (
-          <button className="btn btn-primary" onClick={stopGame}>
-            Stop
-          </button>
-        )}
-      </div>
-      <div className="game-canvas-container ">
-        {!game && (
-          <div className="game-buttons-container-vitesse pt-56 ml-80 flex flex-col justify-center gap-3">
-            <button
-              className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
-              onClick={startGame}
-            >
-              Start
-            </button>
-            <button
-              className="btn btn-sm md:btn-md  gap-2 normal-case lg:gap-3"
-              onClick={startSpeed}
-            >
-              Start speed game{" "}
-            </button>
-            <button
-              className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3"
-              onClick={start2Ball}
-            >
-              Start 2 Ball
-            </button>
+  if (room) {
+    return (
+      <div className="center">
+        <div className="play">
+          <div className="playHeader">
+            <h1> Room {room && room.id} </h1>
           </div>
-        )}
-        <canvas
-          width="800"
-          height="500"
-          id="game-canvas"
-          ref={canvasRef}
-        ></canvas>
+          <div className="playBody">
+            {room.host && (
+              <PlayerEntry
+                player={room.host.infos}
+                ready={hostReady}
+                setReady={setHostReady}
+                room={room}
+              />
+            )}
+            {room.guest && (
+              <PlayerEntry
+                player={room.guest.infos}
+                ready={guestReady}
+                setReady={setGuestReady}
+                room={room}
+              />
+            )}
+          </div>
+          <div className="playFooter">
+            <button onClick={startGame}> Start </button>
+            <Spectators spectators={room.spectators} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="center">
+      <div className="play">
+        <div className="playHeader">
+          <h1> Play </h1>
+        </div>
+        <div className="playBody"></div>
+        <div className="playFooter">
+          <button className="customButton" onClick={searchOpponent}>
+            {" "}
+            Search opponent{" "}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,27 @@
+.form {
+  display: flex;
+  margin: auto;
+  flex-direction: column;
+  align-items: center;
+}
+
+.formInput {
+  display: flex;
+  width: 80%;
+}
+
+.formInputName {
+  width: 30%;
+  margin-right: 10px;
+}
+
+.formInputValue {
+  width: 60%;
+}
+
+.formButtons {
+  display: flex;
+  margin-top: 10px;
+  width: 80%;
+  justify-content: center;
+}

@@ -2,9 +2,9 @@ import React from "react";
 import { userType } from "../types/userType";
 
 type IUserContext = {
-  user : userType,
-  setUser : (arg: userType) => void; 
-}
+  user: userType;
+  setUser: (arg: userType) => void;
+};
 
 export default React.createContext<IUserContext>({
   user: {
@@ -23,6 +23,5 @@ export default React.createContext<IUserContext>({
     date_of_sign: new Date(),
     games: [],
   },
-
   setUser: () => {},
 });

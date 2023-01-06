@@ -1,7 +1,6 @@
 import "../../styles/Home.css";
 import "../../styles/global.css";
 import "../../styles/contact.css";
-import Contact from "../../components/contact/contact";
 import React from "react";
 import Auth from "../../hooks/Auth";
 
@@ -20,9 +19,6 @@ export default function Home() {
             et animi cum nulla hic magnam dolorum rem dicta inventore. Soluta,
             voluptate!
           </p>
-        </div>
-        <div className="contact">
-          <Contact />
         </div>
       </div>
     </div>

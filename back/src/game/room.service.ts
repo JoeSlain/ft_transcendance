@@ -49,6 +49,10 @@ export class RoomService {
     return this.rooms.get(id.toString());
   }
 
+  getUserRoom(id: number) {
+    return this.usersRooms.get(id);
+  }
+
   joinRoom(data: any) {
     console.log("join room");
     let room = this.findRoom(data.hostId);
@@ -89,5 +93,10 @@ export class RoomService {
       return room;
     }
     return null;
+  }
+
+  // Méthode pour récupérer une salle à partir de son identifiant
+  get(roomId: string): Room {
+    return this.rooms.get(roomId);
   }
 }

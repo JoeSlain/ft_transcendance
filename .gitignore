@@ -3,4 +3,4 @@
 /back/dist/
 back/.env
 back/uploads/*
-database-data
+/database-data

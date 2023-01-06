@@ -1,3 +1,5 @@
+import "../../styles/page.css";
+
 export default function Chat() {
-    return <></>
+  return <div className="center"></div>;
 }
