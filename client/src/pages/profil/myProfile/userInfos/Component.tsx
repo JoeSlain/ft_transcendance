@@ -111,7 +111,7 @@ export default function UserInfos() {
             <input defaultValue={user.username} {...register("username")} />
           </div>
           <button
-            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 text-slate-200 center"
+            className="btn mt-2 normal-case  text-slate-200 center"
             type="submit"
           >
             Submit

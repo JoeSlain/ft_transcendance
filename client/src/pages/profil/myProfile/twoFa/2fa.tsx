@@ -26,7 +26,7 @@ export default function TwoFa() {
   return (
     <>
       <button
-        className="btn btn-sm md:btn-md gap-1  normal-case lg:gap-3 text-slate-200 center"
+        className="btn mt-1  normal-case  text-slate-200 center"
         onClick={() => refetch()}
       >
         {" "}
