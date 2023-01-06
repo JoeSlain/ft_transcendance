@@ -34,3 +34,7 @@
 .userEntry:hover {
   background-color: grey;
 }
+
+.form {
+  display: flex;
+}

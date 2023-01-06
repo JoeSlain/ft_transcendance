@@ -9,7 +9,7 @@ export default function Contact() {
   return (
     <div className="contactBar">
       <div className="contacts">
-        <h1 className="header">Contact</h1>
+        <h1 className="header">Contacts</h1>
         {isLogged && <Users />}
       </div>
     </div>

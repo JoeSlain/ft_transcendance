@@ -40,16 +40,16 @@ export default function Login() {
   if (devlog) {
     return (
       <div className="center">
-        <div className="inlineForm">
-          <div className="inlineInput">
-            <div className="inputName"> Username </div>
+        <div className="form">
+          <div className="formInput">
+            <div className="formInputName"> Username </div>
             <input
-              className="inputValue"
+              className="formInputValue"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-          <div className="buttons">
+          <div className="formButtons">
             <button className="button-auth" onClick={handleDevLogin}>
               {" "}
               Connect{" "}

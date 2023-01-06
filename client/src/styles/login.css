@@ -41,28 +41,28 @@
   border: 1px solid #ffc300;
 }
 
-.inlineForm {
+.Form {
   display: flex;
   margin: auto;
   flex-direction: column;
   align-items: center;
 }
 
-.inlineInput {
+.FormInput {
   display: flex;
   width: 80%;
 }
 
-.inputName {
+.FormInputName {
   width: 30%;
   margin-right: 10px;
 }
 
-.inputValue {
+.FormInputValue {
   width: 60%;
 }
 
-.buttons {
+.FormButtons {
   display: flex;
   margin-top: 10px;
   width: 80%;
