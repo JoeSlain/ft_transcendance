@@ -1,16 +1,18 @@
 import { Game } from "./canvas/Draw";
 import "../../styles/games.css";
-import { useRef, useState } from "react";
+import { GameContext } from "../../context/socketContext";
+import { useRef, useState, useContext } from "react";
 
 function Games() {
   const canvasRef = useRef(null);
   const [game, setGame] = useState<Game | null>(null);
+  const socket = useContext(GameContext);
 
   function startGame() {
     if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current);
+      const newGame = new Game(canvasRef.current, 800, 500);
       setGame(newGame);
-      // socket.emit("startGame", { roomId: 123 });
+      socket.emit("createGame", { roomId: 123 });
       newGame.resetScore();
       newGame.start();
     }
@@ -26,7 +28,7 @@ function Games() {
 
   function startSpeed() {
     if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current);
+      const newGame = new Game(canvasRef.current, 800, 500);
       setGame(newGame);
       newGame.resetScore();
       newGame.StartSpeed();
@@ -35,7 +37,7 @@ function Games() {
 
   function start2Ball() {
     if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current);
+      const newGame = new Game(canvasRef.current, 800, 500);
       setGame(newGame);
       newGame.resetScore();
       newGame.Start2Ball();

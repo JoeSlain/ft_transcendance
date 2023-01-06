@@ -8,7 +8,7 @@ import { userInfo } from "os";
 import { Socket, Namespace } from "socket.io";
 import { User } from "src/database";
 import { NotifData, Room } from "src/utils/types";
-import { GameService } from "./game.service";
+import { GameService, GameType, PlayerType, BallType, PaddleType } from "./game.service";
 import { RoomService } from "./room.service";
 
 @WebSocketGateway(3003, {
@@ -108,14 +108,38 @@ export class GameGateway {
   }
 
 
-  @SubscribeMessage("startGame")
-  startGame(client: Socket, data: any) {
-    const room = this.roomService.get(data.roomId);
-    if (!room) return;
+  @SubscribeMessage('createGame')
+createGame(client: Socket, game: GameType, gameData: { width: number; height: number }) {
+  console.log("createGame event");
+  game = this.gameService.createGame(gameData);
+  // ajouter le joueur à la partie
+  this.gameService.addPlayer(game, client.id, client); 
+  
+  this.gameService.startGame(game);
 
-    this.gameService.resetGame(room);
-    this.server.to(room.id).emit("startGame");
-  }
+  while (game.running) {
+    game = this.gameService.moveBall(game);
+
+    this.server.to(game.id.toString()).emit('updateGame', game);
+    
+ }
+}
+
+
+@SubscribeMessage('movePaddle')
+movePaddle(client: Socket, data: any) {
+  console.log("movePaddle event");
+  const game = this.gameService.games.get(data.roomId);
+  if (!game) return; // si la partie n'existe pas, on ne fait rien
+
+  const player = game.players.find(p => p.id === client.id);
+  if (!player) return; // si le joueur n'est pas dans la partie, on ne fait rien
+
+  // on met à jour la position de la raquette du joueur
+  player.paddle = this.gameService.movePaddle(game, player.id, data.direction, data.speed);
+  // on envoie les nouvelles données de la partie à tous les joueurs
+  this.server.to(data.roomId).emit('updateGame', game);
+}
 
 
 }
