@@ -12,7 +12,7 @@ export default function Play() {
   const [hostReady, setHostReady] = useState(false);
   const [guestReady, setGuestReady] = useState(false);
 
-  useLobbyEvents({ setRoom });
+  useLobbyEvents({ room, setRoom });
 
   const startGame = () => {};
   const searchOpponent = () => {};

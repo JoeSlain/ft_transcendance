@@ -30,9 +30,15 @@ export class GameGateway {
     this.gameService.users.set(userId, client.id);
   }
 
-  @SubscribeMessage("loggout")
-  logout(client: Socket, userId: number) {
-    this.gameService.users.delete(userId);
+  @SubscribeMessage("logout")
+  logout(client: Socket, user: User) {
+    let room = this.roomService.getUserRoom(user.id);
+
+    if (room) {
+      room = this.roomService.leaveRoom(room.id, user.id);
+      client.to(room.id).emit("leftRoom", room);
+      client.leave(room.id);
+    }
   }
 
   @SubscribeMessage("getRoom")
@@ -80,13 +86,9 @@ export class GameGateway {
   leaveRoom(client: Socket, data: any) {
     console.log("leave room event");
     const room = this.roomService.leaveRoom(data.roomId, data.userId);
-    const left = {
-      userId: data.userId,
-      room,
-    };
 
     console.log(`client ${data.userId} left room ${data.roomId}`);
-    client.to(data.roomId).emit("leftRoom", left);
+    client.to(data.roomId).emit("leftRoom", room);
     this.server.to(client.id).emit("clearRoom");
     client.leave(data.roomId);
   }
@@ -107,7 +109,6 @@ export class GameGateway {
     }
   }
 
-
   @SubscribeMessage("startGame")
   startGame(client: Socket, data: any) {
     const room = this.roomService.get(data.roomId);
@@ -116,6 +117,4 @@ export class GameGateway {
     this.gameService.resetGame(room);
     this.server.to(room.id).emit("startGame");
   }
-
-
 }

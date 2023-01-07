@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { ChatContext } from "../../context/socketContext";
+import { ChatContext, GameContext } from "../../context/socketContext";
 import axios from "axios";
 import { deleteItem, getSavedItem, saveItem } from "../../utils/storage";
 import { userType } from "../../types/userType";
@@ -17,6 +17,7 @@ type IProps = {
 
 export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
   const chatSocket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
     });
 
     chatSocket.on("loggedOut", () => {
+      gameSocket.emit("logout", user);
       axios
         .post("http://localhost:3001/api/auth/logout", {
           withCredentials: true,
