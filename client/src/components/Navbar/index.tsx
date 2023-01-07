@@ -3,29 +3,24 @@ import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import profile from "../../assets/user.png";
 import Login, { VerifLogged } from "../../pages/login/Login";
-import { deleteItem } from "../../utils/storage";
+import { deleteItem, getSavedItem } from "../../utils/storage";
 import axios from "axios";
 import User from "../../hooks/User";
 import { userType } from "../../types/userType";
+import Auth from "../../hooks/Auth";
+import { ChatContext } from "../../context/socketContext";
 
 type IProps = {
   setIsLogged: (props: boolean) => void;
 };
 
 export default function Navbar({ setIsLogged }: IProps) {
-  const context = useContext(User);
+  const { user } = useContext(User);
+  const isLogged = useContext(Auth);
+  const socket = useContext(ChatContext);
 
   function logout() {
-    deleteItem("user");
-    deleteItem("isLogged");
-    axios
-      .post("http://localhost:3001/api/auth/logout", {
-        withCredentials: true,
-      })
-      .then(() => {
-        setIsLogged(false);
-      })
-      .catch((e) => console.log("Post logout err: " + e));
+    socket.emit("logout", user);
   }
   return (
     <>
@@ -44,11 +39,13 @@ export default function Navbar({ setIsLogged }: IProps) {
             <li className="text-ata-red">
               <NavLink to="/chat">Chat</NavLink>
             </li>
-            <li>
-              <NavLink className="navlink" to="/login" onClick={logout}>
-                Logout
-              </NavLink>
-            </li>
+            {isLogged && (
+              <li>
+                <NavLink className="navlink" to="/login" onClick={logout}>
+                  Logout
+                </NavLink>
+              </li>
+            )}
             <li>
               <NavLink to="/profile">
                 <img className="profile" src={profile} alt="Profile" />

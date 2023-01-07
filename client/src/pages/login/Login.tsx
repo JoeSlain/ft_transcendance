@@ -2,7 +2,6 @@ import axios from "axios";
 import "../../styles/global.css";
 import "../../styles/login.css";
 import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ChatContext } from "../../context/socketContext";
 
 export function VerifLogged() {
@@ -12,7 +11,6 @@ export function VerifLogged() {
 export default function Login() {
   const [devlog, setDevLog] = useState(false);
   const [username, setUsername] = useState("");
-  const navigate = useNavigate();
   const socket = useContext(ChatContext);
 
   const buttonAuth = (event: React.MouseEvent<HTMLButtonElement>) => {

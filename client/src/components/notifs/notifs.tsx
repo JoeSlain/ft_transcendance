@@ -24,8 +24,6 @@ export default function Notifs() {
   useClickListener({ show, setShow });
   useNotifsEvent(setNotifs);
 
-  console.log("show", show);
-
   const handleAccept = (notif: notifType) => {
     socket.emit(notif.acceptEvent, notif);
     setNotifs(notifs.filter((n) => n.id !== notif.id));

@@ -25,9 +25,7 @@ import Modal from "./components/modal";
 import { ModalContext } from "./context/modalContext";
 
 export default function Router() {
-  const [isLogged, setIsLogged] = React.useState(
-    getSavedItem("isLogged") || false
-  );
+  const [isLogged, setIsLogged] = useState(getSavedItem("isLogged"));
   const [user, setUser] = useState<userType>(getSavedItem("user"));
   const [modal, setModal] = useState<ModalType | null>(null);
 
