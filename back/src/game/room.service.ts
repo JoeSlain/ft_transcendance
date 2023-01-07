@@ -17,12 +17,14 @@ export class RoomService {
     };
   }
 
-  createRoom(roomId: number) {
+  createRoom(host: User) {
     console.log("create room");
+    let id = generateRandomId(10);
+    while (this.findRoom(id)) id = generateRandomId(10);
     const room = {
-      id: roomId.toString(),
+      id,
+      host: this.createRoomUser(host),
       guest: null,
-      host: null,
       spectators: [],
       gameStarted: false,
     };
@@ -41,27 +43,22 @@ export class RoomService {
 
   addSpectator(user: User, room: Room) {
     room.spectators.push(user);
-    this.usersRooms.set(user.id, room);
-    this.rooms.set(room.id, room);
+    return room;
   }
 
-  findRoom(id: number) {
-    return this.rooms.get(id.toString());
+  findRoom(id: string) {
+    return this.rooms.get(id);
   }
 
   getUserRoom(id: number) {
     return this.usersRooms.get(id);
   }
 
-  joinRoom(data: any) {
+  joinRoom(user: User, room: Room) {
     console.log("join room");
-    let room = this.findRoom(data.hostId);
 
-    if (!room) room = this.createRoom(data.hostId);
-    if (data.user.id === data.hostId)
-      room.host = this.createRoomUser(data.user);
-    else if (!room.guest) room.guest = this.createRoomUser(data.user);
-    else return null;
+    if (!room.guest) room.guest = this.createRoomUser(user);
+    else room.spectators.push(user);
     this.rooms.set(room.id, room);
     return room;
   }
@@ -79,12 +76,11 @@ export class RoomService {
           console.log("room empty, deleting room");
           return this.deleteRoom(id);
         }
-        room.id = room.host.infos.id.toString();
       } else if (room.guest && room.guest.infos.id === userId) {
         console.log("guest left");
         room.guest = null;
       } else {
-        console.log("spetator left");
+        console.log("spectator left");
         room.spectators = room.spectators.filter(
           (spectator) => spectator.id !== userId
         );

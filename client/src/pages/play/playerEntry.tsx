@@ -17,9 +17,13 @@ export default function PlayerEntry({ room, player, ready, setReady }: IProps) {
   const socket = useContext(GameContext);
   const me = user.id === player.id;
 
+  const isEmptyRoom = () => {
+    return !room.guest && !room.spectators.length;
+  };
+
   const leaveRoom = () => {
     const data = {
-      userId: user.id,
+      user,
       roomId: room.id,
     };
     console.log("userId", user.id);
@@ -39,7 +43,7 @@ export default function PlayerEntry({ room, player, ready, setReady }: IProps) {
       </h2>
       <div className="playerButtons">
         <button onClick={() => setReady(!ready)}> Ready </button>
-        {me && <button onClick={leaveRoom}> Leave </button>}
+        {me && !isEmptyRoom() && <button onClick={leaveRoom}> Leave </button>}
       </div>
     </div>
   );

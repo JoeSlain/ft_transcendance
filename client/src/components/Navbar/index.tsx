@@ -8,7 +8,7 @@ import axios from "axios";
 import User from "../../hooks/User";
 import { userType } from "../../types/userType";
 import Auth from "../../hooks/Auth";
-import { ChatContext } from "../../context/socketContext";
+import { ChatContext, GameContext } from "../../context/socketContext";
 
 type IProps = {
   setIsLogged: (props: boolean) => void;
@@ -17,10 +17,12 @@ type IProps = {
 export default function Navbar({ setIsLogged }: IProps) {
   const { user } = useContext(User);
   const isLogged = useContext(Auth);
-  const socket = useContext(ChatContext);
+  const chatSocket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
 
   function logout() {
-    socket.emit("logout", user);
+    chatSocket.emit("logout", user);
+    gameSocket.emit("logout", user);
   }
   return (
     <>

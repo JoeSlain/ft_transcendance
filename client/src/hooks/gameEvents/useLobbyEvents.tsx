@@ -4,17 +4,16 @@ import { roomType } from "../../types/roomType";
 import User from "../User";
 
 type IProps = {
-  room: roomType | null;
   setRoom: (props: roomType | null) => void;
 };
 
-export default function useLobbyEvents({ room, setRoom }: IProps) {
+export default function useLobbyEvents({ setRoom }: IProps) {
   const gameSocket = useContext(GameContext);
   const { user } = useContext(User);
 
   useEffect(() => {
     console.log("rendering play");
-    gameSocket.emit("getRoom", user.id);
+    gameSocket.emit("getRoom", user);
 
     // new room
     gameSocket.on("newRoom", (room) => {

@@ -36,7 +36,6 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
     });
 
     chatSocket.on("loggedOut", () => {
-      gameSocket.emit("logout", user);
       axios
         .post("http://localhost:3001/api/auth/logout", {
           withCredentials: true,

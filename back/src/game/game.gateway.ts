@@ -42,39 +42,39 @@ export class GameGateway {
   }
 
   @SubscribeMessage("getRoom")
-  getRoom(client: Socket, userId: number) {
-    const room = this.roomService.getUserRoom(userId);
+  getRoom(client: Socket, user: User) {
+    let room = this.roomService.getUserRoom(user.id);
 
-    if (room) this.server.to(client.id).emit("newRoom", room);
+    if (!room) {
+      room = this.roomService.createRoom(user);
+      this.roomService.usersRooms.set(user.id, room);
+    }
+    client.join(room.id);
+    this.server.to(client.id).emit("newRoom", room);
   }
 
   @SubscribeMessage("joinRoom")
   joinRoom(client: Socket, data: any) {
     console.log("join event");
-    let room = this.roomService.usersRooms.get(data.user.id);
+    let room = this.roomService.getUserRoom(data.id);
 
-    if (room) {
-      if (room.id !== data.roomId && !room.gameStarted) {
-        console.log("leaving previous room", room.id);
-
-        const leaveData = {
-          roomId: room.id,
-          userId: data.user.id,
-        };
-        this.leaveRoom(client, leaveData);
+    if (!room) {
+      this.server.to(client.id).emit("error", "game room not found");
+      return null;
+    }
+    const prevRoom = this.roomService.getUserRoom(data.user.id);
+    if (prevRoom) {
+      if (prevRoom.id !== room.id && !prevRoom.gameStarted) {
+        console.log("leaving previous room", prevRoom.id);
+        this.leaveRoom(client, { roomId: prevRoom.id, user: data.user });
       } else return;
     }
 
-    room = this.roomService.joinRoom(data);
-    if (!room)
-      this.server.to(client.id).emit("error", `couldn't join room : room full`);
-    else {
-      console.log("return room", room);
-
-      this.roomService.usersRooms.set(data.user.id, room);
-      client.join(room.id);
-      this.server.to(room.id).emit("joinedRoom", room);
-    }
+    room = this.roomService.joinRoom(data.user, room);
+    console.log("return room", room);
+    this.roomService.usersRooms.set(data.user.id, room);
+    client.join(room.id);
+    this.server.to(room.id).emit("joinedRoom", room);
   }
 
   @SubscribeMessage("join")
@@ -85,12 +85,12 @@ export class GameGateway {
   @SubscribeMessage("leaveRoom")
   leaveRoom(client: Socket, data: any) {
     console.log("leave room event");
-    const room = this.roomService.leaveRoom(data.roomId, data.userId);
+    const room = this.roomService.leaveRoom(data.roomId, data.user.id);
 
-    console.log(`client ${data.userId} left room ${data.roomId}`);
+    console.log(`client ${data.user.id} left room ${data.roomId}`);
     client.to(data.roomId).emit("leftRoom", room);
-    this.server.to(client.id).emit("clearRoom");
     client.leave(data.roomId);
+    this.getRoom(client, data.user);
   }
 
   @SubscribeMessage("spectate")

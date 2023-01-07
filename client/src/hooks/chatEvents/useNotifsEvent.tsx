@@ -24,14 +24,9 @@ export default function useNotifsEvent(setNotifs: (props: any) => void) {
     });
 
     // ACCEPT GAME INVITE EVENT
-    chatSocket.on("acceptedInvite", (data) => {
-      console.log("data host id", data);
-      const roomData = {
-        user,
-        hostId: data,
-      };
-      console.log("acceptedInvite");
-      gameSocket.emit("joinRoom", roomData);
+    chatSocket.on("acceptedInvite", (id) => {
+      console.log("acceptedInvite", id);
+      gameSocket.emit("joinRoom", { user, id });
     });
 
     return () => {
