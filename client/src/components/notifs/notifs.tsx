@@ -48,11 +48,23 @@ export default function Notifs() {
                 {notif.type} from {notif.from.username}{" "}
               </div>
               <div className={"notifButtons"}>
-                <ReadyStyle color="green" onClick={() => handleAccept(notif)}>
+                <ReadyStyle
+                  color="green"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAccept(notif);
+                  }}
+                >
                   {" "}
                   ✓{" "}
                 </ReadyStyle>
-                <ReadyStyle color="red" onClick={() => handleDecline(notif)}>
+                <ReadyStyle
+                  color="red"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDecline(notif);
+                  }}
+                >
                   {" "}
                   x{" "}
                 </ReadyStyle>

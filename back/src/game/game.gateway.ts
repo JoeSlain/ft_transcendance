@@ -26,8 +26,8 @@ export class GameGateway {
   @WebSocketServer() server: Namespace;
 
   @SubscribeMessage("login")
-  login(client: Socket, userId: number) {
-    this.gameService.users.set(userId, client.id);
+  login(client: Socket, user: User) {
+    this.getRoom(client, user);
   }
 
   @SubscribeMessage("logout")
@@ -35,8 +35,8 @@ export class GameGateway {
     let room = this.roomService.getUserRoom(user.id);
 
     if (room) {
-      room = this.roomService.leaveRoom(room.id, user.id);
-      client.to(room.id).emit("leftRoom", room);
+      const roomLeft = this.roomService.leaveRoom(room.id, user.id);
+      client.to(room.id).emit("leftRoom", roomLeft);
       client.leave(room.id);
     }
   }
@@ -64,14 +64,11 @@ export class GameGateway {
     }
     const prevRoom = this.roomService.getUserRoom(data.user.id);
     if (prevRoom) {
-      if (prevRoom.id !== room.id && !prevRoom.gameStarted) {
-        console.log("leaving previous room", prevRoom.id);
+      if (prevRoom.id !== room.id && !prevRoom.gameStarted)
         this.leaveRoom(client, { roomId: prevRoom.id, user: data.user });
-      } else return;
+      else return;
     }
-
     room = this.roomService.joinRoom(data.user, room);
-    console.log("return room", room);
     this.roomService.usersRooms.set(data.user.id, room);
     client.join(room.id);
     this.server.to(room.id).emit("joinedRoom", room);
@@ -96,17 +93,32 @@ export class GameGateway {
   @SubscribeMessage("spectate")
   spectate(client: Socket, data: any) {
     console.log("spectatate event");
-    const room = this.roomService.usersRooms.get(data.user.id);
+    let room = this.roomService.usersRooms.get(data.user.id);
 
-    if (!room)
+    if (!room) {
       this.server
         .to(client.id)
-        .emit("error", `user ${data.user.username} is not currently in a game`);
-    else {
-      this.roomService.addSpectator(data.me, room);
-      client.join(room.id);
-      this.server.to(room.id).emit("joinedRoom", room);
+        .emit("error", ` ${data.user.username} is not currently in a game`);
+      return;
     }
+    const prevRoom = this.roomService.getUserRoom(data.me.id);
+    if (prevRoom) {
+      if (prevRoom.id !== room.id && !prevRoom.gameStarted)
+        this.leaveRoom(client, { roomId: prevRoom.id, user: data.me });
+      else return;
+    }
+    room = this.roomService.addSpectator(data.me, room);
+    this.roomService.rooms.set(room.id, room);
+    this.roomService.usersRooms.set(data.me.id, room);
+    client.join(room.id);
+    this.server.to(room.id).emit("joinedRoom", room);
+  }
+
+  @SubscribeMessage("setReady")
+  setReady(client: Socket, data: any) {
+    console.log("setReady event");
+    data.room = this.roomService.setReady(data.roomId, data.userId);
+    this.server.to(data.roomId).emit("ready", data.room);
   }
 
   @SubscribeMessage("startGame")

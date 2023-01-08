@@ -33,7 +33,7 @@ export class RoomService {
   }
 
   isEmptyRoom(room: Room) {
-    return !room.host && !room.guest;
+    return !room.host && !room.guest && !room.spectators.length;
   }
 
   deleteRoom(roomId: string) {
@@ -54,6 +54,19 @@ export class RoomService {
     return this.usersRooms.get(id);
   }
 
+  setReady(roomId: string, userId: number) {
+    const room = this.rooms.get(roomId);
+    if (userId === room.host.infos.id) {
+      room.host.ready = !room.host.ready;
+      console.log("host ready");
+    } else if (userId === room.guest.infos.id) {
+      room.guest.ready = !room.guest.ready;
+      console.log("guest ready");
+    }
+    this.rooms.set(room.id, room);
+    return room;
+  }
+
   joinRoom(user: User, room: Room) {
     console.log("join room");
 
@@ -72,10 +85,6 @@ export class RoomService {
         console.log("host left");
         room.host = room.guest;
         room.guest = null;
-        if (!room.host) {
-          console.log("room empty, deleting room");
-          return this.deleteRoom(id);
-        }
       } else if (room.guest && room.guest.infos.id === userId) {
         console.log("guest left");
         room.guest = null;
@@ -84,6 +93,10 @@ export class RoomService {
         room.spectators = room.spectators.filter(
           (spectator) => spectator.id !== userId
         );
+      }
+      if (this.isEmptyRoom(room)) {
+        console.log("room empty, deleting room");
+        return this.deleteRoom(id);
       }
       this.rooms.set(room.id, room);
       return room;

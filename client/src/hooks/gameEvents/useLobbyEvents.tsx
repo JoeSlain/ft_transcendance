@@ -35,12 +35,17 @@ export default function useLobbyEvents({ setRoom }: IProps) {
       setRoom(null);
     });
 
+    gameSocket.on("ready", (room) => {
+      setRoom(room);
+    });
+
     return () => {
       gameSocket.off("getRoom");
       gameSocket.off("newRoom");
       gameSocket.off("joinedRoom");
       gameSocket.off("leftRoom");
       gameSocket.off("clearRoom");
+      gameSocket.off("ready");
     };
   }, []);
 }

@@ -22,6 +22,7 @@ export default function AddFriend() {
             to: response.data,
             acceptEvent: "acceptFriendRequest",
           });
+          setName("");
         }
       });
   };

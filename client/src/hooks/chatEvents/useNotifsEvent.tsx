@@ -14,6 +14,7 @@ export default function useNotifsEvent(setNotifs: (props: any) => void) {
     axios
       .get("http://localhost:3001/api/users/notifs", { withCredentials: true })
       .then((response) => {
+        console.log("notifs", response.data);
         if (response.data) setNotifs(response.data);
       });
 

@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { ChatContext } from "../../context/socketContext";
+import { ChatContext, GameContext } from "../../context/socketContext";
 import { userType } from "../../types/userType";
 import { ModalContext } from "../../context/modalContext";
 import User from "../../hooks/User";
@@ -9,12 +9,13 @@ export type UserProps = {
 };
 
 export const UserContextList = ({ friend }: UserProps) => {
-  const socket = useContext(ChatContext);
+  const chatSocket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
 
   const handleInvite = () => {
-    socket.emit("notif", {
+    chatSocket.emit("notif", {
       type: "Game Invite",
       from: user,
       to: friend,
@@ -36,7 +37,8 @@ export const UserContextList = ({ friend }: UserProps) => {
   };
 
   const handleSpectate = () => {
-    console.log("spectate", user);
+    gameSocket.emit("spectate", { user: friend, me: user });
+    console.log("spectate", friend);
   };
 
   return (
