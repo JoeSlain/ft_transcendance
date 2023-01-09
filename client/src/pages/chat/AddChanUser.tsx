@@ -1,30 +1,36 @@
+import axios from "axios";
 import { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
-import axios from "axios";
 import User from "../../hooks/User";
+import { channelType } from "../../types/channelType";
 
-export default function AddFriend() {
+type Props = {
+  selected: channelType | null;
+};
+
+export default function AddChanUser({ selected }: Props) {
   const [name, setName] = useState("");
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
 
-  const addFriend = () => {
+  const handleSubmit = () => {
     axios
       .get(`http://localhost:3001/api/users/username/${name}`, {
         withCredentials: true,
       })
       .then((response) => {
-        if (!response.data) alert(`user ${name} not found`);
-        else {
-          socket.emit("notif", {
-            type: "Friend request",
+        if (response.data) {
+          console.log("sending chan", selected);
+          socket.emit("chanInvite", {
+            type: "Chan Invite",
             from: user,
             to: response.data,
-            acceptEvent: "acceptFriendRequest",
+            channel: selected,
+            acceptEvent: "acceptChannelInvite",
           });
-          setName("");
-        }
+        } else alert("user not found");
       });
+    setName("");
   };
 
   return (
@@ -34,7 +40,7 @@ export default function AddFriend() {
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <button onClick={addFriend} className="contactFormButton">
+      <button className="contactFormButton" onClick={handleSubmit}>
         {" "}
         +{" "}
       </button>

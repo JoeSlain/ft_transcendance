@@ -43,8 +43,11 @@
   width: 80%;
 }
 
-.contactFormButtons {
+.contactFormButton {
   width: 20%;
+  background-color: black;
+  font-size: large;
+  border-radius: 0px;
 }
 
 #contactButton {

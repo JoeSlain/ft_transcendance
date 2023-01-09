@@ -23,6 +23,7 @@ import Notifs from "./components/notifs/notifs";
 import { ModalType } from "./types/modalType";
 import Modal from "./components/modal";
 import { ModalContext } from "./context/modalContext";
+import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
 
 export default function Router() {
   const [isLogged, setIsLogged] = useState(getSavedItem("isLogged"));
@@ -30,6 +31,7 @@ export default function Router() {
   const [modal, setModal] = useState<ModalType | null>(null);
 
   useLogginEvent({ user, isLogged, setUser, setIsLogged });
+  useErrorEvent();
 
   return (
     <Auth.Provider value={isLogged}>

@@ -1,22 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
-import AddChannel from "./addChannel";
-import { UserContext } from "../../context/userContext";
-import PasswordDialog from "./passwordDialog";
-import { ChanContextMenu, ChanEntry } from "./chanUtils";
 import { channelType } from "../../types/channelType";
+import User from "../../hooks/User";
+import PasswordDialog from "./channelUtils/passwordModal";
+import AddChannel from "./channelUtils/AddChannel";
+import "../../styles/chat/channelBar.css";
+import { ChanContextMenu } from "./channelUtils/ChanContextMenu";
+import useClickListener from "../../hooks/useClickListener";
 
 type ChannelProps = {
   channels: channelType[];
-  selected: channelType;
 };
 
-function Channel({ channels, selected }: ChannelProps) {
+function Channel({ channels }: ChannelProps) {
   const [points, setPoints] = useState({ x: 0, y: 0 });
-  const [contextChan, setContextChan] = useState<channelType | null>(null);
+  const [selected, setSelected] = useState<channelType | null>(null);
   const [protectedChan, setProtectedChan] = useState<channelType | null>(null);
   const socket = useContext(ChatContext);
-  const user = useContext(UserContext);
+  const { user } = useContext(User);
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -31,38 +32,29 @@ function Channel({ channels, selected }: ChannelProps) {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("click", () => {
-      setContextChan(null);
-    });
-
-    return () => {
-      window.removeEventListener("click", () => {
-        setContextChan(null);
-      });
-    };
-  }, []);
+  useClickListener({ selected, setSelected });
 
   return (
-    <div>
+    <div className="chanEntries">
       <ChanContextMenu
-        channel={contextChan}
-        setChannel={setContextChan}
+        channel={selected}
+        setChannel={setSelected}
         points={points}
       />
       {channels &&
         channels.map((chan) => (
           <div
+            className="chanEntry"
             key={chan.id}
             onContextMenu={(e) => {
               e.preventDefault();
               console.log("right clicked", chan);
-              setContextChan(chan);
+              setSelected(chan);
               setPoints({ x: e.pageX, y: e.pageY });
             }}
             onClick={(e) => handleClick(e, chan)}
           >
-            <ChanEntry channel={chan} selected={selected} />
+            {chan.name}
           </div>
         ))}
       {protectedChan && (
@@ -78,25 +70,35 @@ function Channel({ channels, selected }: ChannelProps) {
 type ChannelsProps = {
   privateChans: channelType[];
   publicChans: channelType[];
-  selected: channelType;
 };
 
-export default function Channels({
-  privateChans,
-  publicChans,
-  selected,
-}: ChannelsProps) {
+export default function Channels({ privateChans, publicChans }: ChannelsProps) {
   const [showChanMenu, setShowChanMenu] = useState(false);
 
   return (
-    <div className="aside">
-      <h2> Channels </h2>
-      <button onClick={() => setShowChanMenu(true)}> + </button>
+    <div className="channelAside">
+      <div className="channelHeader">
+        <h1> Channels </h1>
+        <button
+          className="customButton"
+          id="chanAddButton"
+          onClick={() => setShowChanMenu(true)}
+        >
+          {" "}
+          +{" "}
+        </button>
+      </div>
 
-      <h3 className="chanType"> Private </h3>
-      <Channel channels={privateChans} selected={selected} />
-      <h3 className="chanType"> Public </h3>
-      <Channel channels={publicChans} selected={selected} />
+      <div className="channelBody">
+        <div className="channelCategory">
+          <h2 className="chanType"> Private </h2>
+          <Channel channels={privateChans} />
+        </div>
+        <div className="channelCategory">
+          <h2 className="chanType"> Public </h2>
+          <Channel channels={publicChans} />
+        </div>
+      </div>
 
       {showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />}
     </div>

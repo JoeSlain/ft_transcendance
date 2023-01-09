@@ -1,9 +1,10 @@
-export const DirectMessages = ({ directMessages, selected, setSelected }) => {
+export const DirectMessages = {
+  /*({ directMessages, selected, setSelected }) => {
   return (
     <div className="dmWrapper">
       {directMessages &&
         directMessages.map((dm) => (
-          <DmStyle
+          <div
             color={selected === dm ? "lightgrey" : "white"}
             key={dm.name}
             className="dmEntry"
@@ -12,8 +13,8 @@ export const DirectMessages = ({ directMessages, selected, setSelected }) => {
             }}
           >
             {dm.name}
-          </DmStyle>
+          </div>
         ))}
     </div>
-  );
+  );*/
 };

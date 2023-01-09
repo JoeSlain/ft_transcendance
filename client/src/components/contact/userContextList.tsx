@@ -5,10 +5,10 @@ import { ModalContext } from "../../context/modalContext";
 import User from "../../hooks/User";
 
 export type UserProps = {
-  friend: userType;
+  selected: userType;
 };
 
-export const UserContextList = ({ friend }: UserProps) => {
+export const UserContextList = ({ selected }: UserProps) => {
   const chatSocket = useContext(ChatContext);
   const gameSocket = useContext(GameContext);
   const { user } = useContext(User);
@@ -18,27 +18,27 @@ export const UserContextList = ({ friend }: UserProps) => {
     chatSocket.emit("notif", {
       type: "Game Invite",
       from: user,
-      to: friend,
+      to: selected,
       acceptEvent: "acceptGameInvite",
     });
-    console.log("invited", friend);
+    console.log("invited", selected);
   };
 
   const handleDelete = () => {
     setModal({
       header: "Delete Friend",
-      body: `Are you sure you want to remove ${friend.username} from your friends  ?`,
+      body: `Are you sure you want to remove ${selected.username} from your friends  ?`,
       acceptEvent: "deleteFriend",
       data: {
-        friend,
+        selected,
         user,
       },
     });
   };
 
   const handleSpectate = () => {
-    gameSocket.emit("spectate", { user: friend, me: user });
-    console.log("spectate", friend);
+    gameSocket.emit("spectate", { user: selected, me: user });
+    console.log("spectate", selected);
   };
 
   return (

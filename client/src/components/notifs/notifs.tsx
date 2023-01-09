@@ -17,11 +17,11 @@ type notif = {
 
 export default function Notifs() {
   const user = useContext(User);
-  const [show, setShow] = useState(false);
+  const [selected, setSelected] = useState<boolean | null>(null);
   const [notifs, setNotifs] = useState<notifType[]>([]);
   const socket = useContext(ChatContext);
 
-  useClickListener({ show, setShow });
+  useClickListener({ selected, setSelected });
   useNotifsEvent(setNotifs);
 
   const handleAccept = (notif: notifType) => {
@@ -36,41 +36,47 @@ export default function Notifs() {
 
   return (
     <div className="notifs">
-      <button onClick={() => setShow(true)} className="notifIcon">
+      <button onClick={() => setSelected(true)} className="notifIcon">
         !
       </button>
-      {show && notifs && (
+      {selected && (
         <div className="dropdown-content">
-          {notifs.map((notif) => (
-            <div className="notifEntry" key={notif.id}>
-              <div className={"notifBody"}>
-                {" "}
-                {notif.type} from {notif.from.username}{" "}
-              </div>
-              <div className={"notifButtons"}>
-                <ReadyStyle
-                  color="green"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAccept(notif);
-                  }}
-                >
+          {notifs.length ? (
+            notifs.map((notif) => (
+              <div className="notifEntry" key={notif.id}>
+                <div className={"notifBody"}>
                   {" "}
-                  ✓{" "}
-                </ReadyStyle>
-                <ReadyStyle
-                  color="red"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDecline(notif);
-                  }}
-                >
-                  {" "}
-                  x{" "}
-                </ReadyStyle>
+                  {notif.type} from {notif.from.username}{" "}
+                </div>
+                <div className={"notifButtons"}>
+                  <ReadyStyle
+                    color="green"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAccept(notif);
+                    }}
+                  >
+                    {" "}
+                    ✓{" "}
+                  </ReadyStyle>
+                  <ReadyStyle
+                    color="red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDecline(notif);
+                    }}
+                  >
+                    {" "}
+                    x{" "}
+                  </ReadyStyle>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="notifEntry">
+              <div className="notifBody"> No new notifs. </div>
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

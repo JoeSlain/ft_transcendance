@@ -1,0 +1,65 @@
+import { useContext, useState } from "react";
+import { channelType } from "../../types/channelType";
+import User from "../../hooks/User";
+import axios from "axios";
+import { ChatContext } from "../../context/socketContext";
+import "../../styles/chat/channelUsersBar.css";
+import "../../styles/contact.css";
+import AddChanUser from "./AddChanUser";
+import { setSourceMapRange } from "typescript";
+import { userType } from "../../types/userType";
+import { ContextMenu } from "../../styles/menus";
+import { ChanUserContextList } from "./ChanUserContextList";
+import useClickListener from "../../hooks/useClickListener";
+
+type Props = {
+  selected: channelType | null;
+  setSelected: (selected: channelType | null) => void;
+};
+
+export default function ChanUsers({ selected, setSelected }: Props) {
+  const [user, setUser] = useState<userType | null>(null);
+  const [point, setPoint] = useState({ x: 0, y: 0 });
+
+  useClickListener({
+    selected: user,
+    setSelected: setUser,
+  });
+
+  if (selected && selected.users) {
+    return (
+      <div className="channelAside">
+        <div className="chanUsersBar">
+          <div className="chanUsersHeader">
+            <h1 className="backButton" onClick={() => setSelected(null)}>
+              ←
+            </h1>
+            <h1 className="usersTitle">Users</h1>
+          </div>
+          <div className="chanUsersBody">
+            <AddChanUser selected={selected} />
+            {selected.users.map((user) => (
+              <div
+                className="userEntry"
+                key={user.username}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setPoint({ x: e.pageX, y: e.pageY });
+                  setUser(user);
+                }}
+              >
+                {user.username}
+              </div>
+            ))}
+            {user && (
+              <ContextMenu top={point.y} left={point.x}>
+                <ChanUserContextList selectedUser={user} />
+              </ContextMenu>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return <></>;
+}
