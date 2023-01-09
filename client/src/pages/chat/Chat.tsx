@@ -2,7 +2,7 @@ import { useState } from "react";
 import useChatEvents from "../../hooks/chatEvents/useChatEvents";
 import Channels from "./Channels";
 import { channelType } from "../../types/channelType";
-import ChanUsers from "./ChanUsers";
+import ChanUsers from "./channelUtils/ChanUsers";
 import MessageForm from "./MessageForm";
 import "../../styles/chat/chat.css";
 import ChatMessages from "./ChatMessages";

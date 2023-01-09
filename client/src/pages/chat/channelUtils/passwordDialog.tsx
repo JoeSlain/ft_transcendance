@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
 import { channelType } from "../../../types/channelType";
+import "../../../styles/modal.css";
 
 type Props = {
   channel: channelType;
@@ -20,7 +21,7 @@ const PasswordDialog = ({ channel, setProtectedChan }: Props) => {
   };
 
   return (
-    <div className="mdal">
+    <div className="modal">
       <div className="modalHeader">{`Enter ${channel.name} password`}</div>
       <div className="modalBody">
         <div> Password : </div>

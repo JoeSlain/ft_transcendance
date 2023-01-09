@@ -1,16 +1,12 @@
 import { useContext, useState } from "react";
-import { channelType } from "../../types/channelType";
-import User from "../../hooks/User";
-import axios from "axios";
-import { ChatContext } from "../../context/socketContext";
-import "../../styles/chat/channelUsersBar.css";
-import "../../styles/contact.css";
+import { channelType } from "../../../types/channelType";
+import "../../../styles/chat/channelUsersBar.css";
+import "../../../styles/contact.css";
 import AddChanUser from "./AddChanUser";
-import { setSourceMapRange } from "typescript";
-import { userType } from "../../types/userType";
-import { ContextMenu } from "../../styles/menus";
+import { userType } from "../../../types/userType";
+import { ContextMenu } from "../../../styles/menus";
 import { ChanUserContextList } from "./ChanUserContextList";
-import useClickListener from "../../hooks/useClickListener";
+import useClickListener from "../../../hooks/useClickListener";
 
 type Props = {
   selected: channelType | null;

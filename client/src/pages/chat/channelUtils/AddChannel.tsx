@@ -39,6 +39,7 @@ const DropDown = ({ setSelected }: DropDownProps) => {
       >
         <option value="public">public</option>
         <option value="private">private</option>
+        <option value="protected">protected</option>
       </select>
     </div>
   );
@@ -72,11 +73,13 @@ const AddChannel = ({ setShowChanMenu }: AddChanProps) => {
           setChanEntry={setChanName}
         />
         <DropDown setSelected={setSelected} />
-        <ChanInput
-          title="Password"
-          chanEntry={password}
-          setChanEntry={setPassword}
-        />
+        {selected === "protected" && (
+          <ChanInput
+            title="Password"
+            chanEntry={password}
+            setChanEntry={setPassword}
+          />
+        )}
       </div>
       <div className="modalButtons">
         <button className="modalButton" onClick={createChannel}>

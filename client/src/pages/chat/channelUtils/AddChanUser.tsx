@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useContext, useState } from "react";
-import { ChatContext } from "../../context/socketContext";
-import User from "../../hooks/User";
-import { channelType } from "../../types/channelType";
+import User from "../../../hooks/User";
+import { channelType } from "../../../types/channelType";
+import { ChatContext } from "../../../context/socketContext";
 
 type Props = {
   selected: channelType | null;

@@ -1,8 +1,7 @@
 import { useContext, useState } from "react";
-import { ChatContext, GameContext } from "../../context/socketContext";
-import { userType } from "../../types/userType";
-import { ModalContext } from "../../context/modalContext";
-import User from "../../hooks/User";
+import { ChatContext } from "../../../context/socketContext";
+import User from "../../../hooks/User";
+import { userType } from "../../../types/userType";
 
 export type Props = {
   selectedUser: userType;
@@ -11,7 +10,6 @@ export type Props = {
 export const ChanUserContextList = ({ selectedUser }: Props) => {
   const chatSocket = useContext(ChatContext);
   const { user } = useContext(User);
-  const { setModal } = useContext(ModalContext);
 
   const handleSetAdmin = () => {};
 

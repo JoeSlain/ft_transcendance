@@ -2,11 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
 import User from "../../hooks/User";
-import PasswordDialog from "./channelUtils/passwordModal";
 import AddChannel from "./channelUtils/AddChannel";
 import "../../styles/chat/channelBar.css";
 import { ChanContextMenu } from "./channelUtils/ChanContextMenu";
 import useClickListener from "../../hooks/useClickListener";
+import PasswordDialog from "./channelUtils/passwordDialog";
+import { createShorthandPropertyAssignment } from "typescript";
 
 type ChannelProps = {
   channels: channelType[];
@@ -96,7 +97,15 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
         </div>
         <div className="channelCategory">
           <h2 className="chanType"> Public </h2>
-          <Channel channels={publicChans} />
+          <Channel
+            channels={publicChans.filter((chan) => chan.type !== "protected")}
+          />
+        </div>
+        <div className="channelCategory">
+          <h2 className="chanType"> Protected </h2>
+          <Channel
+            channels={publicChans.filter((chan) => chan.type === "protected")}
+          />
         </div>
       </div>
 
