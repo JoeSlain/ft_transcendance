@@ -36,14 +36,22 @@ const PrivateContextMenu = ({ channel, setChannel }: ChannelProps) => {
 };
 
 const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
+  const { user } = useContext(User);
+
   const setPassword = () => {
     setChannel(null);
   };
+  const removePassword = () => {
+    setChannel(null);
+  };
 
-  return (
+  return user.id === channel.owner.id ? (
     <ul>
+      <li onClick={removePassword}> Remove Password </li>
       <li onClick={setPassword}> Change Password </li>
     </ul>
+  ) : (
+    <></>
   );
 };
 
