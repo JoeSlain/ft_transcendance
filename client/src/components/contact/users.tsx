@@ -34,9 +34,17 @@ export default function Users() {
 
   return (
     <div className="users">
-      <div className="form">
+      <div className="">
         <div className="formInput">
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            type="text"
+            placeholder="Search contact"
+            className="input input-bordered input-primary w-full max-w-xs mt-5"
+          />
+          {/*           <input value={name} onChange={(e) => setName(e.target.value)} />
+           */}{" "}
         </div>
         <div className="formButtons">
           <button onClick={addFriend}> + </button>

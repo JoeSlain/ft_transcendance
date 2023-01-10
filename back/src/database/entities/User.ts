@@ -5,7 +5,10 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
+
+import { Game } from "./Game";
 
 @Entity({ name: "users" })
 export class User {
@@ -47,6 +50,9 @@ export class User {
 
   @Column()
   date_of_sign: Date;
+
+  @ManyToOne(() => User)
+   games: Game[];
 
   // relations
   @ManyToMany((type) => User, (user) => user.friends)

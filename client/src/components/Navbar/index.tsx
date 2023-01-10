@@ -2,11 +2,10 @@ import "../../styles/navbar.css";
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import profile from "../../assets/user.png";
-import Login, { VerifLogged } from "../../pages/login/Login";
 import { deleteItem } from "../../utils/storage";
 import axios from "axios";
 import User from "../../hooks/User";
-import { userType } from "../../types/userType";
+import Notif from "../notifs/notifs";
 
 type IProps = {
   setIsLogged: (props: boolean) => void;
@@ -28,29 +27,33 @@ export default function Navbar({ setIsLogged }: IProps) {
   }
   return (
     <>
-      <nav className="navigation">
-        <div className="navigation-menu bg-ata-back">
+      <nav className="navigation bg-ata-red pt-4">
+        <div className="navigation-menu bg-ata-red flex justify-center ">
           <ul>
-            <li className="text-ata-red">
-              <NavLink to="/Home">Home</NavLink>
-            </li>
-            <li className="text-ata-red">
-              <NavLink to="/play">Play</NavLink>
-            </li>
-            <li className="text-ata-red">
-              <NavLink to="/games">Games</NavLink>
-            </li>
-            <li className="text-ata-red">
-              <NavLink to="/chat">Chat</NavLink>
-            </li>
             <li>
+              <Notif />
+            </li>
+            <li className=" font-retro text-ata-yellow hover:bo">
+              <NavLink to="/Home">HOME</NavLink>
+            </li>
+            <li className=" font-retro text-ata-yellow">
+              <NavLink to="/play">PLAY</NavLink>
+            </li>
+            <li className=" font-retro text-ata-yellow">
+              <NavLink to="/chat">CHAT</NavLink>
+            </li>
+            <li className=" font-retro text-ata-yellow">
               <NavLink className="navlink" to="/login" onClick={logout}>
-                Logout
+                LOGOUT
               </NavLink>
             </li>
             <li>
               <NavLink to="/profile">
-                <img className="profile" src={profile} alt="Profile" />
+                <img
+                  className="profile bg-ata-red"
+                  src={profile}
+                  alt="Profile"
+                />
               </NavLink>
             </li>
           </ul>

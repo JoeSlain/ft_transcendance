@@ -5,10 +5,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #010912;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+@font-face {
+font-family: "Retro";
+src: local("Retro"),
+ url("../assets/fonts/Retro.ttf") format("truetype");
+font-weight: bold;
 }

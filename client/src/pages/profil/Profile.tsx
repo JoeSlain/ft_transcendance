@@ -39,7 +39,7 @@ export default function Profile() {
         <div className="profil flex flex-col items-center relative">
           <p className="text-slate-200">Username:</p>
           <p className="text-slate-200">{data.username}</p>
-          <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
+          <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
             <img
               src={data.profile_pic}
               alt="Avatar"

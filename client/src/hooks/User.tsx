@@ -21,6 +21,7 @@ export default React.createContext<IUserContext>({
     n_lose: 0,
     avatar: null,
     date_of_sign: new Date(),
+    games: []
   },
   setUser: () => {},
 });
