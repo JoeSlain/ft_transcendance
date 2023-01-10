@@ -1,21 +1,21 @@
 import { useEffect } from "react";
 
 type IProps = {
-  show: boolean;
-  setShow: (props: boolean) => void;
+  selected: any;
+  setSelected: (props: any) => void;
 };
 
-export default function useClickListener({ show, setShow }: IProps) {
-  const handleClick = () => setShow(false);
+export default function useClickListener({ selected, setSelected }: IProps) {
+  const handleClick = () => setSelected(null);
 
   useEffect(() => {
     setTimeout(() => {
-      if (show) {
+      if (selected) {
         window.addEventListener("click", handleClick);
       }
     }, 0);
     return () => {
       window.removeEventListener("click", handleClick);
     };
-  }, [show]);
+  }, [selected]);
 }

@@ -1,0 +1,64 @@
+.chat {
+  display: flex;
+  height: 100%;
+}
+
+.chatMain {
+  width: 100%;
+  text-align: center;
+}
+
+.channelAside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+  box-shadow: 2px 2px 2px 2px rgba(0.23, 0.23, 0.23, 0.23);
+  text-align: center;
+  overflow-y: auto;
+}
+
+.dmWrapper {
+  display: flex;
+}
+
+.chatBody {
+  height: 75%;
+}
+
+.chanUsers {
+  width: 20%;
+  height: 600px;
+  box-shadow: 2px 2px 2px 2px rgba(0.23, 0.23, 0.23, 0.23);
+  text-align: center;
+}
+
+.message {
+  display: flex;
+  justify-content: center;
+  height: 20%;
+}
+
+.messageForm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.messageInput {
+  width: 80%;
+  padding-left: 5px;
+  height: 100%;
+  color: black;
+}
+
+.messageButton {
+  height: 40%;
+  align-items: flex-end;
+}
+
+h2 {
+  font-size: x-large;
+}

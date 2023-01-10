@@ -1,21 +1,44 @@
-import { useContext } from "react";
-import { ChatContext } from "../../context/socketContext";
+import { useContext, useState } from "react";
+import { ChatContext, GameContext } from "../../context/socketContext";
 import { userType } from "../../types/userType";
+import { ModalContext } from "../../context/modalContext";
+import User from "../../hooks/User";
 
 export type UserProps = {
-  user?: userType;
+  selected: userType;
 };
 
-export const UserContextList = ({ user }: UserProps) => {
-  const socket = useContext(ChatContext);
+export const UserContextList = ({ selected }: UserProps) => {
+  const chatSocket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
+  const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
+
   const handleInvite = () => {
-    console.log(user);
+    chatSocket.emit("notif", {
+      type: "Game Invite",
+      from: user,
+      to: selected,
+      acceptEvent: "acceptGameInvite",
+    });
+    console.log("invited", selected);
   };
+
   const handleDelete = () => {
-    console.log(user);
+    setModal({
+      header: "Delete Friend",
+      body: `Are you sure you want to remove ${selected.username} from your friends  ?`,
+      acceptEvent: "deleteFriend",
+      data: {
+        selected,
+        user,
+      },
+    });
   };
+
   const handleSpectate = () => {
-    console.log(user);
+    gameSocket.emit("spectate", { user: selected, me: user });
+    console.log("spectate", selected);
   };
 
   return (

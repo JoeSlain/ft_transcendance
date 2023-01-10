@@ -6,6 +6,7 @@ import { userType } from "../../types/userType";
 import { ContextMenu } from "../../styles/menus";
 import { UserContextList } from "./userContextList";
 import "../../styles/contact.css";
+import AddFriend from "./addFriendForm";
 
 const getColor = (status?: string) => {
   switch (status) {
@@ -19,38 +20,17 @@ const getColor = (status?: string) => {
 };
 
 export default function Users() {
-  const [show, setShow] = useState(false);
   const [point, setPoint] = useState({ x: 0, y: 0 });
-  const [clicked, setClicked] = useState<userType>();
+  const [selected, setSelected] = useState<userType | null>(null);
   const [friends, setFriends] = useState<userType[]>([]);
   const [statuses, setStatuses] = useState(new Map<number, string>());
 
-  const [name, setName] = useState("");
-
-  useClickListener({ show, setShow });
+  useClickListener({ selected, setSelected });
   useFriendsEvent({ setFriends, setStatuses });
-
-  const addFriend = () => {};
 
   return (
     <div className="users">
-      <div className="">
-        <div className="formInput">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            type="text"
-            placeholder="Search contact"
-            className="input input-bordered input-primary w-full max-w-xs mt-5"
-          />
-          {/*           <input value={name} onChange={(e) => setName(e.target.value)} />
-           */}{" "}
-        </div>
-        <div className="formButtons">
-          <button onClick={addFriend}> + </button>
-        </div>
-      </div>
-
+      <AddFriend />
       {friends &&
         friends.map((friend) => (
           <div
@@ -58,8 +38,7 @@ export default function Users() {
             className="userEntry"
             onContextMenu={(e) => {
               e.preventDefault();
-              setShow(true);
-              setClicked(friend);
+              setSelected(friend);
               setPoint({ x: e.pageX, y: e.pageY });
             }}
           >
@@ -67,9 +46,9 @@ export default function Users() {
             <DotStyle color={getColor(statuses.get(friend.id))} />
           </div>
         ))}
-      {show && (
+      {selected && (
         <ContextMenu top={point.y} left={point.x}>
-          <UserContextList user={clicked} />
+          <UserContextList selected={selected} />
         </ContextMenu>
       )}
     </div>

@@ -36,7 +36,8 @@ export class UsersService {
     return user;
   }
 
-  async getByUsername(userName: string): Promise<User | null> {
+  async getByUsername(userName: string) {
+    if (!userName) return null;
     const user = await this.usersRepository.findOneBy({ username: userName });
 
     /*console.log('getByUsername');
@@ -97,18 +98,13 @@ export class UsersService {
     return friend;
   }
 
-  async deleteFriend(user: User, toDelId: number) {
-    const toDel = await this.getById(toDelId);
-
-    if (toDel) {
-      await this.usersRepository
-        .createQueryBuilder()
-        .relation(User, "friends")
-        .of(user)
-        .remove(toDel);
-      return this.getFriends(user);
-    }
-    return null;
+  async deleteFriend(user: User, toDel: User) {
+    await this.usersRepository
+      .createQueryBuilder()
+      .relation(User, "friends")
+      .of(user)
+      .remove(toDel);
+    return this.getFriends(user);
   }
 
   async updateStatus(userId: number, newStatus: string) {
@@ -118,24 +114,23 @@ export class UsersService {
     const modifiedUser = await this.getById(userId);
     return modifiedUser;
   }
-  async updateUser(newUser: User) : Promise<User>
-  {
+  async updateUser(newUser: User): Promise<User> {
     console.log(
-       "🚀 ~ file: users.service.ts:135 ~ UsersService ~ newUser.id",
-       newUser
-     );
-      await this.usersRepository.update(newUser.id, newUser);
-          return this.getById(newUser.id);
-/*
+      "🚀 ~ file: users.service.ts:135 ~ UsersService ~ newUser.id",
+      newUser
+    );
+    await this.usersRepository.update(newUser.id, newUser);
+    return this.getById(newUser.id);
+    /*
     let user = await this.getById(id);
     user = newUser;
     return this.usersRepository.save(user); */
   }
 
-    async uploadAvatar(userId: number, url: string) {
-      await this.usersRepository.update(userId, {
-        avatar: url,
-      });
-        return this.getById(userId);
-    }
+  async uploadAvatar(userId: number, url: string) {
+    await this.usersRepository.update(userId, {
+      avatar: url,
+    });
+    return this.getById(userId);
+  }
 }

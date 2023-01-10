@@ -2,28 +2,27 @@ import "../../styles/navbar.css";
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import profile from "../../assets/user.png";
-import { deleteItem } from "../../utils/storage";
+import Login, { VerifLogged } from "../../pages/login/Login";
+import { deleteItem, getSavedItem } from "../../utils/storage";
 import axios from "axios";
 import User from "../../hooks/User";
-import Notif from "../notifs/notifs";
+import { userType } from "../../types/userType";
+import Auth from "../../hooks/Auth";
+import { ChatContext, GameContext } from "../../context/socketContext";
 
 type IProps = {
   setIsLogged: (props: boolean) => void;
 };
 
 export default function Navbar({ setIsLogged }: IProps) {
-  const context = useContext(User);
+  const { user } = useContext(User);
+  const isLogged = useContext(Auth);
+  const chatSocket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
 
   function logout() {
-    deleteItem("user");
-    axios
-      .post("http://localhost:3001/api/auth/logout", {
-        withCredentials: true,
-      })
-      .then(() => {
-        setIsLogged(false);
-      })
-      .catch((e) => console.log("Post logout err: " + e));
+    chatSocket.emit("logout", user);
+    gameSocket.emit("logout", user);
   }
   return (
     <>

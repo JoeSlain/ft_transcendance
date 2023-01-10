@@ -6,15 +6,13 @@ import PlayerEntry from "./playerEntry";
 import Spectators from "./spectators";
 import useLobbyEvents from "../../hooks/gameEvents/useLobbyEvents";
 import "../../styles/play.css";
+import Buttons from "./Buttons";
 
 export default function Play() {
   const [room, setRoom] = useState<roomType | null>(null);
-  const [hostReady, setHostReady] = useState(false);
-  const [guestReady, setGuestReady] = useState(false);
 
   useLobbyEvents({ setRoom });
 
-  const startGame = () => {};
   const searchOpponent = () => {};
 
   if (room) {
@@ -25,25 +23,11 @@ export default function Play() {
             <h1> Room {room && room.id} </h1>
           </div>
           <div className="playBody">
-            {room.host && (
-              <PlayerEntry
-                player={room.host.infos}
-                ready={hostReady}
-                setReady={setHostReady}
-                room={room}
-              />
-            )}
-            {room.guest && (
-              <PlayerEntry
-                player={room.guest.infos}
-                ready={guestReady}
-                setReady={setGuestReady}
-                room={room}
-              />
-            )}
+            {room.host && <PlayerEntry player={room.host} room={room} />}
+            {room.guest && <PlayerEntry player={room.guest} room={room} />}
           </div>
           <div className="playFooter">
-            <button onClick={startGame}> Start </button>
+            <Buttons room={room} />
             <Spectators spectators={room.spectators} />
           </div>
         </div>
@@ -58,9 +42,13 @@ export default function Play() {
         </div>
         <div className="playBody"></div>
         <div className="playFooter">
-          <button className="customButton" onClick={searchOpponent}>
+          <button
+            className="customButton"
+            id="searchOpponentButton"
+            onClick={searchOpponent}
+          >
             {" "}
-            Search opponent{" "}
+            Search Opponent{" "}
           </button>
         </div>
       </div>

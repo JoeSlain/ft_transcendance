@@ -4,34 +4,48 @@ import { roomType } from "../../types/roomType";
 import User from "../User";
 
 type IProps = {
-  setRoom: (props: roomType) => void;
+  setRoom: (props: roomType | null) => void;
 };
 
 export default function useLobbyEvents({ setRoom }: IProps) {
   const gameSocket = useContext(GameContext);
-  const chatSocket = useContext(ChatContext);
   const { user } = useContext(User);
 
   useEffect(() => {
-    gameSocket.emit("getRoom", user.id);
+    console.log("rendering play");
+    gameSocket.emit("getRoom", user);
 
+    // new room
     gameSocket.on("newRoom", (room) => {
       setRoom(room);
     });
 
-    chatSocket.on("acceptedInvite", (data) => {
-      console.log("data host id", data);
-      const roomData = {
-        user,
-        hostId: data,
-      };
-      console.log("acceptedInvite");
-      gameSocket.emit("joinRoom", roomData);
+    // join
+    gameSocket.on("joinedRoom", (room) => {
+      setRoom(room);
+    });
+
+    // user leave
+    gameSocket.on("leftRoom", (room) => {
+      setRoom(room);
+    });
+
+    // me leave
+    gameSocket.on("clearRoom", () => {
+      setRoom(null);
+    });
+
+    gameSocket.on("ready", (room) => {
+      setRoom(room);
     });
 
     return () => {
       gameSocket.off("getRoom");
-      chatSocket.off("acceptedInvite");
+      gameSocket.off("newRoom");
+      gameSocket.off("joinedRoom");
+      gameSocket.off("leftRoom");
+      gameSocket.off("clearRoom");
+      gameSocket.off("ready");
     };
   }, []);
 }

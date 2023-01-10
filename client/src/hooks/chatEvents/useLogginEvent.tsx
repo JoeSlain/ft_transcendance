@@ -1,48 +1,57 @@
 import { useContext, useEffect } from "react";
-import { ChatContext } from "../../context/socketContext";
+import { ChatContext, GameContext } from "../../context/socketContext";
 import axios from "axios";
-import { saveItem } from "../../utils/storage";
+import { deleteItem, getSavedItem, saveItem } from "../../utils/storage";
 import { userType } from "../../types/userType";
 import { useNavigate } from "react-router-dom";
 import { notifType } from "../../types/notifType";
 import Auth from "../Auth";
+import User from "../User";
 
 type IProps = {
   user: userType | null;
+  isLogged: boolean;
   setUser: (props: userType) => void;
   setIsLogged: (props: boolean) => void;
-  setNotifs: (props: notifType[]) => void;
 };
 
-export default function useLogginEvent({
-  user,
-  setUser,
-  setIsLogged,
-  setNotifs,
-}: IProps) {
+export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
   const chatSocket = useContext(ChatContext);
-  const isLogged = useContext(Auth);
+  const gameSocket = useContext(GameContext);
   const navigate = useNavigate();
 
   useEffect(() => {
+    chatSocket.on("connect", () => {
+      if (user) {
+        chatSocket.emit("login", user);
+      }
+    });
+
     chatSocket.on("loggedIn", (data) => {
-      console.log("loggedIn");
+      setUser(data);
+      saveItem("user", data);
+      if (!getSavedItem("isLogged")) navigate("/home");
+      saveItem("isLogged", true);
+      setIsLogged(true);
+      gameSocket.emit("login", data);
+    });
+
+    chatSocket.on("loggedOut", () => {
       axios
-        .get("http://localhost:3001/api/users/notifs", {
+        .post("http://localhost:3001/api/auth/logout", {
           withCredentials: true,
         })
-        .then((response) => {
-          console.log("data", response.data);
-          setNotifs(response.data);
-          setUser(data);
-          saveItem("user", data);
-          setIsLogged(true);
-          saveItem("isLogged", true);
-          if (!isLogged) navigate("/profile");
-        });
+        .then(() => {
+          console.log("logging out");
+          setIsLogged(false);
+          deleteItem("user");
+          deleteItem("isLogged");
+        })
+        .catch((e) => console.log("Post logout err: " + e));
     });
 
     return () => {
+      chatSocket.off("connect");
       chatSocket.off("loggedIn");
     };
   }, []);

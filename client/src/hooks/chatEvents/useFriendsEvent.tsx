@@ -16,16 +16,14 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
     socket.emit("getFriends", user);
 
     socket.on("friends", (data) => {
-      console.log("friends", data.friends);
+      console.log("get friends event");
       setFriends(data.friends);
       setStatuses(new Map(JSON.parse(data.statuses)));
-      console.log("statuses", data.statuses);
     });
 
     // new friend
     socket.on("newFriend", (data) => {
-      console.log("newFriendEvent");
-      console.log("adding friend", data);
+      console.log("new Friend Event");
       setFriends((prev: userType[]) => [...prev, data]);
       setStatuses(
         (prev: Map<number, string>) => new Map(prev.set(data.id, "online"))
@@ -34,7 +32,7 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
 
     // update friend status
     socket.on("updateStatus", (data) => {
-      console.log("friend update", data.user);
+      console.log("friend update event");
       setStatuses((prev: Map<number, string>) => {
         if (prev.has(data.user.id)) {
           console.log("user found, changing status");
@@ -47,7 +45,7 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
     });
 
     socket.on("friendDeleted", (data) => {
-      console.log(`deleting ${data.username}`);
+      console.log("delete friend event");
       setFriends((prev: userType[]) =>
         prev.filter((friend) => friend.id !== data.id)
       );

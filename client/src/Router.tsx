@@ -1,4 +1,4 @@
-import { redirect, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/home/Home";
@@ -22,22 +22,40 @@ import { notifType } from "./types/notifType";
 import Notif from "./components/notifs/notifs";
 import Stats from "./pages/stats/Stats";
 
-export default function Router() {
-  const [isLogged, setIsLogged] = React.useState(
-    getSavedItem("isLogged") || false
-  );
-  const [user, setUser] = useState<userType>(getSavedItem("user"));
-  const [notifs, setNotifs] = useState<notifType[]>([]);
+import Notifs from "./components/notifs/notifs";
+import { ModalType } from "./types/modalType";
+import Modal from "./components/modal";
+import { ModalContext } from "./context/modalContext";
+import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
 
-  useLogginEvent({ user, setUser, setIsLogged, setNotifs });
-  if (!isLogged)
-    redirect("/login");
+export default function Router() {
+  const [isLogged, setIsLogged] = useState(getSavedItem("isLogged"));
+  const [user, setUser] = useState<userType>(getSavedItem("user"));
+  const [modal, setModal] = useState<ModalType | null>(null);
+
+
+  useLogginEvent({ user, isLogged, setUser, setIsLogged });
+  useErrorEvent();
+
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={{ user, setUser }}>
-        {isLogged === true &&<Navbar setIsLogged={setIsLogged} />}
-        <div className="main heightMinusNav">
-          <div className="w-[75%] ">
+        <ModalContext.Provider value={{ setModal }}>
+          <div className="header">
+            {isLogged && <Notifs />}
+            <Navbar setIsLogged={setIsLogged} />
+             <div className="main heightMinusNav">
+{/*}          <div className="w-[75%] "> */}
+          </div>
+          <div className="main">
+            {modal && (
+              <Modal
+                header={modal.header}
+                body={modal.body}
+                acceptEvent={modal.acceptEvent}
+                data={modal.data}
+              />
+            )}
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
@@ -63,7 +81,8 @@ export default function Router() {
             </Routes>
           </div>
           <div className="w-[25%]">{isLogged === true && <Contact />}</div>
-        </div>
+          </div>
+                </ModalContext.Provider>
       </User.Provider>
     </Auth.Provider>
   );
