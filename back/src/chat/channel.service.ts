@@ -117,6 +117,18 @@ export class ChannelService {
     return null;
   }
 
+  async checkChanPassword(pass: string, cryptedPass: string) {
+    return await bcrypt.compare(pass, cryptedPass);
+  }
+
+  async setChanPassword(channel: Channel, pass: string) {
+    const chan = await this.chanRepo.update(channel.id, {
+      password: await bcrypt.hash(pass, 10),
+      type: "protected",
+    });
+    return chan;
+  }
+
   async setChanOwner(user: User, channel: Channel) {
     await this.chanRepo
       .createQueryBuilder()

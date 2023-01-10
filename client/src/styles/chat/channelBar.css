@@ -36,6 +36,11 @@
   margin-top: 5px;
 }
 
+.chanEntry:hover {
+  color: yellow;
+  cursor: pointer;
+}
+
 /* ADD CHANNEL */
 #chanAddButton {
   width: 30px;

@@ -21,9 +21,10 @@ import Chat from "./pages/chat/Chat";
 import useLogginEvent from "./hooks/chatEvents/useLogginEvent";
 import Notifs from "./components/notifs/notifs";
 import { ModalType } from "./types/modalType";
-import Modal from "./components/modal";
 import { ModalContext } from "./context/modalContext";
 import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
+import useModal from "./hooks/useModal";
+import Modal from "./components/modal";
 
 export default function Router() {
   const [isLogged, setIsLogged] = useState(getSavedItem("isLogged"));
@@ -42,14 +43,7 @@ export default function Router() {
             <Navbar setIsLogged={setIsLogged} />
           </div>
           <div className="main">
-            {modal && (
-              <Modal
-                header={modal.header}
-                body={modal.body}
-                acceptEvent={modal.acceptEvent}
-                data={modal.data}
-              />
-            )}
+            {modal && <Modal header={modal.header} body={modal.body} />}
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
 import User from "../../hooks/User";
@@ -6,8 +6,9 @@ import AddChannel from "./channelUtils/AddChannel";
 import "../../styles/chat/channelBar.css";
 import { ChanContextMenu } from "./channelUtils/ChanContextMenu";
 import useClickListener from "../../hooks/useClickListener";
-import PasswordDialog from "./channelUtils/passwordDialog";
-import { createShorthandPropertyAssignment } from "typescript";
+import PasswordDialog from "./channelUtils/PasswordDialog";
+import SetPassword from "./channelUtils/SetPassword";
+import { ModalContext } from "../../context/modalContext";
 
 type ChannelProps = {
   channels: channelType[];
@@ -16,9 +17,9 @@ type ChannelProps = {
 function Channel({ channels }: ChannelProps) {
   const [points, setPoints] = useState({ x: 0, y: 0 });
   const [selected, setSelected] = useState<channelType | null>(null);
-  const [protectedChan, setProtectedChan] = useState<channelType | null>(null);
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -28,7 +29,10 @@ function Channel({ channels }: ChannelProps) {
     if (e.detail === 2) {
       console.log("left click", channel);
       if (channel.type === "protected") {
-        setProtectedChan(channel);
+        setModal({
+          header: `Enter ${channel.name} password`,
+          body: <PasswordDialog channel={channel} />,
+        });
       } else socket.emit("joinChannel", { user, channel });
     }
   };
@@ -58,12 +62,6 @@ function Channel({ channels }: ChannelProps) {
             {chan.name}
           </div>
         ))}
-      {protectedChan && (
-        <PasswordDialog
-          channel={protectedChan}
-          setProtectedChan={setProtectedChan}
-        />
-      )}
     </div>
   );
 }

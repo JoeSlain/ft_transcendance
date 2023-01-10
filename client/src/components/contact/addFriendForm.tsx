@@ -17,7 +17,7 @@ export default function AddFriend() {
         if (!response.data) alert(`user ${name} not found`);
         else {
           socket.emit("notif", {
-            type: "Friend request",
+            type: "Friend Request",
             from: user,
             to: response.data,
             acceptEvent: "acceptFriendRequest",

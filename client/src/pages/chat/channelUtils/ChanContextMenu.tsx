@@ -3,6 +3,10 @@ import { ContextMenu } from "../../../styles/menus";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
 import { channelType } from "../../../types/channelType";
+import { ModalContext } from "../../../context/modalContext";
+import RemovePassword from "./RemovePassword";
+import SetPassword from "./SetPassword";
+import DeleteChannel from "./DeleteChannel";
 
 type ContextMenuProps = {
   channel: channelType | null;
@@ -19,13 +23,13 @@ type ChannelProps = {
 };
 
 const PrivateContextMenu = ({ channel, setChannel }: ChannelProps) => {
-  const socket = useContext(ChatContext);
-  const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
 
   const handleDelete = () => {
-    console.log("chanentry right clicked", channel);
-    socket.emit("deleteChannel", { channel, user });
-    setChannel(null);
+    setModal({
+      header: `Delete ${channel.name}`,
+      body: <DeleteChannel channel={channel} />,
+    });
   };
 
   return (
@@ -37,18 +41,37 @@ const PrivateContextMenu = ({ channel, setChannel }: ChannelProps) => {
 
 const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
   const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
 
   const setPassword = () => {
-    setChannel(null);
+    setModal({
+      header: `Change ${channel.name} password`,
+      body: <SetPassword channel={channel} />,
+    });
   };
+
   const removePassword = () => {
-    setChannel(null);
+    const handleAccept = () => {
+      console.log("remove pass");
+    };
+    setModal({
+      header: `Remove ${channel.name} Password`,
+      body: <RemovePassword handleAccept={handleAccept} />,
+    });
+  };
+
+  const handleDelete = () => {
+    setModal({
+      header: `Delete ${channel.name}`,
+      body: <DeleteChannel channel={channel} />,
+    });
   };
 
   return user.id === channel.owner.id ? (
     <ul>
       <li onClick={removePassword}> Remove Password </li>
       <li onClick={setPassword}> Change Password </li>
+      <li onClick={handleDelete}> Delete </li>
     </ul>
   ) : (
     <></>

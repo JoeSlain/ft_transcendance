@@ -265,7 +265,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return null;
     }
     if (channel.type === "protected") {
-      const check = await bcrypt.compare(
+      const check = await this.channelService.checkChanPassword(
         data.channel.password,
         channel.password
       );
@@ -343,5 +343,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!message)
       this.server.to(client.id).emit("error", "error creating message");
     else this.server.to(data.channel.socketId).emit("newMessage", message);
+  }
+
+  @SubscribeMessage("setChannelPassword")
+  async setChannelPassword(client: Socket, data: any) {
+    console.log("set chan pass", data);
+    const channel = await this.channelService.findChannelById(data.channel.id);
+    const check = await this.channelService.checkChanPassword(
+      data.channel.password,
+      channel.password
+    );
+    if (!check) {
+      this.server.to(client.id).emit("error", "wrong password");
+      return;
+    }
+    await this.channelService.setChanPassword(data.channel, data.newPassword);
   }
 }
