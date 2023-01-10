@@ -29,9 +29,6 @@ export default function Navbar({ setIsLogged }: IProps) {
       <nav className="navigation bg-ata-red pt-4">
         <div className="navigation-menu bg-ata-red flex justify-center ">
           <ul>
-            <li>
-              <Notif />
-            </li>
             <li className=" font-retro text-ata-yellow hover:bo">
               <NavLink to="/Home">HOME</NavLink>
             </li>

@@ -22,40 +22,21 @@ import { notifType } from "./types/notifType";
 import Notif from "./components/notifs/notifs";
 import Stats from "./pages/stats/Stats";
 
-import Notifs from "./components/notifs/notifs";
-import { ModalType } from "./types/modalType";
-import Modal from "./components/modal";
-import { ModalContext } from "./context/modalContext";
-import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
-
 export default function Router() {
-  const [isLogged, setIsLogged] = useState(getSavedItem("isLogged"));
+  const [isLogged, setIsLogged] = React.useState(
+    getSavedItem("isLogged") || false
+  );
   const [user, setUser] = useState<userType>(getSavedItem("user"));
-  const [modal, setModal] = useState<ModalType | null>(null);
+  const [notifs, setNotifs] = useState<notifType[]>([]);
 
-
-  useLogginEvent({ user, isLogged, setUser, setIsLogged });
-  useErrorEvent();
+  useLogginEvent({ user, setUser, setIsLogged, isLogged });
 
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={{ user, setUser }}>
-        <ModalContext.Provider value={{ setModal }}>
-          <div className="header">
-            {isLogged && <Notifs />}
-            <Navbar setIsLogged={setIsLogged} />
-             <div className="main heightMinusNav">
-{/*}          <div className="w-[75%] "> */}
-          </div>
-          <div className="main">
-            {modal && (
-              <Modal
-                header={modal.header}
-                body={modal.body}
-                acceptEvent={modal.acceptEvent}
-                data={modal.data}
-              />
-            )}
+        {isLogged === true &&<Navbar setIsLogged={setIsLogged} />}
+        <div className="main heightMinusNav">
+          <div className="w-[75%] ">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
@@ -81,8 +62,7 @@ export default function Router() {
             </Routes>
           </div>
           <div className="w-[25%]">{isLogged === true && <Contact />}</div>
-          </div>
-                </ModalContext.Provider>
+        </div>
       </User.Provider>
     </Auth.Provider>
   );
