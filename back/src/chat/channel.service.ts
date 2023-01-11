@@ -55,6 +55,7 @@ export class ChannelService {
         owner: true,
       },
     });
+    channel[0].password = null;
     return channel[0];
   }
 
@@ -132,22 +133,26 @@ export class ChannelService {
   }
 
   async setChanOwner(user: User, channel: Channel) {
-    await this.chanRepo
+    channel.owner = user;
+    return await this.chanRepo.save(channel);
+    /*await this.chanRepo
       .createQueryBuilder()
       .relation(Channel, "owner")
       .of(channel)
       .set(user);
-    return await this.addUserChan(user, channel, "admins");
+    return await this.addUserChan(user, channel, "admins");*/
   }
 
   async addUserChan(user: User, chan: Channel, role: string) {
-    await this.chanRepo
+    chan[role].push(user);
+    return await this.chanRepo.save(chan);
+    /*  await this.chanRepo
       .createQueryBuilder()
       .relation(Channel, role)
       .of(chan)
       .add(user);
     chan = await this.findChannelById(chan.id);
-    return chan;
+    return chan;*/
   }
 
   async createChannel(chanData: ChannelData) {
@@ -160,11 +165,12 @@ export class ChannelService {
       socketId: `${chanData.type}/${chanData.name}`,
       password: hashedPassword,
     });
-    channel = await this.chanRepo.save(channel);
+    await this.chanRepo.save(channel);
+    channel = await this.findChannelById(channel.id);
     channel = await this.setChanOwner(chanData.owner, channel);
     channel = await this.addUserChan(chanData.owner, channel, "users");
 
-    return { ...channel, password: null };
+    return channel;
   }
 
   findUserInChan(userId: number, channel: Channel) {
@@ -211,7 +217,7 @@ export class ChannelService {
         channel = await this.setChanOwner(channel.admins[0], channel);
       else if (channel.users && channel.users[0])
         channel = await this.setChanOwner(channel.users[0], channel);
-      else {
+      else if (channel.type === "private") {
         await this.deleteChan(channel);
         return null;
       }
