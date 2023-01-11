@@ -21,6 +21,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("use login");
     chatSocket.on("connect", () => {
       if (user) {
         chatSocket.emit("login", user);

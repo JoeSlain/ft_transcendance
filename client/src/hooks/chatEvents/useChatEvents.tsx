@@ -88,9 +88,9 @@ export default function useChatEvents({
       setSelected(data.channel);
     });
 
-    socket.on("updateChannel", (data) => {
+    socket.on("updateChannel", (channel) => {
       console.log("updating channel");
-      updateChannel(data.channel);
+      updateChannel(channel);
     });
 
     socket.on("updateSelected", (data) => {

@@ -1,6 +1,7 @@
 /* CHAN BAR */
 .channelHeader {
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .channelBody {
@@ -43,7 +44,7 @@
 
 /* ADD CHANNEL */
 #chanAddButton {
-  width: 30px;
+  width: 100px;
   border-radius: 0;
 }
 

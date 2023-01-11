@@ -22,7 +22,7 @@ const PasswordDialog = ({ channel }: Props) => {
   };
 
   return (
-    <>
+    <form className="modalForm">
       <div className="modalBody">
         <div> Password : </div>
         <input onChange={(e) => setPass(e.target.value)} />
@@ -35,7 +35,7 @@ const PasswordDialog = ({ channel }: Props) => {
           Cancel
         </button>
       </div>
-    </>
+    </form>
   );
 };
 

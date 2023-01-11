@@ -45,18 +45,25 @@ export class ChannelService {
     return channel[0];
   }
 
+  async getChannelWithUsers(id: number) {
+    const channel = await this.chanRepo.find({
+      where: {
+        id,
+      },
+      relations: {
+        users: true,
+        owner: true,
+      },
+    });
+    return channel[0];
+  }
+
   async getPublicChannels() {
     const tmp = await this.chanRepo.find({
       where: [{ type: "public" }, { type: "protected" }],
       relations: {
-        users: true,
         owner: true,
-        banned: true,
-        admins: true,
-        muted: true,
-        messages: {
-          from: true,
-        },
+        users: true,
       },
     });
     const chans = tmp.map((chan) => {
@@ -78,12 +85,6 @@ export class ChannelService {
       relations: {
         users: true,
         owner: true,
-        banned: true,
-        admins: true,
-        muted: true,
-        messages: {
-          from: true,
-        },
       },
       where: {
         type: "private",
@@ -122,10 +123,11 @@ export class ChannelService {
   }
 
   async setChanPassword(channel: Channel, pass: string) {
-    const chan = await this.chanRepo.update(channel.id, {
+    await this.chanRepo.update(channel.id, {
       password: await bcrypt.hash(pass, 10),
       type: "protected",
     });
+    let chan = await this.getChannelWithUsers(channel.id);
     return chan;
   }
 
@@ -173,20 +175,9 @@ export class ChannelService {
   }
 
   async removeUserChan(user: User, chan: Channel) {
-    if (chan.admins.find((u) => u.id === user.id)) {
-      await this.chanRepo
-        .createQueryBuilder()
-        .relation(Channel, "admins")
-        .of(chan)
-        .remove(user);
-    }
-    if (chan.users.find((u) => u.id === user.id)) {
-      await this.chanRepo
-        .createQueryBuilder()
-        .relation(Channel, "users")
-        .of(chan)
-        .remove(user);
-    }
+    chan.admins = chan.admins.filter((u) => u.id !== user.id);
+    chan.users = chan.users.filter((u) => u.id !== user.id);
+    return this.chanRepo.save(chan);
   }
 
   async deleteChan(chan: Channel) {
@@ -209,22 +200,22 @@ export class ChannelService {
   }
 
   async leaveChan(user: User, chan: Channel) {
+    let channel = await this.findChannelById(chan.id);
     //console.log("chan1", chan);
-    await this.removeUserChan(user, chan);
-    chan = await this.findChannelById(chan.id);
+    channel = await this.removeUserChan(user, channel);
 
     //console.log("chan2", chan);
 
-    if (chan.owner.id === user.id) {
-      if (chan.admins && chan.admins[0])
-        chan = await this.setChanOwner(chan.admins[0], chan);
-      else if (chan.users && chan.users[0])
-        chan = await this.setChanOwner(chan.users[0], chan);
+    if (channel.owner.id === user.id) {
+      if (channel.admins && channel.admins[0])
+        channel = await this.setChanOwner(channel.admins[0], channel);
+      else if (channel.users && channel.users[0])
+        channel = await this.setChanOwner(channel.users[0], channel);
       else {
-        await this.deleteChan(chan);
+        await this.deleteChan(channel);
         return null;
       }
     }
-    return chan;
+    return channel;
   }
 }

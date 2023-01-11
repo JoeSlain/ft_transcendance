@@ -31,3 +31,8 @@
 .customButton:hover {
   color: lightgrey;
 }
+
+.inputEntry {
+  text-align: left;
+  padding-left: 5px;
+}

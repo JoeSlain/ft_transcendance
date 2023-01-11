@@ -9,6 +9,7 @@ import useClickListener from "../../hooks/useClickListener";
 import PasswordDialog from "./channelUtils/PasswordDialog";
 import SetPassword from "./channelUtils/SetPassword";
 import { ModalContext } from "../../context/modalContext";
+import ChanEntry from "./channelUtils/ChanEntry";
 
 type ChannelProps = {
   channels: channelType[];
@@ -40,7 +41,7 @@ function Channel({ channels }: ChannelProps) {
   useClickListener({ selected, setSelected });
 
   return (
-    <div className="chanEntries">
+    <>
       <ChanContextMenu
         channel={selected}
         setChannel={setSelected}
@@ -49,7 +50,7 @@ function Channel({ channels }: ChannelProps) {
       {channels &&
         channels.map((chan) => (
           <div
-            className="chanEntry"
+            className="chanEntries"
             key={chan.id}
             onContextMenu={(e) => {
               e.preventDefault();
@@ -59,10 +60,10 @@ function Channel({ channels }: ChannelProps) {
             }}
             onClick={(e) => handleClick(e, chan)}
           >
-            {chan.name}
+            <ChanEntry channel={chan} />
           </div>
         ))}
-    </div>
+    </>
   );
 }
 
@@ -84,7 +85,7 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
           onClick={() => setShowChanMenu(true)}
         >
           {" "}
-          +{" "}
+          New{" "}
         </button>
       </div>
 

@@ -35,8 +35,15 @@ export default function SetPassword({ channel }: Props) {
   return (
     <>
       <div className="modalBody">
-        <div>Old Password :</div>
-        <input value={oldPass} onChange={(e) => setOldPass(e.target.value)} />
+        {channel.type === "protected" && (
+          <>
+            <div>Old Password :</div>
+            <input
+              value={oldPass}
+              onChange={(e) => setOldPass(e.target.value)}
+            />
+          </>
+        )}
         <div>New Password :</div>
         <input value={newPass} onChange={(e) => setNewPass(e.target.value)} />
       </div>

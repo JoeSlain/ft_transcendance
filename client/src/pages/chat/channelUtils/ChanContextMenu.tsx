@@ -39,9 +39,12 @@ const PrivateContextMenu = ({ channel, setChannel }: ChannelProps) => {
   );
 };
 
-const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
+const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
+  const owned = channel.owner.id === user.id;
+  const userInChannel =
+    channel.users && channel.users.find((u) => u.id === user.id);
 
   const setPassword = () => {
     setModal({
@@ -67,15 +70,56 @@ const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
     });
   };
 
-  return user.id === channel.owner.id ? (
-    <ul>
-      <li onClick={removePassword}> Remove Password </li>
-      <li onClick={setPassword}> Change Password </li>
-      <li onClick={handleDelete}> Delete </li>
-    </ul>
-  ) : (
-    <></>
-  );
+  if (userInChannel) {
+    return (
+      <ul>
+        {owned && (
+          <>
+            <li onClick={removePassword}> Remove Password </li>
+            <li onClick={setPassword}> Change Password </li>
+          </>
+        )}
+        <li onClick={handleDelete}> Leave </li>
+      </ul>
+    );
+  }
+  return <></>;
+};
+
+const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
+  const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
+  const owned = channel.owner.id === user.id;
+  const userInChannel =
+    channel.users && channel.users.find((u) => u.id === user.id);
+
+  const setPassword = () => {
+    setModal({
+      header: `Set ${channel.name} password`,
+      body: <SetPassword channel={channel} />,
+    });
+  };
+
+  const handleDelete = () => {
+    setModal({
+      header: `Delete ${channel.name}`,
+      body: <DeleteChannel channel={channel} />,
+    });
+  };
+
+  if (userInChannel) {
+    return (
+      <ul>
+        {owned && (
+          <>
+            <li onClick={setPassword}> Set Password </li>
+          </>
+        )}
+        <li onClick={handleDelete}> Leave </li>
+      </ul>
+    );
+  }
+  return <></>;
 };
 
 export const ChanContextMenu = ({
@@ -93,9 +137,14 @@ export const ChanContextMenu = ({
     else if (channel.type === "protected")
       return (
         <ContextMenu top={points.y} left={points.x}>
-          <PublicContextMenu channel={channel} setChannel={setChannel} />
+          <ProtectedContextMenu channel={channel} setChannel={setChannel} />
         </ContextMenu>
       );
+    return (
+      <ContextMenu top={points.y} left={points.x}>
+        <PublicContextMenu channel={channel} setChannel={setChannel} />
+      </ContextMenu>
+    );
   }
   return <></>;
 };

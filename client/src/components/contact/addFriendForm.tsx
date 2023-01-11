@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import axios from "axios";
 import User from "../../hooks/User";
@@ -8,7 +8,8 @@ export default function AddFriend() {
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
 
-  const addFriend = () => {
+  const addFriend = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     axios
       .get(`http://localhost:3001/api/users/username/${name}`, {
         withCredentials: true,
@@ -22,22 +23,22 @@ export default function AddFriend() {
             to: response.data,
             acceptEvent: "acceptFriendRequest",
           });
-          setName("");
         }
+        setName("");
       });
   };
 
   return (
-    <div className="contactForm">
+    <form className="contactForm" onSubmit={addFriend}>
       <input
         className="contactFormInput"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <button onClick={addFriend} className="contactFormButton">
+      <button type="submit" className="contactFormButton">
         {" "}
         +{" "}
       </button>
-    </div>
+    </form>
   );
 }
