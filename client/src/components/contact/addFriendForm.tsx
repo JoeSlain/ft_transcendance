@@ -28,7 +28,7 @@ export default function AddFriend() {
   };
 
   return (
-    <div className="">
+    <div className="pt-4">
       <div className="">
         <input
           value={name}

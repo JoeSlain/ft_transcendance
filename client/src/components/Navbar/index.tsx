@@ -27,7 +27,7 @@ export default function Navbar({ setIsLogged }: IProps) {
   }
   return (
     <>
-      <nav className="navigation bg-ata-red pt-3 pb-3">
+      <nav className="navigation bg-ata-red pt-7">
         <div className="navigation-menu bg-ata-red flex justify-center ">
           <ul>
             <li>{isLogged && <Notifs />}</li>
