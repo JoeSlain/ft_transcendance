@@ -1,8 +1,10 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ChatContext, GameContext } from "../../context/socketContext";
 import { userType } from "../../types/userType";
 import { ModalContext } from "../../context/modalContext";
 import User from "../../hooks/User";
+import useModal from "../../hooks/useModal";
+import DeleteFriend from "./DeleteFriend";
 
 export type UserProps = {
   selected: userType;
@@ -27,12 +29,7 @@ export const UserContextList = ({ selected }: UserProps) => {
   const handleDelete = () => {
     setModal({
       header: "Delete Friend",
-      body: `Are you sure you want to remove ${selected.username} from your friends  ?`,
-      acceptEvent: "deleteFriend",
-      data: {
-        selected,
-        user,
-      },
+      body: <DeleteFriend friend={selected} />,
     });
   };
 

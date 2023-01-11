@@ -42,14 +42,7 @@ export default function Router() {
           <Navbar setIsLogged={setIsLogged} />
           <div className="main heightMinusNav">
             <div className="w-[75%] ">
-              {modal && (
-                <Modal
-                  header={modal.header}
-                  body={modal.body}
-                  acceptEvent={modal.acceptEvent}
-                  data={modal.data}
-                />
-              )}
+              {modal && <Modal header={modal.header} body={modal.body} />}
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route

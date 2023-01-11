@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import axios from "axios";
 import User from "../../hooks/User";
@@ -8,7 +8,8 @@ export default function AddFriend() {
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
 
-  const addFriend = () => {
+  const addFriend = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     axios
       .get(`http://localhost:3001/api/users/username/${name}`, {
         withCredentials: true,
@@ -17,13 +18,13 @@ export default function AddFriend() {
         if (!response.data) alert(`user ${name} not found`);
         else {
           socket.emit("notif", {
-            type: "Friend request",
+            type: "Friend Request",
             from: user,
             to: response.data,
             acceptEvent: "acceptFriendRequest",
           });
-          setName("");
         }
+        setName("");
       });
   };
 
@@ -41,7 +42,7 @@ export default function AddFriend() {
          */}{" "}
       </div>
       <div className="mt-2">
-        <button onClick={addFriend}  className="btn btn-circle">
+        <button onClick={addFriend} className="btn btn-circle">
           +
         </button>
         {/*           <button onClick={addFriend}> + </button>

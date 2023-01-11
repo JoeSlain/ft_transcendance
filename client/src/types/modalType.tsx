@@ -1,6 +1,7 @@
+import { ReactNode } from "react";
+
 export type ModalType = {
   header: string;
-  body: string;
-  acceptEvent: string;
-  data: any;
+  body: string | ReactNode;
+  //handleAccept: () => void;
 };

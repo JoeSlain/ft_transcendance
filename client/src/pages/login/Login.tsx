@@ -19,7 +19,8 @@ export default function Login() {
     window.location.assign("http://localhost:3001/api/auth/login");
   };
 
-  const handleDevLogin = () => {
+  const handleDevLogin = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     axios
       .post(
         "http://localhost:3001/api/auth/devlog",
@@ -38,7 +39,7 @@ export default function Login() {
   if (devlog) {
     return (
       <div className="center">
-        <div className="form">
+        <form className="form" onSubmit={handleDevLogin}>
           <div className="formInput">
             <div className="formInputName"> Username </div>
             <input
@@ -48,7 +49,7 @@ export default function Login() {
             />
           </div>
           <div className="formButtons">
-            <button className="button-auth" onClick={handleDevLogin}>
+            <button className="button-auth" type="submit">
               {" "}
               Connect{" "}
             </button>
@@ -62,7 +63,7 @@ export default function Login() {
               Cancel
             </button>
           </div>
-        </div>
+        </form>
       </div>
     );
   } else {
