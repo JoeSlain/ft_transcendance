@@ -26,7 +26,7 @@ export default function Navbar({ setIsLogged }: IProps) {
   }
   return (
     <>
-      <nav className="navigation bg-ata-red pt-4">
+      <nav className="navigation bg-ata-red pt-3 pb-3">
         <div className="navigation-menu bg-ata-red flex justify-center ">
           <ul>
             <li className=" font-retro text-ata-yellow hover:bo">

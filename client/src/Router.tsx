@@ -34,7 +34,7 @@ export default function Router() {
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={{ user, setUser }}>
-        {isLogged === true &&<Navbar setIsLogged={setIsLogged} />}
+        <Navbar setIsLogged={setIsLogged} />
         <div className="main heightMinusNav">
           <div className="w-[75%] ">
             <Routes>

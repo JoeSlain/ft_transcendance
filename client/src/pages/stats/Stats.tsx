@@ -56,7 +56,7 @@ export default function Stats(props: { userId: number }) {
       <>
         <ProfileNavbar userId={props.userId} />
 
-        <div className="flex flex-col justify-center gap-10 items-center heightMinusNavProfile ">
+        <div className="flex flex-col justify-center gap-10 items-center pt-5 ">
           <div className="stats shadow mb-5 justify-center max-w-[25%] ">
             <div className="stat min-w-[33%]" style={win}>
               <div className="stat-title">Wins</div>
