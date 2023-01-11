@@ -265,7 +265,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return null;
     }
     if (channel.type === "protected") {
-      const check = await bcrypt.compare(
+      const check = await this.channelService.checkChanPassword(
         data.channel.password,
         channel.password
       );
@@ -343,5 +343,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!message)
       this.server.to(client.id).emit("error", "error creating message");
     else this.server.to(data.channel.socketId).emit("newMessage", message);
+  }
+
+  async checkChanPassword(client: Socket, data: any) {
+    const channel = await this.channelService.findChannelById(data.channel.id);
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return false;
+    }
+    if (channel.type === "protected") {
+      const check = await this.channelService.checkChanPassword(
+        data.channel.password,
+        channel.password
+      );
+      if (!check) {
+        this.server.to(client.id).emit("error", "wrong password");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @SubscribeMessage("setChannelPassword")
+  async setChannelPassword(client: Socket, data: any) {
+    console.log("set chan pass", data);
+    if (!this.checkChanPassword(client, data)) return;
+    const channel = await this.channelService.setChanPassword(
+      data.channel,
+      data.newPassword
+    );
+    if (data.channel.type === "public") {
+      channel.password = null;
+      console.log("channel returned", channel);
+      this.server.emit("updateChannel", channel);
+    }
+  }
+
+  @SubscribeMessage("removeChannelPassword")
+  async removeChannelPassword(client: Socket, data: any) {
+    console.log("remove chan pass", data);
+    if (!this.checkChanPassword) return;
   }
 }

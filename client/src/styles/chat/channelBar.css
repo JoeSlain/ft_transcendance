@@ -1,6 +1,7 @@
 /* CHAN BAR */
 .channelHeader {
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .channelBody {
@@ -36,9 +37,14 @@
   margin-top: 5px;
 }
 
+.chanEntry:hover {
+  color: yellow;
+  cursor: pointer;
+}
+
 /* ADD CHANNEL */
 #chanAddButton {
-  width: 30px;
+  width: 100px;
   border-radius: 0;
 }
 

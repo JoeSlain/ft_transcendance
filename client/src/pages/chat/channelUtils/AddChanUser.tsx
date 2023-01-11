@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import User from "../../../hooks/User";
 import { channelType } from "../../../types/channelType";
 import { ChatContext } from "../../../context/socketContext";
@@ -13,7 +13,8 @@ export default function AddChanUser({ selected }: Props) {
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     axios
       .get(`http://localhost:3001/api/users/username/${name}`, {
         withCredentials: true,
@@ -34,16 +35,16 @@ export default function AddChanUser({ selected }: Props) {
   };
 
   return (
-    <div className="contactForm">
+    <form onSubmit={handleSubmit} className="contactForm">
       <input
         className="contactFormInput"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
-      <button className="contactFormButton" onClick={handleSubmit}>
+      <button className="contactFormButton" type="submit">
         {" "}
         +{" "}
       </button>
-    </div>
+    </form>
   );
 }

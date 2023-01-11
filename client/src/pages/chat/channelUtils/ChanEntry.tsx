@@ -1,16 +1,17 @@
+import { useContext } from "react";
 import { channelType } from "../../../types/channelType";
+import User from "../../../hooks/User";
 
 type Props = {
   channel: channelType;
-  selected: channelType | null;
 };
 
-export default function ChanEntry({ channel, selected }: Props) {
-  const isSelected = selected && selected.id === channel.id;
-  const color = isSelected ? "lightgrey" : "white";
+export default function ChanEntry({ channel }: Props) {
+  const { user } = useContext(User);
+  const color = channel.owner.id === user.id ? "yellow" : "white";
 
   return (
-    <div className="chanEntry" style={{ color }}>
+    <div className="chanEntry" style={{ color: color }}>
       {channel.name}
     </div>
   );

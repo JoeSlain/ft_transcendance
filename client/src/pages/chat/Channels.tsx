@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
 import User from "../../hooks/User";
@@ -6,8 +6,10 @@ import AddChannel from "./channelUtils/AddChannel";
 import "../../styles/chat/channelBar.css";
 import { ChanContextMenu } from "./channelUtils/ChanContextMenu";
 import useClickListener from "../../hooks/useClickListener";
-import PasswordDialog from "./channelUtils/passwordDialog";
-import { createShorthandPropertyAssignment } from "typescript";
+import PasswordDialog from "./channelUtils/PasswordDialog";
+import SetPassword from "./channelUtils/SetPassword";
+import { ModalContext } from "../../context/modalContext";
+import ChanEntry from "./channelUtils/ChanEntry";
 
 type ChannelProps = {
   channels: channelType[];
@@ -16,9 +18,9 @@ type ChannelProps = {
 function Channel({ channels }: ChannelProps) {
   const [points, setPoints] = useState({ x: 0, y: 0 });
   const [selected, setSelected] = useState<channelType | null>(null);
-  const [protectedChan, setProtectedChan] = useState<channelType | null>(null);
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
 
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -28,7 +30,10 @@ function Channel({ channels }: ChannelProps) {
     if (e.detail === 2) {
       console.log("left click", channel);
       if (channel.type === "protected") {
-        setProtectedChan(channel);
+        setModal({
+          header: `Enter ${channel.name} password`,
+          body: <PasswordDialog channel={channel} />,
+        });
       } else socket.emit("joinChannel", { user, channel });
     }
   };
@@ -36,7 +41,7 @@ function Channel({ channels }: ChannelProps) {
   useClickListener({ selected, setSelected });
 
   return (
-    <div className="chanEntries">
+    <>
       <ChanContextMenu
         channel={selected}
         setChannel={setSelected}
@@ -45,7 +50,7 @@ function Channel({ channels }: ChannelProps) {
       {channels &&
         channels.map((chan) => (
           <div
-            className="chanEntry"
+            className="chanEntries"
             key={chan.id}
             onContextMenu={(e) => {
               e.preventDefault();
@@ -55,16 +60,10 @@ function Channel({ channels }: ChannelProps) {
             }}
             onClick={(e) => handleClick(e, chan)}
           >
-            {chan.name}
+            <ChanEntry channel={chan} />
           </div>
         ))}
-      {protectedChan && (
-        <PasswordDialog
-          channel={protectedChan}
-          setProtectedChan={setProtectedChan}
-        />
-      )}
-    </div>
+    </>
   );
 }
 
@@ -86,7 +85,7 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
           onClick={() => setShowChanMenu(true)}
         >
           {" "}
-          +{" "}
+          New{" "}
         </button>
       </div>
 
