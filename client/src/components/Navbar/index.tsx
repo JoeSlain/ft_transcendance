@@ -9,6 +9,7 @@ import User from "../../hooks/User";
 import { userType } from "../../types/userType";
 import Auth from "../../hooks/Auth";
 import { ChatContext, GameContext } from "../../context/socketContext";
+import Notifs from "../notifs/notifs";
 
 type IProps = {
   setIsLogged: (props: boolean) => void;
@@ -29,6 +30,9 @@ export default function Navbar({ setIsLogged }: IProps) {
       <nav className="navigation bg-ata-red pt-3 pb-3">
         <div className="navigation-menu bg-ata-red flex justify-center ">
           <ul>
+            <li>
+              <Notifs />
+              </li>
             <li className=" font-retro text-ata-yellow hover:bo">
               <NavLink to="/Home">HOME</NavLink>
             </li>
