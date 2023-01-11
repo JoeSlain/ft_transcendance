@@ -1,4 +1,3 @@
-import { ReadyStyle } from "../styles/readyStyle";
 import { ModalType } from "../types/modalType";
 import "../styles/modal.css";
 import { useContext } from "react";
@@ -17,6 +16,10 @@ export default function Modal({ header, body, acceptEvent, data }: ModalType) {
   const handleDecline = () => {
     setModal(null);
   };
+
+  console.log("modal");
+  console.log("header", header);
+  console.log("body", body);
 
   return (
     <div className="modal">
