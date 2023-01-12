@@ -57,19 +57,19 @@ export default function Stats(props: { userId: number }) {
         <ProfileNavbar userId={props.userId} />
 
         <div className="flex flex-col justify-center gap-10 items-center pt-5 ">
-          <div className="stats shadow mb-5 justify-center max-w-[25%] ">
-            <div className="stat min-w-[33%]" style={win}>
+          <div className="stats shadow mb-5 justify-center">
+            <div className="stat " style={win}>
               <div className="stat-title">Wins</div>
               <div className="stat-value">{data.n_win}</div>
               <div className="stat-desc">
                 {(data.n_win / (data.n_lose + data.n_win)) * 100}% wins
               </div>
             </div>
-            <div className="stat min-w-[33%]">
+            <div className="stat ">
               <div className="stat-title">Elo</div>
               <div className="stat-value">{data.elo}</div>
             </div>
-            <div className="stat min-w-[33%]" style={lose}>
+            <div className="stat " style={lose}>
               <div className="stat-title">Losses</div>
               <div className="stat-value">{data.n_lose}</div>
               <div className="stat-desc">

@@ -42,7 +42,7 @@ export default function Router() {
           <Navbar setIsLogged={setIsLogged} />
           {modal && <Modal header={modal.header} body={modal.body} />}
           <div className="main heightMinusNav">
-            <div className="w-[75%] ">
+            <div className="w-[80%] ">
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route
@@ -67,7 +67,7 @@ export default function Router() {
                 </Route>
               </Routes>
             </div>
-            <div className="w-[25%]">{isLogged === true && <Contact />}</div>
+            <div className="w-[20%]">{isLogged === true && <Contact />}</div>
           </div>
         </ModalContext.Provider>
       </User.Provider>
