@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
 import { channelType } from "../../../types/channelType";
@@ -15,20 +15,22 @@ const PasswordDialog = ({ channel }: Props) => {
   const { setModal } = useContext(ModalContext);
   const [pass, setPass] = useState("");
 
-  const handleAccept = () => {
+  const handleAccept = (e: React.SyntheticEvent) => {
+    e.preventDefault();
     channel.password = pass;
+    console.log("pass", channel.password);
     socket.emit("joinChannel", { channel, user });
     setModal(null);
   };
 
   return (
-    <form className="modalForm">
+    <form className="modalForm" onSubmit={handleAccept}>
       <div className="modalBody">
         <div> Password : </div>
         <input onChange={(e) => setPass(e.target.value)} />
       </div>
       <div className="modalButtons">
-        <button className="modalButton" onClick={handleAccept}>
+        <button className="modalButton" type="submit">
           Confirm
         </button>
         <button className="modalButton" onClick={() => setModal(null)}>

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
+import { ModalContext } from "../../../context/modalContext";
 
 type AddChanProps = {
   setShowChanMenu: (show: boolean) => void;
@@ -45,12 +46,13 @@ const DropDown = ({ setSelected }: DropDownProps) => {
   );
 };
 
-const AddChannel = ({ setShowChanMenu }: AddChanProps) => {
+const AddChannel = () => {
   const [chanName, setChanName] = useState("");
   const [password, setPassword] = useState("");
   const [selected, setSelected] = useState("public");
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
 
   const createChannel = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -61,43 +63,37 @@ const AddChannel = ({ setShowChanMenu }: AddChanProps) => {
       password,
     };
     socket.emit("createChannel", newChan);
-    setShowChanMenu(false);
+    setModal(null);
   };
 
   return (
-    <div className="modal">
-      <div className="modalHeader">AddChannel</div>
-      <form className="modalForm" onSubmit={createChannel}>
-        <div className="modalBody">
+    <form className="modalForm" onSubmit={createChannel}>
+      <div className="modalBody">
+        <ChanInput
+          title="Name"
+          chanEntry={chanName}
+          setChanEntry={setChanName}
+        />
+        <DropDown setSelected={setSelected} />
+        {selected === "protected" && (
           <ChanInput
-            title="Name"
-            chanEntry={chanName}
-            setChanEntry={setChanName}
+            title="Password"
+            chanEntry={password}
+            setChanEntry={setPassword}
           />
-          <DropDown setSelected={setSelected} />
-          {selected === "protected" && (
-            <ChanInput
-              title="Password"
-              chanEntry={password}
-              setChanEntry={setPassword}
-            />
-          )}
-        </div>
-        <div className="modalButtons">
-          <button className="modalButton" type="submit">
-            {" "}
-            Create{" "}
-          </button>
-          <button
-            className="modalButton"
-            onClick={() => setShowChanMenu(false)}
-          >
-            {" "}
-            Cancel{" "}
-          </button>
-        </div>
-      </form>
-    </div>
+        )}
+      </div>
+      <div className="modalButtons">
+        <button className="modalButton" type="submit">
+          {" "}
+          Create{" "}
+        </button>
+        <button className="modalButton" onClick={() => setModal(null)}>
+          {" "}
+          Cancel{" "}
+        </button>
+      </div>
+    </form>
   );
 };
 

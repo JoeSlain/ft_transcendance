@@ -255,25 +255,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  async checkChanPassword(client: Socket, data: any) {
+    const channel = await this.channelService.findChannelById(data.channel.id);
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return false;
+    }
+    if (channel.type === "protected") {
+      let check = false;
+      if (data.channel.password) {
+        console.log("data pass", data.channel.password);
+        console.log("chan pass", channel.password);
+        check = await this.channelService.checkChanPassword(
+          data.channel.password,
+          channel.password
+        );
+      }
+      if (!check) {
+        this.server.to(client.id).emit("error", "wrong password");
+        return false;
+      }
+    }
+    return true;
+  }
+
   @SubscribeMessage("joinChannel")
   async joinChannel(client: Socket, data: any) {
     console.log("joinChannel");
+    if (!(await this.checkChanPassword(client, data))) {
+      console.log("wrong pass return");
+      return;
+    }
+    console.log("good pass");
     let channel = await this.channelService.findChannelById(data.channel.id);
-
-    if (!channel) {
-      this.server.to(client.id).emit("error", "invalid channel");
-      return null;
-    }
-    if (channel.type === "protected") {
-      const check = await this.channelService.checkChanPassword(
-        data.channel.password,
-        channel.password
-      );
-      if (!check) {
-        this.server.to(client.id).emit("error", "invalid password");
-        return null;
-      }
-    }
     if (!this.channelService.findUserInChan(data.user.id, channel)) {
       channel = await this.channelService.addUserChan(
         data.user,
@@ -283,8 +297,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     data.channel = { ...channel, password: null };
     client.join(data.channel.socketId);
-    client.to(data.channel.socketId).emit("updateSelected", data);
-    this.server.to(client.id).emit("joinedChannel", data);
+    client.to(data.channel.socketId).emit("updateChannel", data.channel);
+    this.server.to(client.id).emit("joinedChannel", data.channel);
     return data.channel;
   }
 
@@ -298,12 +312,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.channel
     );
     //console.log("postleave", data.channel);
-    this.server.to(client.id).emit("removeChannel", data.channel);
-    client.leave(data.channel.socketId);
+    if (data.channel.type === "private")
+      this.server.to(client.id).emit("removeChannel", data.channel);
     if (channel) {
-      //console.log("returned channel", channel);
+      console.log("returned channel", channel);
       this.server.to(data.channel.socketId).emit("leftChannel", channel);
     }
+    client.leave(data.channel.socketId);
   }
 
   @SubscribeMessage("chanInvite")
@@ -343,25 +358,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!message)
       this.server.to(client.id).emit("error", "error creating message");
     else this.server.to(data.channel.socketId).emit("newMessage", message);
-  }
-
-  async checkChanPassword(client: Socket, data: any) {
-    const channel = await this.channelService.findChannelById(data.channel.id);
-    if (!channel) {
-      this.server.to(client.id).emit("error", "channel not found");
-      return false;
-    }
-    if (channel.type === "protected") {
-      const check = await this.channelService.checkChanPassword(
-        data.channel.password,
-        channel.password
-      );
-      if (!check) {
-        this.server.to(client.id).emit("error", "wrong password");
-        return false;
-      }
-    }
-    return true;
   }
 
   @SubscribeMessage("setChannelPassword")

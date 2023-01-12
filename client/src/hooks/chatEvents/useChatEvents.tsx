@@ -23,6 +23,8 @@ export default function useChatEvents({
   // update functions
   const updateSelected = (newChan: channelType) => {
     setSelected((prev: any) => {
+      console.log("update selected", newChan);
+      console.log("prev", prev);
       if (prev && prev.id === newChan.id) {
         console.log("update selected");
         return newChan;
@@ -57,6 +59,7 @@ export default function useChatEvents({
 
   // on mount
   useEffect(() => {
+    console.log("use chat effect");
     // get Channels
     axios
       .get("http://localhost:3001/api/chat/privateChannels", {
@@ -83,9 +86,10 @@ export default function useChatEvents({
       else setPublicChans((prev: any) => [...prev, channel]);
     });
 
-    socket.on("joinedChannel", (data) => {
-      console.log("joined channel", data.channel);
-      setSelected(data.channel);
+    socket.on("joinedChannel", (channel) => {
+      console.log("joined channel", channel);
+      setSelected(channel);
+      updateChannel(channel);
     });
 
     socket.on("updateChannel", (channel) => {
@@ -104,14 +108,14 @@ export default function useChatEvents({
         setPrivateChans((prev: any) =>
           prev.filter((chan: any) => chan.id !== channel.id)
         );
-      else
+      /*else
         setPublicChans((prev: any) =>
           prev.filter((chan: any) => chan.id !== channel.id)
         );
       setSelected((prev: any) => {
         if (prev && prev.id === channel.id) return null;
         return prev;
-      });
+      });*/
     });
 
     socket.on("leftChannel", (channel) => {
