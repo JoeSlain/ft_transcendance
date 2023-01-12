@@ -1,6 +1,7 @@
 .chat {
   display: flex;
   height: 100%;
+  color: black;
 }
 
 .chatMain {

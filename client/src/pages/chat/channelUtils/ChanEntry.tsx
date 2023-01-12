@@ -8,7 +8,7 @@ type Props = {
 
 export default function ChanEntry({ channel }: Props) {
   const { user } = useContext(User);
-  const color = channel.owner.id === user.id ? "yellow" : "white";
+  const color = channel.owner.id === user.id ? "red" : "black";
 
   return (
     <div className="chanEntry" style={{ color: color }}>
