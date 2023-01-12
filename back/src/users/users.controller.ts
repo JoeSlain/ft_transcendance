@@ -123,6 +123,20 @@ export class UsersController {
     return user;
   }
 
+  /**
+   * @brief Updates user's username in database
+   * @param req : userType
+   * @returns updated user
+   */
+  @Post("updateUsername")
+  @UseGuards(TwoFactorGuard)
+  async updateUsername(@Req() req) {
+    console.log("REQUEST BODY: ", req.body);
+    const user = await this.usersService.updateUsername(req.body.id, req.body.username).then((res) => {console.log("Username updated: ", res)})
+    .catch((e) => console.log("failed to update username: ", e.message));
+    return user;
+  }
+
   @Post("uploadAvatar")
   @UseGuards(TwoFactorGuard)
   @UseInterceptors(

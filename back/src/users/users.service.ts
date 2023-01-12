@@ -114,6 +114,16 @@ export class UsersService {
     const modifiedUser = await this.getById(userId);
     return modifiedUser;
   }
+
+  async updateUsername(userId: number, username: string) {
+    console.log("🚀 ~ file: users.service.ts:119 ~ UsersService ~ updateUsername ~ username", username)
+
+    await this.usersRepository.update(userId, {
+      username: username,
+    });
+    console.log("getting USERBYID: ", await this.getById(userId));
+    return this.getById(userId);
+  }
   async updateUser(newUser: User): Promise<User> {
     console.log(
       "🚀 ~ file: users.service.ts:135 ~ UsersService ~ newUser.id",

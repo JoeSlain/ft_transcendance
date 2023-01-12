@@ -62,30 +62,28 @@ export default function UserInfos() {
       user.avatar = await getAvatar(user.id);
       setAvatar({ ...avatar, url: user.avatar });
     }
-    saveItem("user", user);
     if (formValue.username !== user.username) {
       user.username = formValue.username;
+      console.log("In username avatar is:  ", user.avatar)
       await axios
         .post(
-          `${BACK_ROUTE}users/updateUser`,
-          { user },
+          `${BACK_ROUTE}users/updateUsername`,
+          { id: user.id, username: formValue.username },
           {
             withCredentials: true,
           }
         )
         .then((data) => {
-          console.log("Username changed: ", data);
+          console.log("Username changed: ", data.data);
         })
         .catch((err) => {
           console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ err", err);
         });
     }
-    await getSavedItem("user");
+    saveItem("user", user);
   }
   function handleAvatar(data: any) {
     //Handles avatar upload
-    // console.log("🚀 ~ file: Component.tsx:58 ~ handleAvatar ~ data", data);
-
     setAvatar({
       url: URL.createObjectURL(data.target.files[0]),
       file: data.target.files[0],
@@ -111,7 +109,7 @@ export default function UserInfos() {
             <input defaultValue={user.username} {...register("username")} />
           </div>
           <button
-            className="btn mt-2 normal-case  text-slate-200 center"
+            className="btn mt-2 normal-case text-slate-200 center"
             type="submit"
           >
             Submit
