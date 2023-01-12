@@ -40,9 +40,9 @@ export default function Router() {
       <User.Provider value={{ user, setUser }}>
         <ModalContext.Provider value={{ setModal }}>
           <Navbar setIsLogged={setIsLogged} />
+              {modal && <Modal header={modal.header} body={modal.body} />}
           <div className="main heightMinusNav">
             <div className="w-[75%] ">
-              {modal && <Modal header={modal.header} body={modal.body} />}
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route
