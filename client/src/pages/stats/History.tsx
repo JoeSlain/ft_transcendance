@@ -40,7 +40,7 @@ export default function History(props: { userId: number }) {
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
-            <tr>
+            <tr >
               <th>Game Id</th>
               <th>Opponents</th>
               <th>Winner</th>
@@ -50,8 +50,8 @@ export default function History(props: { userId: number }) {
             </tr>
           </thead>
           <tbody>
-            {games.map((row: any) => (
-              <TableRow row={row} />
+            {games.map((row: any, index) => (
+              <TableRow row={row} key={index}/>
             ))}
           </tbody>
         </table>
