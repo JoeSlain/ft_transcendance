@@ -23,7 +23,8 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background-color: black;
+  background-color: rgba(128, 128, 128, 0.329);
+  color: white;
 }
 
 .usersTitle {

@@ -17,6 +17,7 @@ import { RoomService } from "src/game/room.service";
 import { ChannelService } from "./channel.service";
 import * as bcrypt from "bcrypt";
 import { MessageService } from "./message.service";
+import { RestrictionService } from "./restrictions.service";
 
 @WebSocketGateway(3002, {
   cors: {
@@ -31,7 +32,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly notifService: NotifService,
     private readonly roomService: RoomService,
     private readonly channelService: ChannelService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly restrictionService: RestrictionService
   ) {}
 
   @WebSocketServer() server: Namespace;
@@ -294,6 +296,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         channel,
         "users"
       );
+      if (!channel.owner)
+        channel = await this.channelService.setChanOwner(data.user, channel);
     }
     data.channel = { ...channel, password: null };
     client.join(data.channel.socketId);
@@ -379,5 +383,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async removeChannelPassword(client: Socket, data: any) {
     console.log("remove chan pass", data);
     if (!this.checkChanPassword) return;
+  }
+
+  @SubscribeMessage("banUser")
+  async banUser(client: Socket, data: any) {
+    console.log("ban user event");
+    let channel = await this.channelService.findChannelById(data.channel.id);
+
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return;
+    }
+    channel = await this.restrictionService.ban(data.user, channel, data.time);
+    console.log("returned channel", channel);
+    const to = this.chatService.getUser(data.user.id);
+    if (to) this.server.to(to).emit("banned", data);
+    this.server.to(channel.socketId).emit("userBanned", data);
   }
 }

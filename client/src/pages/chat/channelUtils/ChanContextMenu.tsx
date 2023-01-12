@@ -89,7 +89,7 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
 const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
-  const owned = channel.owner.id === user.id;
+  const owned = channel.owner && channel.owner.id === user.id;
   const userInChannel =
     channel.users && channel.users.find((u) => u.id === user.id);
 

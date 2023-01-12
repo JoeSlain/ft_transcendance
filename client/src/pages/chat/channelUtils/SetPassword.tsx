@@ -16,9 +16,6 @@ export default function SetPassword({ channel }: Props) {
   console.log("set pass");
 
   const handleAccept = () => {
-    console.log("setPassword");
-    console.log("oldPass", oldPass);
-    console.log("newPass", newPass);
     channel.password = oldPass;
     socket.emit("setChannelPassword", {
       channel,
