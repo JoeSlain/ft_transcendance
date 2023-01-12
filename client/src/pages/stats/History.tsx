@@ -3,46 +3,44 @@ import Loading from "../../components/loading";
 import Error from "../../components/error";
 import { getUser } from "../../services/User/GetUser";
 
-
-const games = [{
-  userId1: 123,
-  userId2: 123,
-  winnerId: 123,
-  score: "3/0",
-  status: "Over",
-  date: new Date(),
-  gameId: 89043,
-},
-{
-  userId1: 123,
-  userId2: 123,
-  winnerId: 123,
-  score: "3/0",
-  status: "Over",
-  date: new Date(),
-  gameId: 89043,
-}
-]
+const games = [
+  {
+    userId1: 123,
+    userId2: 123,
+    winnerId: 123,
+    score: "3/0",
+    status: "Over",
+    date: new Date().toISOString().slice(0, 10),
+    gameId: 89043,
+  },
+  {
+    userId1: 123,
+    userId2: 123,
+    winnerId: 123,
+    score: "3/0",
+    status: "Over",
+    date: new Date().toISOString().slice(0, 10),
+    gameId: 89043,
+  },
+];
 
 export default function History(props: { userId: number }) {
   let { isLoading, data, error } = useQuery({
     queryKey: ["userData", props.userId],
     queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
   });
-  if (isLoading)
-    return <Loading/>
+  if (isLoading) return <Loading />;
   if (error) {
-    return <Error err="Error fetching user"/>
+    return <Error err="Error fetching user" />;
   }
   if (data) {
-
     console.log("games: ", data.games);
     return (
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
             <tr>
-              <th></th>
+              <th>Game Id</th>
               <th>Opponents</th>
               <th>Winner</th>
               <th>Score</th>
@@ -63,11 +61,18 @@ export default function History(props: { userId: number }) {
 }
 
 function TableRow(props: { row: any }) {
+  console.log("🚀 ~ file: History.tsx:66 ~ TableRow ~ row", props.row);
+
   return (
-    <tr>
-      {props.row.map((val: any) => (
-        <td>{val}</td>
-      ))}
-    </tr>
+    <>
+      <tr>
+        <td>{props.row.gameId}</td>
+        <td>{props.row.userId1}</td>
+        <td>{props.row.userId2}</td>
+        <td>{props.row.score}</td>
+        <td>{props.row.date}</td>
+        <td>{props.row.status}</td>
+      </tr>
+    </>
   );
 }
