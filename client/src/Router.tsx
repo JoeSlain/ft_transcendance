@@ -24,6 +24,7 @@ import Stats from "./pages/stats/Stats";
 import { ModalType } from "./types/modalType";
 import { ModalContext } from "./context/modalContext";
 import Modal from "./components/modal";
+import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -34,6 +35,7 @@ export default function Router() {
   const [modal, setModal] = useState<ModalType | null>(null);
 
   useLogginEvent({ user, setUser, setIsLogged, isLogged });
+  useErrorEvent();
 
   return (
     <Auth.Provider value={isLogged}>

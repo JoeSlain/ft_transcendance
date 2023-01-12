@@ -73,7 +73,7 @@ type ChannelsProps = {
 };
 
 export default function Channels({ privateChans, publicChans }: ChannelsProps) {
-  const [showChanMenu, setShowChanMenu] = useState(false);
+  const { setModal } = useContext(ModalContext);
 
   return (
     <div className="channelAside">
@@ -82,7 +82,12 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
         <button
           className="customButton"
           id="chanAddButton"
-          onClick={() => setShowChanMenu(true)}
+          onClick={() =>
+            setModal({
+              header: "Add channel",
+              body: <AddChannel />,
+            })
+          }
         >
           {" "}
           New{" "}
@@ -107,8 +112,6 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
           />
         </div>
       </div>
-
-      {showChanMenu && <AddChannel setShowChanMenu={setShowChanMenu} />}
     </div>
   );
 }
