@@ -27,12 +27,18 @@ export default function DeleteFriend({ friend }: Props) {
       <div className="modalBody">
         Are you sure you want to remove {friend.username} from your friends ?
       </div>
-      <div className="modalButtons">
-        <button className="modalButton" onClick={handleAccept}>
+      <div className="modalButtons mb-5 gap-2">
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 bg-primary"
+          onClick={handleAccept}
+        >
           {" "}
           Yes{" "}
         </button>
-        <button className="modalButton" onClick={handleDecline}>
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 bg-primary"
+          onClick={handleDecline}
+        >
           {" "}
           No{" "}
         </button>
