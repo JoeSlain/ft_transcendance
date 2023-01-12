@@ -4,6 +4,7 @@ import "../../styles/contact.css";
 import React from "react";
 import Auth from "../../hooks/Auth";
 import { gameType } from "../../types/gameType";
+import TableRow from "../../components/tableRow";
 
 let arr: gameType[] = [
   {
@@ -42,22 +43,12 @@ function Games()
           </tr>
         </thead>
         <tbody>
-          {arr?.map((row: any) => (
-            <TableRow row={row} />
+          {arr.map((row: any, index) => (
+            <TableRow key={index} row={row} />
           ))}
         </tbody>
       </table>
     </div>
-  );
-}
-
-function TableRow(props: { row: any }) {
-  return (
-    <tr>
-      {props.row.map((val: any) => (
-        <td>{val}</td>
-      ))}
-    </tr>
   );
 }
 

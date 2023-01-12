@@ -10,7 +10,6 @@ module.exports = {
       "ata-green": "#9fae69",
       "ata-blue": "#2385aa",
       "ata-back": "#ffc47e",
-      "ata-back": "#F3DE8A",
     },
     extend: {
       fontFamily: {

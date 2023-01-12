@@ -33,7 +33,8 @@ export default function UserInfos() {
       console.log("effect");
       getAvatar(user.id).then((res) => {
         setAvatar({ url: res, file: null });
-      });
+      })
+      .catch((e) => console.log("Error gtting avatar: ", e.message));
       console.log("avatar modified?: ", avatar.url);
     }
   }, []);

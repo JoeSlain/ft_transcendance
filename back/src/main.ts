@@ -17,6 +17,8 @@ async function bootstrap() {
     session({
       cookie: {
         maxAge: 86400000,
+        httpOnly: true,
+        secure: true,
       },
       secret: process.env.FT_SECRET,
       resave: false,

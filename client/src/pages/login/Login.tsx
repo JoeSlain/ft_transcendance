@@ -33,7 +33,8 @@ export default function Login() {
       .then((response) => {
         console.log("redirecting");
         socket.emit("login", response.data);
-      });
+      })
+      .catch((e) => console.log("error login dev"));
   };
 
   if (devlog) {
