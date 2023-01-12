@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/loading";
 import Error from "../../components/error";
 import { getUser } from "../../services/User/GetUser";
+import TableRow from "../../components/tableRow";
 
 const games = [
   {

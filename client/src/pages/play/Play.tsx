@@ -17,9 +17,8 @@ export default function Play() {
 
   if (room) {
     return (
-      <div className="center">
-        <div className="play">
-          <div className="playHeader">
+        <div className="flex flex-col justify-center items-center mt-7">
+          <div className="">
             <h1> Room {room && room.id} </h1>
           </div>
           <div className="playBody">
@@ -31,7 +30,6 @@ export default function Play() {
             <Spectators spectators={room.spectators} />
           </div>
         </div>
-      </div>
     );
   }
   return (

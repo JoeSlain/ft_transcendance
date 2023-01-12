@@ -34,7 +34,9 @@ export default function Buttons({ room }: IProps) {
       {showStart && (
         <button
           onClick={startGame}
-          className="customButton"
+          className={`btn ${
+            playersReady ? "" : "btn-disabled"
+          } btn-sm md:btn-md gap-2 normal-case lg:gap-3 `}
           style={{
             width: "70px",
             color: playersReady ? "white" : "grey",
@@ -46,7 +48,7 @@ export default function Buttons({ room }: IProps) {
       )}
       {showLeave && (
         <button
-          className="customButton"
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
           style={{ width: "70px" }}
           onClick={leaveRoom}
         >

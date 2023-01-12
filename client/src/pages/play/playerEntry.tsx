@@ -39,7 +39,7 @@ export default function PlayerEntry({ room, player }: IProps) {
       <div className="playerButtons">
         {me && (
           <button
-            className="customButton"
+            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 mb-3"
             style={{ width: "70px" }}
             onClick={readyUp}
           >
@@ -49,7 +49,7 @@ export default function PlayerEntry({ room, player }: IProps) {
         )}
         {me && !isEmptyRoom() && (
           <button
-            className="customButton"
+            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
             style={{ width: "70px" }}
             onClick={leaveRoom}
           >
