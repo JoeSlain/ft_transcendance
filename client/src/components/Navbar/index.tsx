@@ -9,6 +9,7 @@ import User from "../../hooks/User";
 import { userType } from "../../types/userType";
 import Auth from "../../hooks/Auth";
 import { ChatContext, GameContext } from "../../context/socketContext";
+import Notifs from "../notifs/notifs";
 
 type IProps = {
   setIsLogged: (props: boolean) => void;
@@ -26,31 +27,31 @@ export default function Navbar({ setIsLogged }: IProps) {
   }
   return (
     <>
-      <nav className="navigation">
-        <div className="navigation-menu bg-ata-back">
+      <nav className="navigation bg-ata-red pt-7">
+        <div className="navigation-menu bg-ata-red flex justify-center ">
           <ul>
-            <li className="text-ata-red">
-              <NavLink to="/Home">Home</NavLink>
+            <li>{isLogged && <Notifs />}</li>
+            <li className=" font-retro text-ata-yellow hover:bo">
+              <NavLink to="/Home">HOME</NavLink>
             </li>
-            <li className="text-ata-red">
-              <NavLink to="/play">Play</NavLink>
+            <li className=" font-retro text-ata-yellow">
+              <NavLink to="/play">PLAY</NavLink>
             </li>
-            <li className="text-ata-red">
-              <NavLink to="/games">Games</NavLink>
+            <li className=" font-retro text-ata-yellow">
+              <NavLink to="/chat">CHAT</NavLink>
             </li>
-            <li className="text-ata-red">
-              <NavLink to="/chat">Chat</NavLink>
+            <li className=" font-retro text-ata-yellow">
+              <NavLink className="navlink" to="/login" onClick={logout}>
+                LOGOUT
+              </NavLink>
             </li>
-            {isLogged && (
-              <li>
-                <NavLink className="navlink" to="/login" onClick={logout}>
-                  Logout
-                </NavLink>
-              </li>
-            )}
             <li>
               <NavLink to="/profile">
-                <img className="profile" src={profile} alt="Profile" />
+                <img
+                  className="profile bg-ata-red"
+                  src={profile}
+                  alt="Profile"
+                />
               </NavLink>
             </li>
           </ul>

@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@font-face {
+font-family: "Retro";
+src: local("Retro"),
+ url("./assets/fo") format("truetype");
+font-weight: bold;
+}

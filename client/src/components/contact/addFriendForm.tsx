@@ -29,16 +29,25 @@ export default function AddFriend() {
   };
 
   return (
-    <form className="contactForm" onSubmit={addFriend}>
-      <input
-        className="contactFormInput"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <button type="submit" className="contactFormButton">
-        {" "}
-        +{" "}
-      </button>
-    </form>
+    <div className="pt-4">
+      <div className="">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          placeholder="Search contact"
+          className="input input-bordered input-primary w-full mt-2"
+        />
+        {/*           <input value={name} onChange={(e) => setName(e.target.value)} />
+         */}{" "}
+      </div>
+      <div className="mt-2">
+        <button onClick={addFriend} className="btn btn-circle">
+          +
+        </button>
+        {/*           <button onClick={addFriend}> + </button>
+         */}{" "}
+      </div>
+    </div>
   );
 }

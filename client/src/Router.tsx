@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import Home from "./pages/home/Home";
 import MyProfile from "./pages/profil/myProfile/Component";
-import Stats from "./pages/stats/Stats";
 import Play from "./pages/play/Play";
 import Games from "./pages/games/Games";
 import Login from "./pages/login/Login";
@@ -19,56 +18,56 @@ import Contact from "./components/contact/contact";
 import "./styles/page.css";
 import Chat from "./pages/chat/Chat";
 import useLogginEvent from "./hooks/chatEvents/useLogginEvent";
-import Notifs from "./components/notifs/notifs";
+import { notifType } from "./types/notifType";
+import Notif from "./components/notifs/notifs";
+import Stats from "./pages/stats/Stats";
 import { ModalType } from "./types/modalType";
 import { ModalContext } from "./context/modalContext";
-import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
-import useModal from "./hooks/useModal";
 import Modal from "./components/modal";
 
 export default function Router() {
-  const [isLogged, setIsLogged] = useState(getSavedItem("isLogged"));
+  const [isLogged, setIsLogged] = React.useState(
+    getSavedItem("isLogged") || false
+  );
   const [user, setUser] = useState<userType>(getSavedItem("user"));
+  const [notifs, setNotifs] = useState<notifType[]>([]);
   const [modal, setModal] = useState<ModalType | null>(null);
 
-  useLogginEvent({ user, isLogged, setUser, setIsLogged });
-  useErrorEvent();
+  useLogginEvent({ user, setUser, setIsLogged, isLogged });
 
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={{ user, setUser }}>
         <ModalContext.Provider value={{ setModal }}>
-          <div className="header">
-            {isLogged && <Notifs />}
-            <Navbar setIsLogged={setIsLogged} />
-          </div>
-          <div className="main">
-            {modal && <Modal header={modal.header} body={modal.body} />}
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/login/redirect"
-                element={
-                  <Redirect setIsLogged={setIsLogged} setUser={setUser} />
-                }
-              />
-              <Route element={<AuthRoute />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/play" element={<Play />} />
-                <Route path="/games" element={<Games />} />
-                <Route path="/chat" element={<Chat />} />
-                <Route path="/profile">
-                  <Route index element={<MyProfile />} />
-                  <Route path=":id" element={<Profile />} />
-                  {/*               <Route path="stats" element={<Stats />} />
-                   */}{" "}
+          <Navbar setIsLogged={setIsLogged} />
+          {modal && <Modal header={modal.header} body={modal.body} />}
+          <div className="main heightMinusNav">
+            <div className="w-[75%] ">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/login/redirect"
+                  element={
+                    <Redirect setIsLogged={setIsLogged} setUser={setUser} />
+                  }
+                />
+                <Route element={<AuthRoute />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/play" element={<Play />} />
+                  <Route path="/games" element={<Games />} />
+                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/profile">
+                    <Route index element={<MyProfile />} />
+                    <Route path=":id" element={<Profile />} />
+                    <Route path="stats" element={<Stats userId={user?.id} />} />
+                    <Route path="*" element={<PageNotFound />} />
+                  </Route>
                   <Route path="*" element={<PageNotFound />} />
                 </Route>
-                <Route path="*" element={<PageNotFound />} />
-              </Route>
-            </Routes>
-            <Contact />
+              </Routes>
+            </div>
+            <div className="w-[25%]">{isLogged === true && <Contact />}</div>
           </div>
         </ModalContext.Provider>
       </User.Provider>

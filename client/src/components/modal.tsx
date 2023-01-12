@@ -6,9 +6,12 @@ type Props = {
 };
 
 const Modal: React.FC<Props> = ({ header, body }) => {
+  console.log("modal");
+  console.log("header", header);
+  console.log("body", body);
   return (
-    <div className="modal">
-      <div className="modalHeader">{header}</div>
+    <div className="modalCss">
+      <div className="modalHeader ">{header}</div>
       {body}
     </div>
   );

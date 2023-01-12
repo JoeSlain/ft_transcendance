@@ -1,5 +1,5 @@
 #game-canvas {
-  border: 1px solid #ffc300;
+  border: 1px solid;
   background-color: rgb(0, 0, 0);
   display: block;
   margin: 0px auto;
@@ -7,37 +7,26 @@
   position: relative;
   top: 110px;
   width: 100%;
-  height: 80%;
+  height: 100%;
 }
 
 .game-buttons-container {
   position: absolute;
   z-index: 1;
-  color: #ffc300;
   font-size: 26px;
   font-style: bold;
-  background-color: #001d3d;
   margin: 0 1rem;
   padding-left: 1%;
   padding-right: 1%;
-  border-radius: 5px;
-  border: 1px solid #ffc300;
+
   top: 80px;
 }
 
 .game-buttons-container-vitesse {
   position: absolute;
   z-index: 1;
-  color: #ffc300;
   font-size: 26px;
   font-style: bold;
-  background-color: #001d3d;
-  margin: 0 1rem;
-  padding-left: 1%;
-  padding-right: 1%;
-  border-radius: 5px;
-  border: 1px solid #ffc300;
-  top: 130px;
 }
 
 .game {

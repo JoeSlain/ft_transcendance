@@ -1,11 +1,9 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import User from "../../../../hooks/User";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
-import { userType } from "../../../../types/userType";
 import { BACK_ROUTE } from "../../../../services/back_route";
-import { blob } from "node:stream/consumers";
 
 type avatarState = {
   url: string;
@@ -23,23 +21,24 @@ async function getAvatar(userId: number) {
 
 //Username and avatar component
 export default function UserInfos() {
-  let { user, setUser } = useContext(User); //user data to print
+  let { user } = useContext(User); //user data to print
   const { register, handleSubmit } = useForm();
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
     url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
-  console.log(
-    "avatar start componenent: ",
-    avatar,
-    " user.avatar: ",
-    user.avatar
-  );
+  useEffect(() => {
+    if (user.avatar != null) {
+      console.log("effect");
+      getAvatar(user.id).then((res) => {
+        setAvatar({ url: res, file: null });
+      });
+      console.log("avatar modified?: ", avatar.url);
+    }
+  }, []);
   async function onSave(formValue: any) {
     //sends form to back
-    console.log("🚀 formValue", formValue);
-    console.log("🚀 ~ line:26 ~ AVATAR START ", avatar);
 
     if (avatar.file != null) {
       let formData = new FormData();
@@ -58,14 +57,12 @@ export default function UserInfos() {
           console.log("then res ", res);
         })
         .catch((e) => {
-          console.log("failed uplaoding avatar: ", e.message);
+          console.log("failed uploading avatar: ", e.message);
         });
       user.avatar = await getAvatar(user.id);
       setAvatar({ ...avatar, url: user.avatar });
     }
-    console.log("avatar is: ", avatar);
     saveItem("user", user);
-    console.log("🚀 ~ file: Component.tsx:74 ~ onSave ~ userAFTERCALL", user);
     if (formValue.username !== user.username) {
       user.username = formValue.username;
       await axios
@@ -97,12 +94,7 @@ export default function UserInfos() {
   return (
     <>
       <form onSubmit={handleSubmit(onSave)}>
-        <div>
-          <p className="text-slate-200">Username</p>
-          <input defaultValue={user.username} {...register("username")} />
-        </div>
-
-        <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg shadow-lg tracking-wide uppercase  hover:text-white">
+        <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
           <img
             src={avatar.url}
             alt="Avatar"
@@ -113,11 +105,19 @@ export default function UserInfos() {
           </p>
           <input onChange={handleAvatar} type="file" className="hidden" />
         </label>
-        <button className="text-slate-200 center" type="submit">
-          Submit
-        </button>
+        <div className="flex flex-col items-center justify-center">
+          <div>
+            <p className="text-slate-200">Username</p>
+            <input defaultValue={user.username} {...register("username")} />
+          </div>
+          <button
+            className="btn mt-2 normal-case  text-slate-200 center"
+            type="submit"
+          >
+            Submit
+          </button>
+        </div>
       </form>
-      {user.avatar != null && <h1>AVATAR</h1>}
     </>
   );
 }

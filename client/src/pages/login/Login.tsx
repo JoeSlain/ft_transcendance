@@ -3,6 +3,7 @@ import "../../styles/global.css";
 import "../../styles/login.css";
 import React, { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
+import "../../styles/global.css";
 
 export function VerifLogged() {
   return false;
@@ -16,7 +17,6 @@ export default function Login() {
   const buttonAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     window.location.assign("http://localhost:3001/api/auth/login");
-    console.log("button de emrde");
   };
 
   const handleDevLogin = (e: React.SyntheticEvent) => {
@@ -68,20 +68,24 @@ export default function Login() {
     );
   } else {
     return (
-      <div className="back">
-        <div className="titre">
-          <p>TRANSCENDANCE </p>
-          <p>Play for fun on PongGame </p>
+      <div className="back bg-base flex flex-col items-center justify-center gap-5">
+        <div className="">
+          <h1 className="font-retro text-7xl">TRANSCENDANCE </h1>
+          <p className="font-retro">Play for fun on PongGame </p>
         </div>
-
-        <div>
-          <button onClick={buttonAuth} className="button-auth" name="button 1">
-            Connect with 42
-          </button>
-          <button onClick={() => setDevLog(true)} className="button-auth">
-            Dev connect
-          </button>
-        </div>
+        <button
+          onClick={buttonAuth}
+          className="btn btn-sm md:btn-md  gap-2 normal-case lg:gap-3"
+          name="button 1"
+        >
+          Connect with 42
+        </button>
+        <button
+          onClick={() => setDevLog(true)}
+          className="btn btn-sm md:btn-md  gap-2 normal-case lg:gap-3"
+        >
+          Dev connect
+        </button>
       </div>
     );
   }
