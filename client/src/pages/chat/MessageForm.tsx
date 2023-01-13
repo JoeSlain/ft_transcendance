@@ -34,10 +34,11 @@ function handleKeyDown (e : any) {
       <div className="message">
         <div className="messageForm">
           <textarea
-            className="textarea "
+            className="textarea"
             value={message}
             onKeyDown={handleKeyDown}
             onChange={(e) => {
+              console.log("change value=: ", e.target);
               setMessage(e.target.value);
             }}
           />

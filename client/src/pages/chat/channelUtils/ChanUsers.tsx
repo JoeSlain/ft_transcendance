@@ -24,13 +24,13 @@ export default function ChanUsers({ selected, setSelected }: Props) {
 
   if (selected && selected.users) {
     return (
-      <div className="channelAside">
+      <div className="channelAside heightMinusNav pt-5">
         <div className="chanUsersBar">
           <div className="chanUsersHeader">
-            <h1 className="backButton" onClick={() => setSelected(null)}>
+            <button className="btn btn-sm font-bold" onClick={() => setSelected(null)}>
               ←
-            </h1>
-            <h1 className="usersTitle">Users</h1>
+            </button>
+            <h1 className="usersTitle font-retro">Users</h1>
           </div>
           <div className="chanUsersBody">
             <AddChanUser selected={selected} />

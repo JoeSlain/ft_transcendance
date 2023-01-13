@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createRef, useState } from "react";
 import useChatEvents from "../../hooks/chatEvents/useChatEvents";
 import Channels from "./Channels";
 import { channelType } from "../../types/channelType";
@@ -12,6 +12,8 @@ export default function Chat() {
   const [privateChans, setPrivateChans] = useState([]);
   const [publicChans, setPublicChans] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
+  const chatContainer = createRef();
+
 
   useChatEvents({
     privateChans,
@@ -21,16 +23,23 @@ export default function Chat() {
     setSelected,
   });
 
+/*   function scrollToMyRef() {
+    const scroll =
+      chatContainer.current.scrollHeight -
+      chatContainer.current.clientHeight;
+    chatContainer.current.scrollTo(0, scroll);
+  }; */
+
   return (
     <div className="flex ">
-      <div>
+      <div className="heightMinusNav">
         {selected ? (
           <ChanUsers selected={selected} setSelected={setSelected} />
         ) : (
           <Channels privateChans={privateChans} publicChans={publicChans} />
         )}
       </div>
-      <div className="wholechat flex flex-col justify-center flex-grow m-0">
+      <div className="wholechat flex flex-col justify-center flex-grow ">
         <div className="chatMain heightMinusNav bg-base-300">
           <div className="drop-shadow-xl">
             <h2 className="font-retro mt-5 text-4xl">
@@ -43,7 +52,7 @@ export default function Chat() {
           selected={selected}
           setSelected={setSelected}
         />*/}
-          <div className="">
+          <div  className="">
             <ChatMessages selected={selected} />
           </div>
           <div
