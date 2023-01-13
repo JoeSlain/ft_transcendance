@@ -21,7 +21,6 @@ export default function MessageForm({ selected }: Props) {
   };
 
 function handleKeyDown (e : any) {
-  console.log("keyyy");
   if (e.key === 'Enter')
   {
     submitMessage();
@@ -38,7 +37,9 @@ function handleKeyDown (e : any) {
             value={message}
             onKeyDown={handleKeyDown}
             onChange={(e) => {
-              console.log("change value=: ", e.target);
+              if (e.target.value === '\n')
+                return ;
+              console.log("change value=: ", e.target.value);
               setMessage(e.target.value);
             }}
           />
