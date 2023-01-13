@@ -14,11 +14,11 @@ export class ChannelService {
     private readonly notifService: NotifService
   ) {}
 
-  async findChannel(chanData: ChannelData) {
+  async findChannel(name: string, type: string) {
     const channel = await this.chanRepo.find({
       where: {
-        name: chanData.name,
-        type: chanData.type,
+        name,
+        type,
       },
     });
 
@@ -112,7 +112,13 @@ export class ChannelService {
   }
 
   async checkChanData(chanData: ChannelData) {
-    if (!chanData.name || (await this.findChannel(chanData)))
+    if (!chanData.name) return "invalid channel name";
+    if (chanData.type === "public" || chanData.type === "protected") {
+      const chan =
+        (await this.findChannel(chanData.name, "public")) ||
+        (await this.findChannel(chanData.name, "protected"));
+      if (chan) return "invalid channel name";
+    } else if (await this.findChannel(chanData.name, "private"))
       return "invalid channel name";
     if (chanData.type === "protected" && !chanData.password)
       return "invalid password";
