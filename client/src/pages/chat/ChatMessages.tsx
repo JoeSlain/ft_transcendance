@@ -18,7 +18,10 @@ const ChatMessages = ({ selected }: Props) => {
           console.log("message", message);
           if (message.from.id === user.id) {
             return (
-              <div className="pr-5 chat chat-end justify-end">
+
+              <div className="pr-5 chat chat-end justify-end flex flex-col">
+                <div className="chat-header mr-1">{message.from.username}</div>
+                
                 <div className="chat-bubble">
                   {message.content}
                 </div>
@@ -32,7 +35,9 @@ const ChatMessages = ({ selected }: Props) => {
             );
           } else {
             return (
-              <div className="pl-5 chat chat-start">
+              <div className="pl-5 chat chat-start flex flex-col">
+                <div className="chat-header ml-1">{message.from.username}</div>
+
                 <div className="chat-bubble chat-bubble-primary">
                   {message.content}
                 </div>

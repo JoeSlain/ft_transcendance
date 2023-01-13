@@ -13,6 +13,7 @@ export default function Chat() {
   const [publicChans, setPublicChans] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
   const chatContainer = createRef();
+  //    ^?
 
 
   useChatEvents({
