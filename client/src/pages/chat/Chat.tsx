@@ -22,24 +22,38 @@ export default function Chat() {
   });
 
   return (
-    <div className="center">
-      <div className="chat">
+    <div className="flex ">
+      <div>
         {selected ? (
           <ChanUsers selected={selected} setSelected={setSelected} />
         ) : (
           <Channels privateChans={privateChans} publicChans={publicChans} />
         )}
-        <div className="chatMain">
+      </div>
+      <div className="wholechat flex flex-col justify-center flex-grow m-0">
+        <div className="chatMain heightMinusNav bg-base-300">
+          <div className="drop-shadow-xl">
+            <h2 className="font-retro mt-5 text-4xl">
+              {selected ? selected.name : "CHAT"}{" "}
+            </h2>
+            <div className="bg-base-content/10 my-2 mx-1 h-px"></div>
+          </div>
           {/*<DirectMessages
           directMessages={directMessages}
           selected={selected}
           setSelected={setSelected}
         />*/}
-          <div className="chatBody">
-            <h2>{selected ? selected.name : "CHAT"} </h2>
+          <div className="">
             <ChatMessages selected={selected} />
           </div>
-          <MessageForm selected={selected} />
+          <div
+            className="fixed
+             inset-x-0
+             bottom-0
+             p-4"
+          >
+            <MessageForm selected={selected} />
+          </div>
         </div>
       </div>
     </div>

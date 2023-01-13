@@ -18,21 +18,31 @@ const ChatMessages = ({ selected }: Props) => {
           console.log("message", message);
           if (message.from.id === user.id) {
             return (
-              <div key={message.id} className="messageWrapper">
+              <div className="pr-5 chat chat-end justify-end">
+                <div className="chat-bubble">
+                  {message.content}
+                </div>
+              </div>
+              /*               <div key={message.id} className="messageWrapper">
                 <div className="myUsername"> me</div>
                 <div className="myMessage">
                   <div className="content">{message.content}</div>
                 </div>
-              </div>
+              </div> */
             );
           } else {
             return (
-              <div key={message.id} className="messageWrapper">
+              <div className="pl-5 chat chat-start">
+                <div className="chat-bubble chat-bubble-primary">
+                  {message.content}
+                </div>
+              </div>
+              /*               <div key={message.id} className="messageWrapper">
                 <div className="theirUsername">{message.from.username}</div>
                 <div className="theirMessage">
                   <div className="content"> {message.content}</div>
                 </div>
-              </div>
+              </div> */
             );
           }
         })}
