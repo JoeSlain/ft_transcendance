@@ -24,7 +24,7 @@ export const ChanUserContextList = ({ selectedUser }: Props) => {
       type: "Game Invite",
       from: user,
       to: selectedUser,
-      acceptEvent: "acceptChanInvite",
+      acceptEvent: "acceptGameInvite",
     });
     console.log("invited", selectedUser);
   };
