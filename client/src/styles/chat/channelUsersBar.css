@@ -30,3 +30,24 @@
 .usersTitle {
   margin-left: 5px;
 }
+
+.banModal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.banEntry {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.banInput {
+  width: 40px;
+  margin-right: 5px;
+}
+
+.banCategory {
+  margin-right: 5px;
+}
