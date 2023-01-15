@@ -45,28 +45,6 @@ export class Game {
     // Initialisation de la police de caractères à utiliser pour dessiner le score
     this.gameContext.font = "30px Orbitron";
 
-    // Initialisation des écouteurs d'événements pour gérer les entrées clavier
-    window.addEventListener("keydown", function (e) {
-      if (
-        e.which === KeyBindings.A ||
-        e.which === KeyBindings.Q ||
-        e.which === KeyBindings.UP ||
-        e.which === KeyBindings.DOWN
-      ) {
-        Game.keysPressed[e.which] = true;
-      }
-    });
-
-    window.addEventListener("keyup", function (e) {
-      if (
-        e.which === KeyBindings.A ||
-        e.which === KeyBindings.Q ||
-        e.which === KeyBindings.UP ||
-        e.which === KeyBindings.DOWN
-      ) {
-        Game.keysPressed[e.which] = false;
-      }
-    });
 
     // Initialisation des objets Paddle et Ball
     var paddleWidth: number = 20,
@@ -145,16 +123,6 @@ export class Game {
     this.player1.update(this.gameCanvas);
     this.player2.update(this.gameCanvas);
     this.ball.update(this.player1, this.player2, this.gameCanvas);
-  }
-  updateSpeed() {
-    console.log("updatespeed called");
-    if (!this.gameCanvas) {
-      console.error("Unable to find gamecanvas element");
-      return;
-    }
-    this.player1.update(this.gameCanvas);
-    this.player2.update(this.gameCanvas);
-    this.ball.speedUpdate(this.player1, this.player2, this.gameCanvas);
   }
   update2Ball() {
     console.log("update2ball called");
@@ -241,10 +209,6 @@ export class Game {
   public stop(): void {
     this.running = false;
   }
-  public StartSpeed(): void {
-    this.running = true;
-    this.gameLoopSpeed();
-  }
 
   public Start2Ball(): void {
     this.running = true;
@@ -256,7 +220,12 @@ export class Game {
     Game.player1Score = 0;
     Game.player2Score = 0;
   }
+  movePaddle(KeyboardEvent:KeyboardEvent ,direction:string, )
+  {
+    this.player1.movePaddle(KeyboardEvent, this.gameCanvas);
+  }
 
+  
   private gameLoop(): void {
     console.log("gameLoop called1");
     if (this.running) {
@@ -275,23 +244,6 @@ export class Game {
     }
   }
 
-  private gameLoopSpeed(): void {
-    console.log("gameLoopSpeed called");
-    if (this.running) {
-      // mettre à jour l'état du jeu et dessiner le canvas
-      this.updateSpeed();
-      this.draw();
-      requestAnimationFrame(this.gameLoopSpeed.bind(this));
-      if (Game.player1Score === 10 || Game.player2Score === 10) {
-        if (Game.player1Score === 10) {
-          this.win("Joueur 1 a gagné!");
-        } else if (Game.player2Score === 10) {
-          this.win("Joueur 2 a gagné!");
-        }
-        this.stop();
-      }
-    }
-  }
   private gameLoop2Ball(): void {
     console.log("gameLoop2ball called");
     if (this.running) {
@@ -340,21 +292,41 @@ class Paddle extends Entity {
 
   update(canvas: HTMLElement) {
     if (Game.keysPressed[KeyBindings.A]) {
-      this.yVel = -1;
-      if (this.y <= 20) {
-        this.yVel = 0;
-      }
-    } else if (Game.keysPressed[KeyBindings.Q]) {
-      this.yVel = 1;
-      if (this.y + this.height >= canvas.height - 20) {
-        this.yVel = 0;
-      }
-    } else {
-      this.yVel = 0;
+    this.yVel = -1;
+    if (this.y <= 20) {
+    this.yVel = 0;
     }
-
+    } else if (Game.keysPressed[KeyBindings.Q]) {
+    this.yVel = 1;
+    if (this.y + this.height >= canvas.height - 20) {
+    this.yVel = 0;
+    }
+    } else {
+    this.yVel = 0;
+    }
+  
     this.y += this.yVel * this.speed;
-  }
+    }
+    
+    movePaddle(e: KeyboardEvent, canvas: HTMLElement) {
+    if (e.keyCode === KeyBindings.UP) {
+    this.yVel = -1;
+    if (this.y <= 20) {
+    this.yVel = 0;
+    }
+    } else if (e.keyCode === KeyBindings.DOWN) {
+    this.yVel = 1;
+    if (this.y + this.height >= canvas.height - 20) {
+    this.yVel = 0;
+    }
+    } else {
+    this.yVel = 0;
+    }
+    
+ 
+    this.y += this.yVel * this.speed;
+    }
+  
 }
 
 class Paddle2 extends Paddle {
@@ -425,49 +397,6 @@ class Ball extends Entity {
         this.y + this.height <= player2.y + player2.height
       ) {
         this.xVel = -1;
-      }
-    }
-    this.x += this.xVel * this.speed;
-    this.y += this.yVel * this.speed;
-  }
-
-  speedUpdate(player1: Paddle, player2: Paddle2, canvas: HTMLElement) {
-    //vérifier les limites du canvas supérieur
-    if (this.y <= 10) {
-      this.yVel = 1;
-    }
-    //vérifier les limites inférieures du canvas
-    if (this.y + this.height >= canvas.height - 10) {
-      this.yVel = -1;
-    }
-    //vérifier les limites du canvas gauche et score+1
-    if (this.x <= 0) {
-      this.x = canvas.width / 2 - this.width / 2;
-      Game.player2Score += 1;
-    }
-    //vérifier les limites du canvas droit et score+1
-    if (this.x + this.width >= canvas.width) {
-      this.x = canvas.width / 2 - this.width / 2;
-      Game.player1Score += 1;
-    }
-    //vérifier la collision player1
-    if (this.x <= player1.x + player1.width) {
-      if (
-        this.y >= player1.y &&
-        this.y + this.height <= player1.y + player1.height
-      ) {
-        this.xVel = 1;
-        this.speed += 1;
-      }
-    }
-    //vérifier la collision player2
-    if (this.x + this.width >= player2.x) {
-      if (
-        this.y >= player2.y &&
-        this.y + this.height <= player2.y + player2.height
-      ) {
-        this.xVel = -1;
-        this.speed += 1;
       }
     }
     this.x += this.xVel * this.speed;

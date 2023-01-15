@@ -1,5 +1,6 @@
 import { Game } from "./canvas/Draw";
 import "../../styles/games.css";
+import { useEffect } from "react";
 import { GameContext } from "../../context/socketContext";
 import { useRef, useState, useContext } from "react";
 
@@ -7,84 +8,94 @@ function Games() {
   const canvasRef = useRef(null);
   const [game, setGame] = useState<Game | null>(null);
   const socket = useContext(GameContext);
+  const id = { id: socket.id };
 
-  function startGame() {
-    if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current, 800, 500);
-      setGame(newGame);
-      socket.emit("createGame", { roomId: 123 });
-      newGame.resetScore();
-      newGame.start();
-    }
-  }
 
-  function stopGame() {
+  function movePaddle(e: KeyboardEvent) {
     if (game) {
-      game.stop();
-      game.resetScore();
-      setGame(null);
+    const direction = e.keyCode === 38 ? 'up' : 'down';
+    const newPaddle = game.movePaddle(KeyboardEvent, direction);
+    socket.emit('movePaddle', { gameId: id, paddle: newPaddle });
     }
-  }
-
-  function startSpeed() {
+    }
+    
+    useEffect(() => {
+    window.addEventListener('keydown', movePaddle);
+    socket.on('updateGame', (game) => {
+    setGame(game);
+    });
+    
+    socket.emit('createGame', game);
+    return () => {
+    window.removeEventListener('keydown', movePaddle);
+    socket.off('updateGame');
+    socket.off('createGame');
+    };
+    }, [game, socket]);
+    
+    function startGame() {
     if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current, 800, 500);
-      setGame(newGame);
-      newGame.resetScore();
-      newGame.StartSpeed();
+    const newGame = new Game(canvasRef.current, 800, 500);
+    setGame(newGame);
+    socket.emit('startGame', { gameId: id });
+    newGame.resetScore();
+    newGame.start();
     }
-  }
-
-  function start2Ball() {
-    if (canvasRef.current) {
-      const newGame = new Game(canvasRef.current, 800, 500);
-      setGame(newGame);
-      newGame.resetScore();
-      newGame.Start2Ball();
     }
-  }
+    
+    function stopGame() {
+    if (game) {
+    socket.emit('stopGame', { gameId: id });
+    game.stop();
+    game.resetScore();
+    setGame(null);
+    }
+    }
 
-return (
-  <div className="game">
-    <div className="game-buttons-container">
-      {game && (
-        <button className="btn btn-primary" onClick={stopGame}>
-          Stop
-        </button>
-      )}
-    </div>
-    <div className="game-canvas-container ">
-      {!game && (
-        <div className="game-buttons-container-vitesse pt-56 ml-80 flex flex-col justify-center gap-3">
-          <button
-            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
-            onClick={startGame}
-          >
-            Start
-          </button>
-          <button
-            className="btn btn-sm md:btn-md  gap-2 normal-case lg:gap-3"
-            onClick={startSpeed}
-          >
-            Start speed game{" "}
-          </button>
-          <button
-            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3"
-            onClick={start2Ball}
-          >
-            Start 2 Ball
-          </button>
+    function start2Ball() {
+      if (canvasRef.current) {
+        const newGame = new Game(canvasRef.current, 800, 500);
+        setGame(newGame);
+        newGame.resetScore();
+        newGame.Start2Ball();
+      }
+    }
+
+    return (
+      <div className="game">
+        <div className="game-buttons-container">
+          {game && (
+            <button className="btn btn-primary" onClick={stopGame}>
+              Stop
+            </button>
+          )}
         </div>
-      )}
-      <canvas
-        width="800"
-        height="500"
-        id="game-canvas"
-        ref={canvasRef}
-      ></canvas>
-    </div>
-  </div>
-);
+        <div className="game-canvas-container ">
+          {!game && (
+            <div className="game-buttons-container-vitesse pt-56 ml-80 flex flex-col justify-center gap-3">
+              <button
+                className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
+                onClick={startGame}
+              >
+                Start
+              </button>
+              <button
+                className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3"
+                onClick={start2Ball}
+              >
+                Start 2 Ball
+              </button>
+            </div>
+          )}
+          <canvas
+            width="800"
+            height="500"
+            id="game-canvas"
+            ref={canvasRef}
+          ></canvas>
+        </div>
+      </div>
+    );
+  }
 }
-
-export default Games;
+  export default Games;
