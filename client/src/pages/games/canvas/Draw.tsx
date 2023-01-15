@@ -27,13 +27,15 @@ export class Game {
   private ball2: Ball = new Ball(0, 0, 0, 0, -1);
   private ball: Ball = new Ball(0, 0, 0, 0, 1);
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     // Récupération de l'objet canvas
     this.gameCanvas = canvas;
     if (!this.gameCanvas) {
       console.error("Unable to find canvas element with id 'game-canvas'");
       return;
     }
+     this.gameCanvas.height = height;
+    this.gameCanvas.width = width;
     // Récupération du contexte du canvas
     this.gameContext = this.gameCanvas.getContext("2d");
     if (!this.gameContext) {
