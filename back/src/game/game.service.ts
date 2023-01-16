@@ -75,7 +75,7 @@ movePaddle(game: GameType, playerId: string, direction: string, speed: number): 
   const player = game.players.find((p) => p.id === playerId);
   if (!player) return player.paddle; // Retourne la position actuelle de la raquette si le joueur est introuvable
 
-  // Crée un nouvel objet de type 'PaddleType' à partir de l'objet actuel pour éviter de muter l'objet original
+  // Crée un nouvel objet de type 'PaddleType' à partir de l'objet actuel
   const newPaddle = {...player.paddle};
 
   // Met à jour la coordonnée y de la raquette en fonction de la direction et de la vitesse

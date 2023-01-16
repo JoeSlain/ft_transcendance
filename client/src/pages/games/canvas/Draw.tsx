@@ -34,7 +34,7 @@ export class Game {
       console.error("Unable to find canvas element with id 'game-canvas'");
       return;
     }
-     this.gameCanvas.height = height;
+    this.gameCanvas.height = height;
     this.gameCanvas.width = width;
     // Récupération du contexte du canvas
     this.gameContext = this.gameCanvas.getContext("2d");
@@ -45,6 +45,28 @@ export class Game {
     // Initialisation de la police de caractères à utiliser pour dessiner le score
     this.gameContext.font = "30px Orbitron";
 
+    // Initialisation des écouteurs d'événements pour gérer les entrées clavier
+    window.addEventListener("keydown", function (e) {
+      if (
+        e.which === KeyBindings.A ||
+        e.which === KeyBindings.Q ||
+        e.which === KeyBindings.UP ||
+        e.which === KeyBindings.DOWN
+      ) {
+        Game.keysPressed[e.which] = true;
+      }
+    });
+
+    window.addEventListener("keyup", function (e) {
+      if (
+        e.which === KeyBindings.A ||
+        e.which === KeyBindings.Q ||
+        e.which === KeyBindings.UP ||
+        e.which === KeyBindings.DOWN
+      ) {
+        Game.keysPressed[e.which] = false;
+      }
+    });
 
     // Initialisation des objets Paddle et Ball
     var paddleWidth: number = 20,
@@ -220,12 +242,8 @@ export class Game {
     Game.player1Score = 0;
     Game.player2Score = 0;
   }
-  movePaddle(KeyboardEvent:KeyboardEvent ,direction:string, )
-  {
-    this.player1.movePaddle(KeyboardEvent, this.gameCanvas);
-  }
 
-  
+
   private gameLoop(): void {
     console.log("gameLoop called1");
     if (this.running) {
@@ -292,41 +310,22 @@ class Paddle extends Entity {
 
   update(canvas: HTMLElement) {
     if (Game.keysPressed[KeyBindings.A]) {
-    this.yVel = -1;
-    if (this.y <= 20) {
-    this.yVel = 0;
-    }
+      this.yVel = -1;
+      if (this.y <= 20) {
+        this.yVel = 0;
+      }
     } else if (Game.keysPressed[KeyBindings.Q]) {
-    this.yVel = 1;
-    if (this.y + this.height >= canvas.height - 20) {
-    this.yVel = 0;
-    }
+      this.yVel = 1;
+      if (this.y + this.height >= canvas.height - 20) {
+        this.yVel = 0;
+      }
     } else {
-    this.yVel = 0;
+      this.yVel = 0;
     }
-  
+
     this.y += this.yVel * this.speed;
-    }
-    
-    movePaddle(e: KeyboardEvent, canvas: HTMLElement) {
-    if (e.keyCode === KeyBindings.UP) {
-    this.yVel = -1;
-    if (this.y <= 20) {
-    this.yVel = 0;
-    }
-    } else if (e.keyCode === KeyBindings.DOWN) {
-    this.yVel = 1;
-    if (this.y + this.height >= canvas.height - 20) {
-    this.yVel = 0;
-    }
-    } else {
-    this.yVel = 0;
-    }
-    
- 
-    this.y += this.yVel * this.speed;
-    }
-  
+  }
+
 }
 
 class Paddle2 extends Paddle {
