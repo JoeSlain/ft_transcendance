@@ -2,7 +2,6 @@
   height: 80%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .messageWrapper {
@@ -36,15 +35,4 @@
   background-color: rgba(165, 3, 3, 0.541);
   box-shadow: 2px 2px 2px 2px rgba(9, 9, 9, 0.23);
   text-align: justify;
-}
-
-.myUsername {
-  width: 70%;
-  align-self: flex-end;
-  color: white;
-}
-
-.theirUsername {
-  width: 70%;
-  color: red;
 }

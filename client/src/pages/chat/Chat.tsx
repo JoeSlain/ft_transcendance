@@ -1,4 +1,4 @@
-import { createRef, useState } from "react";
+import { createRef, useRef, useState } from "react";
 import useChatEvents from "../../hooks/chatEvents/useChatEvents";
 import Channels from "./Channels";
 import { channelType } from "../../types/channelType";
@@ -12,9 +12,8 @@ export default function Chat() {
   const [privateChans, setPrivateChans] = useState([]);
   const [publicChans, setPublicChans] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
-  const chatContainer = createRef();
-  //    ^?
 
+  //    ^?
 
   useChatEvents({
     privateChans,
@@ -24,12 +23,7 @@ export default function Chat() {
     setSelected,
   });
 
-/*   function scrollToMyRef() {
-    const scroll =
-      chatContainer.current.scrollHeight -
-      chatContainer.current.clientHeight;
-    chatContainer.current.scrollTo(0, scroll);
-  }; */
+
 
   return (
     <div className="flex ">
@@ -53,7 +47,7 @@ export default function Chat() {
           selected={selected}
           setSelected={setSelected}
         />*/}
-          <div  className="">
+          <div>
             <ChatMessages selected={selected} />
           </div>
           <div

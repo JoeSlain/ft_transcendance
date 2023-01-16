@@ -13,32 +13,30 @@ export default function MessageForm({ selected }: Props) {
   const socket = useContext(ChatContext);
 
   const submitMessage = () => {
-    if (message === "")
-      return ;
+    if (message === "") return;
     const newMessage = { from: user, content: message, channel: selected };
     setMessage("");
+   // scrollToMyRef();
     socket.emit("chanMessage", newMessage);
   };
 
-function handleKeyDown (e : any) {
-  if (e.key === 'Enter')
-  {
-    submitMessage();
-    setMessage("");
+  function handleKeyDown(e: any) {
+    if (e.key === "Enter") {
+      submitMessage();
+      setMessage("");
+    }
   }
-}
 
   if (selected) {
     return (
-      <div className="message">
+      <div className="">
         <div className="messageForm">
           <textarea
-            className="textarea"
+            className="textarea max-h-24"
             value={message}
             onKeyDown={handleKeyDown}
             onChange={(e) => {
-              if (e.target.value === '\n')
-                return ;
+              if (e.target.value === "\n") return;
               console.log("change value=: ", e.target.value);
               setMessage(e.target.value);
             }}
