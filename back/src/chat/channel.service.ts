@@ -2,7 +2,7 @@ import { ConsoleLogger, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Channel, User } from "src/database";
 import { ChannelData } from "src/utils/types";
-import { Repository, createQueryBuilder } from "typeorm";
+import { Brackets, Repository, createQueryBuilder } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { NotifService } from "src/users/notifs.service";
 
@@ -14,11 +14,11 @@ export class ChannelService {
     private readonly notifService: NotifService
   ) {}
 
-  async findChannel(chanData: ChannelData) {
+  async findChannel(name: string, type: string) {
     const channel = await this.chanRepo.find({
       where: {
-        name: chanData.name,
-        type: chanData.type,
+        name,
+        type,
       },
     });
 
@@ -65,6 +65,7 @@ export class ChannelService {
       relations: {
         owner: true,
         users: true,
+        banned: true,
       },
     });
     const chans = tmp.map((chan) => {
@@ -75,27 +76,40 @@ export class ChannelService {
   }
 
   async getPrivateChannels(userId: number) {
-    /*const tmp = await this.chanRepo
-      .createQueryBuilder("channel")
-      .leftJoinAndSelect("channel.owner", "owner")
-      .where("channel.owner = :id", { id: userId })
-      .andWhere("channel.type = :type", { type: "private" })
-      .getMany();*/
+    const bannedId = userId;
+    const tmp = await this.chanRepo
+      .createQueryBuilder("channels")
+      .leftJoinAndSelect("channels.users", "user")
+      .leftJoinAndSelect("channels.owner", "owner")
+      .leftJoinAndSelect("channels.banned", "banned")
+      .where("channels.type = :type", { type: "private" })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where("banned.userId = :bannedId", { bannedId }).orWhere(
+            "user.id = :userId",
+            { userId }
+          );
+        })
+      )
+      .getMany();
 
-    const tmp = await this.chanRepo.find({
+    /*const tmp = await this.chanRepo.find({
       relations: {
         users: true,
         owner: true,
+        banned: true,
       },
-      where: {
-        type: "private",
-        users: {
-          id: userId,
+      where: [
+        {
+          type: "private",
+          banned: {
+            userId: userId,
+          },
         },
-      },
-    });
+      ],
+    });*/
 
-    //console.log("tmpPrivateChans", tmp);
+    console.log("tmpPrivateChans", tmp);
     const chans = tmp.map((chan) => {
       return { ...chan, password: null };
     });
@@ -112,7 +126,13 @@ export class ChannelService {
   }
 
   async checkChanData(chanData: ChannelData) {
-    if (!chanData.name || (await this.findChannel(chanData)))
+    if (!chanData.name) return "invalid channel name";
+    if (chanData.type === "public" || chanData.type === "protected") {
+      const chan =
+        (await this.findChannel(chanData.name, "public")) ||
+        (await this.findChannel(chanData.name, "protected"));
+      if (chan) return "invalid channel name";
+    } else if (await this.findChannel(chanData.name, "private"))
       return "invalid channel name";
     if (chanData.type === "protected" && !chanData.password)
       return "invalid password";
@@ -170,6 +190,7 @@ export class ChannelService {
     channel = await this.setChanOwner(chanData.owner, channel);
     channel = await this.addUserChan(chanData.owner, channel, "users");
 
+    //console.log("created channel", channel);
     return channel;
   }
 
@@ -207,11 +228,8 @@ export class ChannelService {
 
   async leaveChan(user: User, chan: Channel) {
     let channel = await this.findChannelById(chan.id);
-    //console.log("chan1", chan);
+
     channel = await this.removeUserChan(user, channel);
-
-    //console.log("chan2", chan);
-
     if (channel.owner.id === user.id) {
       if (channel.admins && channel.admins[0])
         channel = await this.setChanOwner(channel.admins[0], channel);
@@ -220,7 +238,7 @@ export class ChannelService {
       else if (channel.type === "private") {
         await this.deleteChan(channel);
         return null;
-      }
+      } else channel = await this.setChanOwner(null, channel);
     }
     return channel;
   }

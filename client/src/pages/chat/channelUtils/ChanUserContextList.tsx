@@ -1,19 +1,29 @@
 import { useContext, useState } from "react";
+import { ModalContext } from "../../../context/modalContext";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
+import { channelType } from "../../../types/channelType";
 import { userType } from "../../../types/userType";
+import BanUser from "./BanUser";
 
 export type Props = {
   selectedUser: userType;
+  channel: channelType;
 };
 
-export const ChanUserContextList = ({ selectedUser }: Props) => {
+export const ChanUserContextList = ({ selectedUser, channel }: Props) => {
   const chatSocket = useContext(ChatContext);
   const { user } = useContext(User);
+  const { setModal } = useContext(ModalContext);
 
   const handleSetAdmin = () => {};
 
-  const handleBan = () => {};
+  const handleBan = () => {
+    setModal({
+      header: `Ban ${selectedUser.username} from channel ${channel.name}`,
+      body: <BanUser user={selectedUser} channel={channel} />,
+    });
+  };
 
   const handleMute = () => {};
 
@@ -24,7 +34,7 @@ export const ChanUserContextList = ({ selectedUser }: Props) => {
       type: "Game Invite",
       from: user,
       to: selectedUser,
-      acceptEvent: "acceptChanInvite",
+      acceptEvent: "acceptGameInvite",
     });
     console.log("invited", selectedUser);
   };

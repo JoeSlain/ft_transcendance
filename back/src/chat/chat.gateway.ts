@@ -17,6 +17,7 @@ import { RoomService } from "src/game/room.service";
 import { ChannelService } from "./channel.service";
 import * as bcrypt from "bcrypt";
 import { MessageService } from "./message.service";
+import { RestrictionService } from "./restrictions.service";
 
 @WebSocketGateway(3002, {
   cors: {
@@ -31,7 +32,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly notifService: NotifService,
     private readonly roomService: RoomService,
     private readonly channelService: ChannelService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly restrictionService: RestrictionService
   ) {}
 
   @WebSocketServer() server: Namespace;
@@ -54,7 +56,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       status: "online",
     };
     console.log("chat ws login");
-    console.log("user", user);
 
     this.chatService.addUser(user.id, client.id);
     client.broadcast.emit("updateStatus", data);
@@ -251,6 +252,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       else {
         if (channel.type !== "private") this.server.emit("newChannel", channel);
         else this.server.to(client.id).emit("newChannel", channel);
+        client.join(channel.socketId);
       }
     }
   }
@@ -281,19 +283,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("joinChannel")
   async joinChannel(client: Socket, data: any) {
+    let channel = await this.channelService.findChannelById(data.channel.id);
     console.log("joinChannel");
-    if (!(await this.checkChanPassword(client, data))) {
-      console.log("wrong pass return");
+
+    if (await this.restrictionService.isBanned(data.user.id, channel)) {
+      const ban = await this.restrictionService.getBanned(
+        data.user.id,
+        channel
+      );
+      this.server
+        .to(client.id)
+        .emit(
+          "error",
+          `You cannot join this channel because you have been banned until ${ban.end}`
+        );
       return;
     }
-    console.log("good pass");
-    let channel = await this.channelService.findChannelById(data.channel.id);
+    if (!(await this.checkChanPassword(client, data))) return;
     if (!this.channelService.findUserInChan(data.user.id, channel)) {
       channel = await this.channelService.addUserChan(
         data.user,
         channel,
         "users"
       );
+      if (!channel.owner)
+        channel = await this.channelService.setChanOwner(data.user, channel);
     }
     data.channel = { ...channel, password: null };
     client.join(data.channel.socketId);
@@ -314,8 +328,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //console.log("postleave", data.channel);
     if (data.channel.type === "private")
       this.server.to(client.id).emit("removeChannel", data.channel);
+    if (channel)
+      this.server.to(data.channel.socketId).emit("leftChannel", channel);
+    client.leave(data.channel.socketId);
+  }
+
+  @SubscribeMessage("leaveChannel")
+  async leaveChannel(client: Socket, data: any) {
+    console.log("leave channel");
+    const channel = await this.channelService.leaveChan(
+      data.user,
+      data.channel
+    );
+    //console.log("postleave", data.channel);
     if (channel) {
-      console.log("returned channel", channel);
       this.server.to(data.channel.socketId).emit("leftChannel", channel);
     }
     client.leave(data.channel.socketId);
@@ -338,7 +364,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("acceptChannelInvite")
   async acceptChanInvite(client: Socket, notif: Notif) {
-    console.log("accept chan invite");
+    console.log("accept chan invite", notif.channel);
     await this.notifService.deleteNotif(notif);
     const channel = await this.joinChannel(client, {
       user: notif.to,
@@ -379,5 +405,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async removeChannelPassword(client: Socket, data: any) {
     console.log("remove chan pass", data);
     if (!this.checkChanPassword) return;
+  }
+
+  @SubscribeMessage("banUser")
+  async banUser(client: Socket, data: any) {
+    console.log("ban user event");
+    let channel = await this.channelService.findChannelById(data.channel.id);
+
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return;
+    }
+    data.channel = await this.restrictionService.ban(
+      data.user,
+      channel,
+      data.date
+    );
+    const to = this.chatService.getUser(data.user.id);
+    if (to) {
+      this.server.to(to).emit("banned", data);
+    }
+    this.server.to(channel.socketId).emit("userBanned", data);
   }
 }

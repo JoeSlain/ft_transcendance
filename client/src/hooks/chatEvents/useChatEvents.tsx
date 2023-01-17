@@ -134,12 +134,37 @@ export default function useChatEvents({
       });
     });
 
+    socket.on("banned", (data) => {
+      console.log("ban event");
+      alert(
+        `You have been banned from ${data.channel.name} until ${data.date}`
+      );
+      setSelected((prev: any) => {
+        if (prev && prev.id === data.channel.id) return null;
+      });
+      socket.emit("leaveChannel", { user: data.user, channel: data.channel });
+    });
+
+    socket.on("userBanned", (data) => {
+      console.log("banned", data);
+      setSelected((prev: any) => {
+        if (prev && prev.id === data.channel.id) {
+          const message = {
+            from: "server",
+            content: `${data.user.username} was banned from channel`,
+          };
+          return { ...prev, messages: prev.messages.concat(message) };
+        }
+      });
+    });
+
     return () => {
       socket.off("newChannel");
       socket.off("joinedChannel");
       socket.off("removeChannel");
       socket.off("leftChannel");
       socket.off("newMessage");
+      socket.off("banned");
     };
   }, []);
 }

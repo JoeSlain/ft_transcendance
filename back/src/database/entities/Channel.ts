@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { User } from "./User";
 import { ChanMessage } from "./ChanMessage";
+import { Restriction } from "./Restriction";
 
 @Entity({ name: "channels" })
 export class Channel {
@@ -39,13 +40,19 @@ export class Channel {
   @JoinTable()
   admins: User[];
 
-  @ManyToMany(() => User)
+  /*@ManyToMany(() => User)
   @JoinTable()
   banned: User[];
 
   @ManyToMany(() => User)
   @JoinTable()
-  muted: User[];
+  muted: User[];*/
+
+  @OneToMany(() => Restriction, (restriction) => restriction.channel)
+  banned: Restriction[];
+
+  @OneToMany(() => Restriction, (restriction) => restriction.channel)
+  muted: Restriction[];
 
   @OneToMany(() => ChanMessage, (message) => message.channel)
   messages: ChanMessage[];

@@ -7,6 +7,7 @@ import { userType } from "../../../types/userType";
 import { ContextMenu } from "../../../styles/menus";
 import { ChanUserContextList } from "./ChanUserContextList";
 import useClickListener from "../../../hooks/useClickListener";
+import User from "../../../hooks/User";
 
 type Props = {
   selected: channelType | null;
@@ -16,6 +17,7 @@ type Props = {
 export default function ChanUsers({ selected, setSelected }: Props) {
   const [user, setUser] = useState<userType | null>(null);
   const [point, setPoint] = useState({ x: 0, y: 0 });
+  const me = useContext(User).user;
 
   useClickListener({
     selected: user,
@@ -34,22 +36,25 @@ export default function ChanUsers({ selected, setSelected }: Props) {
           </div>
           <div className="chanUsersBody">
             <AddChanUser selected={selected} />
-            {selected.users.map((user) => (
-              <div
-                className="userEntry"
-                key={user.username}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setPoint({ x: e.pageX, y: e.pageY });
-                  setUser(user);
-                }}
-              >
-                {user.username}
-              </div>
-            ))}
+            {selected.users.map((user) => {
+              if (me.id !== user.id)
+                return (
+                  <div
+                    className="userEntry"
+                    key={user.username}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setPoint({ x: e.pageX, y: e.pageY });
+                      setUser(user);
+                    }}
+                  >
+                    {user.username}
+                  </div>
+                );
+            })}
             {user && (
               <ContextMenu top={point.y} left={point.x}>
-                <ChanUserContextList selectedUser={user} />
+                <ChanUserContextList selectedUser={user} channel={selected} />
               </ContextMenu>
             )}
           </div>

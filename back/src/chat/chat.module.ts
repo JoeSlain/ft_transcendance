@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
-import { Channel, ChanMessage, Notif, User } from "src/database";
+import { Channel, ChanMessage, Notif, User, Restriction } from "src/database";
 import { GameModule } from "src/game/game.module";
 import { RoomService } from "src/game/room.service";
 import { NotifService } from "src/users/notifs.service";
@@ -11,6 +11,7 @@ import { ChatService } from "./chat.service";
 import { ChannelService } from "./channel.service";
 import { ChatController } from "./chat.controller";
 import { MessageService } from "./message.service";
+import { RestrictionService } from "./restrictions.service";
 
 @Module({
   controllers: [ChatController],
@@ -18,7 +19,7 @@ import { MessageService } from "./message.service";
     UsersModule,
     AuthModule,
     GameModule,
-    TypeOrmModule.forFeature([Notif, Channel, User, ChanMessage]),
+    TypeOrmModule.forFeature([Notif, Channel, User, ChanMessage, Restriction]),
   ],
   providers: [
     ChatGateway,
@@ -27,6 +28,7 @@ import { MessageService } from "./message.service";
     RoomService,
     ChannelService,
     MessageService,
+    RestrictionService,
   ],
 })
 export class ChatModule {}
