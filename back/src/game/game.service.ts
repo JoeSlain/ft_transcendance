@@ -19,6 +19,8 @@ export class GameService {
         y: 0,
         speedX: 0,
         speedY: 0,
+        xVel: 1
+
       },
       running: false,
       height: gameData.height || 500,
@@ -40,6 +42,8 @@ export class GameService {
         y: 0,
         width: PADDLE_WIDTH, 
         height: PADDLE_HEIGHT,
+        xVel : 1,
+        yVel : 0,
       },
     };
     game.players.push(newPlayer);
@@ -51,6 +55,7 @@ export class GameService {
       y: 0,
       speedX: INITIAL_SPEED, 
       speedY: INITIAL_SPEED, 
+      xVel : 1,
     };
   }
   saveGame(game: GameType): void {
@@ -128,6 +133,7 @@ export interface BallType {
   y: number; // la coordonnée y de la balle
   speedX: number; // la vitesse de la balle en x
   speedY: number; // la vitesse de la balle en y
+  xVel: number; // la vitesse de la raquette en x
 }
 
 export interface PaddleType {
@@ -135,4 +141,6 @@ export interface PaddleType {
   y: number; // la coordonnée y de la raquette
   width: number; // la largeur de la raquette
   height: number; // la hauteur de la raquette
+  xVel: number; // la vitesse de la raquette en x
+  yVel: number; // la vitesse de la raquette en y
 }
