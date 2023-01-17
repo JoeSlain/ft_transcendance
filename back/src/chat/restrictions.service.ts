@@ -78,7 +78,7 @@ export class RestrictionService {
   }
 
   async ban(user: User, channel: Channel, date: Date) {
-    if (channel.owner.id === user.id) return;
+    if (channel.owner.id === user.id) return null;
     const restrictionId = await this.getBannedId(user.id, channel);
 
     if (restrictionId >= 0) {
@@ -97,7 +97,7 @@ export class RestrictionService {
   }
 
   async mute(user: User, channel: Channel, date: Date) {
-    if (channel.owner.id === user.id) return;
+    if (channel.owner.id === user.id) return null;
     const restrictionId = await this.getMutedId(user.id, channel);
 
     if (restrictionId >= 0) channel.muted[restrictionId].end = date;

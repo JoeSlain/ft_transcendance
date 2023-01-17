@@ -146,6 +146,7 @@ export default function useChatEvents({
     });
 
     socket.on("userBanned", (data) => {
+      console.log("banned", data);
       setSelected((prev: any) => {
         if (prev && prev.id === data.channel.id) {
           const message = {

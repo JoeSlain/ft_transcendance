@@ -2,7 +2,7 @@ import { ConsoleLogger, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Channel, User } from "src/database";
 import { ChannelData } from "src/utils/types";
-import { Repository, createQueryBuilder } from "typeorm";
+import { Brackets, Repository, createQueryBuilder } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { NotifService } from "src/users/notifs.service";
 
@@ -65,6 +65,7 @@ export class ChannelService {
       relations: {
         owner: true,
         users: true,
+        banned: true,
       },
     });
     const chans = tmp.map((chan) => {
@@ -75,27 +76,40 @@ export class ChannelService {
   }
 
   async getPrivateChannels(userId: number) {
-    /*const tmp = await this.chanRepo
-      .createQueryBuilder("channel")
-      .leftJoinAndSelect("channel.owner", "owner")
-      .where("channel.owner = :id", { id: userId })
-      .andWhere("channel.type = :type", { type: "private" })
-      .getMany();*/
+    const bannedId = userId;
+    const tmp = await this.chanRepo
+      .createQueryBuilder("channels")
+      .leftJoinAndSelect("channels.users", "user")
+      .leftJoinAndSelect("channels.owner", "owner")
+      .leftJoinAndSelect("channels.banned", "banned")
+      .where("channels.type = :type", { type: "private" })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where("banned.userId = :bannedId", { bannedId }).orWhere(
+            "user.id = :userId",
+            { userId }
+          );
+        })
+      )
+      .getMany();
 
-    const tmp = await this.chanRepo.find({
+    /*const tmp = await this.chanRepo.find({
       relations: {
         users: true,
         owner: true,
+        banned: true,
       },
-      where: {
-        type: "private",
-        users: {
-          id: userId,
+      where: [
+        {
+          type: "private",
+          banned: {
+            userId: userId,
+          },
         },
-      },
-    });
+      ],
+    });*/
 
-    //console.log("tmpPrivateChans", tmp);
+    console.log("tmpPrivateChans", tmp);
     const chans = tmp.map((chan) => {
       return { ...chan, password: null };
     });
@@ -176,6 +190,7 @@ export class ChannelService {
     channel = await this.setChanOwner(chanData.owner, channel);
     channel = await this.addUserChan(chanData.owner, channel, "users");
 
+    //console.log("created channel", channel);
     return channel;
   }
 

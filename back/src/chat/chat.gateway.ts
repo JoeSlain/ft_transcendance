@@ -56,7 +56,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       status: "online",
     };
     console.log("chat ws login");
-    console.log("user", user);
 
     this.chatService.addUser(user.id, client.id);
     client.broadcast.emit("updateStatus", data);
