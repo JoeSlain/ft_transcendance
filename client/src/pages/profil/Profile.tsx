@@ -6,12 +6,13 @@ import User from "../../hooks/User";
 import { getUser } from "../../services/User/GetUser";
 import { useQuery } from "@tanstack/react-query";
 import ProfileNavbar from "./Navbar";
+import Loading from "../../components/loading";
 
 export default function Profile() {
   const { user } = useContext(User);
   const userId = useParams().id || "";
   console.log("In profile by id");
-  const { isLoading, error, data } = useQuery({
+  let { isLoading, error, data } = useQuery({
     queryKey: ["userData", userId],
     queryFn: ({ queryKey }) => getUser(queryKey[1]),
   });
@@ -24,11 +25,10 @@ export default function Profile() {
         Profile not found.
       </h1>
     );
+  isLoading = true;
   if (isLoading) {
     return (
-      <h1 className="flex justify-center text-slate-200 text-8xl items-center">
-        Loading
-      </h1>
+      <Loading/>
     );
   }
   return (

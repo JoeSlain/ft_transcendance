@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
 import { BACK_ROUTE } from "../../../../services/back_route";
+import validateUsername from "../../../../services/zod/validateUsername";
 
 type avatarState = {
   url: string;
@@ -22,6 +23,7 @@ async function getAvatar(userId: number) {
 //Username and avatar component
 export default function UserInfos() {
   let { user } = useContext(User); //user data to print
+  const [usernameErr, setUsernameErr] = useState(false);
   const { register, handleSubmit } = useForm();
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
@@ -64,8 +66,15 @@ export default function UserInfos() {
       setAvatar({ ...avatar, url: user.avatar });
     }
     if (formValue.username !== user.username) {
+      const isValidUsername = validateUsername(formValue.username);
+      if (isValidUsername.res === false)
+      {
+          setUsernameErr(true);
+          saveItem("user", user);
+          console.log("invalid username");
+          return ;
+      }
       user.username = formValue.username;
-      console.log("In username avatar is:  ", user.avatar)
       await axios
         .post(
           `${BACK_ROUTE}users/updateUsername`,
@@ -107,8 +116,9 @@ export default function UserInfos() {
         <div className="flex flex-col items-center justify-center">
           <div>
             <p className="text-slate-200">Username</p>
-            <input defaultValue={user.username} {...register("username")} />
+            <input defaultValue={user.username} {...register("username")} onChange={() => setUsernameErr(false)}/>
           </div>
+          {usernameErr && <><p>Username can only contain alphanumerical</p> <p>characters aswell as - and _</p></>}
           <button
             className="btn mt-2 normal-case text-slate-200 center"
             type="submit"
