@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import User from "../../hooks/User";
 import { channelType } from "../../types/channelType";
+import "../../styles/chat/chat.css";
 
 type Props = {
   selected: channelType | null;
@@ -29,10 +30,9 @@ export default function MessageForm({ selected }: Props) {
 
   if (selected) {
     return (
-      <div className="">
         <div className="messageForm">
           <textarea
-            className="textarea max-h-24"
+            className="textarea max-h-24 "
             value={message}
             onKeyDown={handleKeyDown}
             onChange={(e) => {
@@ -48,7 +48,6 @@ export default function MessageForm({ selected }: Props) {
             SEND
           </button>
         </div>
-      </div>
     );
   }
   return <></>;

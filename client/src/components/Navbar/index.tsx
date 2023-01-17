@@ -25,26 +25,26 @@ export default function Navbar({ setIsLogged }: IProps) {
   }
   return (
     <>
-      <nav className=" navigation-menu bg-ata-red ">
-        <ul className=" bg-ata-red flex justify-center gap-7 grow">
+      <nav className=" bg-ata-red py-2">
+        <ul className=" bg-ata-red flex justify-center gap-2 sm:gap-7 grow">
           <li>{isLogged && <Notifs />}</li>
-          <li className=" font-retro text-ata-yellow hover:bo">
+          <li className=" font-retro sm:text-[26px] text-ata-yellow hover:bo">
             <NavLink to="/Home">HOME</NavLink>
           </li>
-          <li className=" font-retro text-ata-yellow">
+          <li className=" font-retro sm:text-[26px] text-ata-yellow">
             <NavLink to="/play">PLAY</NavLink>
           </li>
-          <li className=" font-retro text-ata-yellow">
+          <li className=" font-retro sm:text-[26px] text-ata-yellow">
             <NavLink to="/chat">CHAT</NavLink>
           </li>
-          <li className=" font-retro text-ata-yellow">
+          <li className=" font-retro sm:text-[26px] text-ata-yellow">
             <NavLink className="navlink" to="/login" onClick={logout}>
               LOGOUT
             </NavLink>
           </li>
           <li>
             <NavLink to="/profile">
-              <img className="avatar max-w-[42px] max-h-[42px] bg-ata-red" src={profile} alt="Profile" />
+              <img className="avatar max-w-[20px] sm:max-w-[42px] sm:max-h-[42px] bg-ata-red" src={profile} alt="Profile" />
             </NavLink>
           </li>
         </ul>

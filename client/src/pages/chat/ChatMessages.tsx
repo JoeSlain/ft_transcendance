@@ -40,7 +40,7 @@ const ChatMessages = ({ selected }: Props) => {
     return (
       <div
         ref={messagesEndRef}
-        className="chatMessages border-2 max-h-[400px] sm:max-h-[700px] overflow-y-auto"
+        className="chatMessages mx-2 max-h-[400px] sm:max-h-[700px] overflow-y-auto rounded-md bg-base-200"
       >
         {messages.map((message, index) => {
           console.log("message", message);

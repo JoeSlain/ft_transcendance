@@ -36,7 +36,10 @@ export default function Notifs() {
 
   return (
     <div className="notifs">
-      <button onClick={() => setSelected(true)} className="notifIcon">
+      <button
+        onClick={() => setSelected(true)}
+        className="notifIcon sm:text-[26px]"
+      >
         !
       </button>
       {selected && (

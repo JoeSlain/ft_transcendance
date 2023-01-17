@@ -1,12 +1,10 @@
 .notifs {
-  height: 60px;
   width: 10%;
   position: relative;
   display: inline-block;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  padding-top: 2%;
+
 }
 
 .notifIcon {
@@ -14,10 +12,7 @@
   justify-content: center;
   width: 100%;
   color: #ffc300;
-  font-size: 26px;
   font-style: bold;
-  border-radius: 5px;
-  background-color: #003566;
   cursor: pointer;
 }
 

@@ -23,8 +23,6 @@ export default function Chat() {
     setSelected,
   });
 
-
-
   return (
     <div className="flex ">
       <div className="heightMinusNav">
@@ -35,26 +33,31 @@ export default function Chat() {
         )}
       </div>
       <div className="wholechat flex flex-col justify-center flex-grow ">
-        <div className="chatMain heightMinusNav bg-base-300">
+        <div className="chatMain border-2 heightMinusNav bg-base-300">
           <div className="drop-shadow-xl">
             <h2 className="font-retro mt-5 text-4xl">
               {selected ? selected.name : "CHAT"}{" "}
             </h2>
-            <div className="bg-base-content/10 my-2 mx-1 h-px"></div>
+            <div className="bg-base-content/10  mx-2 h-px"></div>
           </div>
           {/*<DirectMessages
           directMessages={directMessages}
           selected={selected}
           setSelected={setSelected}
         />*/}
-          <div>
+          <div className="">
             <ChatMessages selected={selected} />
           </div>
           <div
-            className="fixed
-             inset-x-0
+            className="
+            flex
+            justify center
+            fixed
+            border-2
              bottom-0
-             p-4"
+             p-4
+             max-w-[50%]
+             sm:max-w-[70%]"
           >
             <MessageForm selected={selected} />
           </div>
