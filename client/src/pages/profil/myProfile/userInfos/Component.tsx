@@ -5,6 +5,7 @@ import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
 import { BACK_ROUTE } from "../../../../services/back_route";
 import validateUsername from "../../../../services/zod/validateUsername";
+import Error from "../../../../components/error"
 
 type avatarState = {
   url: string;
@@ -101,6 +102,16 @@ export default function UserInfos() {
   }
   return (
     <>
+      {usernameErr && (
+        <div >
+          <Error
+            err={
+              "Username can only contain alphanumerical characters aswell as - and _"
+            }
+          />{" "}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSave)}>
         <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
           <img
@@ -116,9 +127,12 @@ export default function UserInfos() {
         <div className="flex flex-col items-center justify-center">
           <div>
             <p className="text-slate-200">Username</p>
-            <input defaultValue={user.username} {...register("username")} onChange={() => setUsernameErr(false)}/>
+            <input
+              defaultValue={user.username}
+              {...register("username")}
+              onChange={() => setUsernameErr(false)}
+            />
           </div>
-          {usernameErr && <><p>Username can only contain alphanumerical</p> <p>characters aswell as - and _</p></>}
           <button
             className="btn mt-2 normal-case text-slate-200 center"
             type="submit"
