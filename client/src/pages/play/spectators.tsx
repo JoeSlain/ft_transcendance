@@ -6,7 +6,6 @@ type IProps = {
 };
 
 export default function Spectators({ spectators }: IProps) {
-  console.log("spectators", spectators);
   return (
     <div className="spectators">
       <b>Spectating : </b>
