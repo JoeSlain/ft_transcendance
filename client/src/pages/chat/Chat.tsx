@@ -33,7 +33,7 @@ export default function Chat() {
         )}
       </div>
       <div className="wholechat flex flex-col justify-center flex-grow ">
-        <div className="chatMain border-2 heightMinusNav bg-base-300">
+        <div className="chatMain  heightMinusNav bg-base-300">
           <div className="drop-shadow-xl">
             <h2 className="font-retro mt-5 text-4xl">
               {selected ? selected.name : "CHAT"}{" "}
@@ -53,7 +53,6 @@ export default function Chat() {
             flex
             justify center
             fixed
-            border-2
              bottom-0
              p-4
              max-w-[50%]
