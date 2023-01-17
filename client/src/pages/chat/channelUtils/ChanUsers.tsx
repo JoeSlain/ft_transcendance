@@ -8,6 +8,7 @@ import { ContextMenu } from "../../../styles/menus";
 import { ChanUserContextList } from "./ChanUserContextList";
 import useClickListener from "../../../hooks/useClickListener";
 import User from "../../../hooks/User";
+import { saveItem } from "../../../utils/storage";
 
 type Props = {
   selected: channelType | null;
@@ -29,7 +30,13 @@ export default function ChanUsers({ selected, setSelected }: Props) {
       <div className="channelAside heightMinusNav pt-5">
         <div className="chanUsersBar">
           <div className="chanUsersHeader">
-            <button className="btn btn-sm font-bold" onClick={() => setSelected(null)}>
+            <button
+              className="btn btn-sm font-bold"
+              onClick={() => {
+                setSelected(null);
+                saveItem("selected", null);
+              }}
+            >
               ←
             </button>
             <h1 className="usersTitle font-retro">Users</h1>

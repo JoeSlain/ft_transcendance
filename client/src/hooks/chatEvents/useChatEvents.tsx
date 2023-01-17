@@ -2,6 +2,8 @@ import axios from "axios";
 import { useContext, useEffect } from "react";
 import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
+import { getSavedItem, saveItem } from "../../utils/storage";
+import User from "../User";
 
 type IProps = {
   privateChans: channelType[];
@@ -19,6 +21,7 @@ export default function useChatEvents({
   setSelected,
 }: IProps) {
   const socket = useContext(ChatContext);
+  const user = useContext(User);
 
   // update functions
   const updateSelected = (newChan: channelType) => {
@@ -27,6 +30,7 @@ export default function useChatEvents({
       console.log("prev", prev);
       if (prev && prev.id === newChan.id) {
         console.log("update selected");
+        saveItem("selected", newChan);
         return newChan;
       }
       return prev;
@@ -60,6 +64,11 @@ export default function useChatEvents({
   // on mount
   useEffect(() => {
     console.log("use chat effect");
+    const selected = getSavedItem("selected");
+    if (selected) {
+      socket.emit("joinChannel", { user, channel: selected });
+    }
+
     // get Channels
     axios
       .get("http://localhost:3001/api/chat/privateChannels", {
@@ -89,6 +98,7 @@ export default function useChatEvents({
     socket.on("joinedChannel", (channel) => {
       console.log("joined channel", channel);
       setSelected(channel);
+      saveItem("selected", channel);
       updateChannel(channel);
     });
 
@@ -128,8 +138,14 @@ export default function useChatEvents({
       console.log("newmessage", message);
 
       setSelected((prev: any) => {
-        if (prev && prev.id === message.channel.id)
-          return { ...prev, messages: prev.messages.concat(message) };
+        if (prev && prev.id === message.channel.id) {
+          const newSelected = {
+            ...prev,
+            messages: prev.messages.concat(message),
+          };
+          saveItem("selected", newSelected);
+          return newSelected;
+        }
         return prev;
       });
     });
@@ -140,20 +156,23 @@ export default function useChatEvents({
         `You have been banned from ${data.channel.name} until ${data.date}`
       );
       setSelected((prev: any) => {
-        if (prev && prev.id === data.channel.id) return null;
+        if (prev && prev.id === data.channel.id) {
+          saveItem("selected", null);
+          return null;
+        }
       });
       socket.emit("leaveChannel", { user: data.user, channel: data.channel });
     });
 
-    socket.on("userBanned", (data) => {
-      console.log("banned", data);
+    socket.on("muted", (data) => {
+      console.log("mute event");
+      alert(
+        `You have been muted on channel ${data.channel.name} until ${data.date}`
+      );
       setSelected((prev: any) => {
         if (prev && prev.id === data.channel.id) {
-          const message = {
-            from: "server",
-            content: `${data.user.username} was banned from channel`,
-          };
-          return { ...prev, messages: prev.messages.concat(message) };
+          saveItem("selected", data.channel);
+          return data.channel;
         }
       });
     });

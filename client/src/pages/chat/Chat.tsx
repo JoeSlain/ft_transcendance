@@ -6,9 +6,12 @@ import ChanUsers from "./channelUtils/ChanUsers";
 import MessageForm from "./MessageForm";
 import "../../styles/chat/chat.css";
 import ChatMessages from "./ChatMessages";
+import { getSavedItem } from "../../utils/storage";
 
 export default function Chat() {
-  const [selected, setSelected] = useState<channelType | null>(null);
+  const [selected, setSelected] = useState<channelType | null>(
+    getSavedItem("selected")
+  );
   const [privateChans, setPrivateChans] = useState([]);
   const [publicChans, setPublicChans] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
@@ -22,8 +25,6 @@ export default function Chat() {
     setPublicChans,
     setSelected,
   });
-
-
 
   return (
     <div className="flex ">

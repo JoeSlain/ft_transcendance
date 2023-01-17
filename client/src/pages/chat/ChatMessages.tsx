@@ -7,9 +7,8 @@ type Props = {
   selected: channelType | null;
 };
 
-
 const ChatMessages = ({ selected }: Props) => {
-/*   function scrollToMyRef() {
+  /*   function scrollToMyRef() {
     if (chatContainer.current) {
       console.log("USING REF");
       const scroll =
@@ -17,20 +16,20 @@ const ChatMessages = ({ selected }: Props) => {
       chatContainer.current.scrollTo(0, scroll);
     }
   } */
-      const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-      useEffect(() => {
-        if (messagesEndRef && messagesEndRef.current) {
-          let lastChild = messagesEndRef.current.lastElementChild;
-          console.log("USERFFECT");
-          if (selected?.messages)
-          lastChild?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-            inline: "nearest"
-          });
-        }
-      }, [selected?.messages]);
+  useEffect(() => {
+    if (messagesEndRef && messagesEndRef.current) {
+      let lastChild = messagesEndRef.current.lastElementChild;
+      console.log("USERFFECT");
+      if (selected?.messages)
+        lastChild?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+          inline: "nearest",
+        });
+    }
+  }, [selected?.messages]);
 
   const { user } = useContext(User);
   //const chatContainer = useChatScroll(selected!.messages);
@@ -44,7 +43,17 @@ const ChatMessages = ({ selected }: Props) => {
       >
         {messages.map((message, index) => {
           console.log("message", message);
-          if (message.from.id === user.id) {
+          if (!message.from) {
+            return (
+              <div
+                key={index}
+                className="pr-5 chat chat-end justify-end flex flex-col"
+              >
+                <div className="chat-header mr-1">Server</div>
+                <div className="chat-bubble">{message.content}</div>
+              </div>
+            );
+          } else if (message.from.id === user.id) {
             return (
               <div
                 key={index}
