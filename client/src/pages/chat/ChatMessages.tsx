@@ -27,7 +27,7 @@ const ChatMessages = ({ selected }: Props) => {
    const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()
   ); 
-  const [linebreak, setLineBreak] = useState(40);
+  const [linebreak, setLineBreak] = useState(110);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useContext(User);
 
@@ -43,7 +43,7 @@ const ChatMessages = ({ selected }: Props) => {
     if (windowDimensions.width <= 1200)
       setLineBreak(10);
     else
-      setLineBreak(40);  
+      setLineBreak(110);  
   }, [windowDimensions]);
 
   //console.log("win dimensions: ", windowDimensions);
@@ -76,7 +76,7 @@ const ChatMessages = ({ selected }: Props) => {
                 className="pr-5 chat chat-end justify-end flex flex-col"
               >
                 <div className="chat-header mr-1">{message.from.username}</div>
-                <div className="chat-bubble max-w-[50%] ">
+                <div className="chat-bubble max-w-[90%] ">
                   {addLineBreaks(message.content, linebreak)}
                 </div>
               </div>
@@ -92,8 +92,8 @@ const ChatMessages = ({ selected }: Props) => {
               <div key={index} className="pl-5 chat chat-start flex flex-col">
                 <div className="chat-header ml-1">{message.from.username}</div>
 
-                <div className="chat-bubble chat-bubble-primary max-w-[10%]">
-                  {message.content}
+                <div className="chat-bubble chat-bubble-primary max-w-[90%]">
+                  {addLineBreaks(message.content, linebreak)}
                 </div>
               </div>
               /*               <div key={message.id} className="messageWrapper">
