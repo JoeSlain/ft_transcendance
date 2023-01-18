@@ -40,7 +40,7 @@ export const ChanUserContextList = ({ selectedUser, channel }: Props) => {
   };
 
   return (
-    <ul>
+    <ul className="z-2">
       <li onClick={handleInvite}> Invite </li>
       <li> Block </li>
       <li onClick={handleSetAdmin}> Promote to admin </li>

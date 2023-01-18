@@ -26,8 +26,8 @@ function addLineBreaks(str: string, n: number) {
 const ChatMessages = ({ selected }: Props) => {
    const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()
-  ); 
-  const [linebreak, setLineBreak] = useState(110);
+  );
+  const [linebreak, setLineBreak] = useState(90);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useContext(User);
 
@@ -43,7 +43,7 @@ const ChatMessages = ({ selected }: Props) => {
     if (windowDimensions.width <= 1200)
       setLineBreak(10);
     else
-      setLineBreak(110);  
+      setLineBreak(90);  
   }, [windowDimensions]);
 
   //console.log("win dimensions: ", windowDimensions);

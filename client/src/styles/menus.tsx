@@ -7,9 +7,11 @@ type ContextMenuProps = {
 
 export const ContextMenu = styled.div<ContextMenuProps>`
   border-radius: 4px;
+  background-color: #d2c49d;
   box-sizing: border-box;
-  position: absolute;
-  background-color: #003566;
+  position: fixed;
+  z-index: 1;
+  
   box-shadow: 0px 1px 8px 0px grey;
   ${({ top, left }: ContextMenuProps) => css`
     top: ${top}px;
