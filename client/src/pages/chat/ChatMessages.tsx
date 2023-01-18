@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import User from "../../hooks/User";
 import { channelType } from "../../types/channelType";
 import "../../styles/chat/chatMessages.css";
@@ -7,33 +7,58 @@ type Props = {
   selected: channelType | null;
 };
 
+function getWindowDimensions() {
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height,
+  };
+}
+
+function addLineBreaks(str: string, n: number) {
+  let slicedString = "";
+  for (let i = 0; i < str.length; i += n) {
+    slicedString += str.slice(i, i + n) + "\n";
+  }
+  return slicedString;
+}
 
 const ChatMessages = ({ selected }: Props) => {
-/*   function scrollToMyRef() {
-    if (chatContainer.current) {
-      console.log("USING REF");
-      const scroll =
-        chatContainer.current.scrollHeight - chatContainer.current.clientHeight;
-      chatContainer.current.scrollTo(0, scroll);
-    }
-  } */
-      const messagesEndRef = useRef<HTMLDivElement>(null);
-
-      useEffect(() => {
-        if (messagesEndRef && messagesEndRef.current) {
-          let lastChild = messagesEndRef.current.lastElementChild;
-          console.log("USERFFECT");
-          if (selected?.messages)
-          lastChild?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-            inline: "nearest"
-          });
-        }
-      }, [selected?.messages]);
-
+   const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions()
+  ); 
+  const [linebreak, setLineBreak] = useState(40);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useContext(User);
-  //const chatContainer = useChatScroll(selected!.messages);
+
+   useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); 
+  useEffect(() => {
+    if (windowDimensions.width <= 1200)
+      setLineBreak(10);
+    else
+      setLineBreak(40);  
+  }, [windowDimensions]);
+
+  //console.log("win dimensions: ", windowDimensions);
+  useEffect(() => {
+    if (messagesEndRef && messagesEndRef.current) {
+      let lastChild = messagesEndRef.current.lastElementChild;
+      console.log("USERFFECT");
+      if (selected?.messages)
+        lastChild?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+          inline: "nearest",
+        });
+    }
+  }, [selected?.messages]);
 
   if (selected && selected.messages) {
     const messages = selected.messages;
@@ -51,7 +76,9 @@ const ChatMessages = ({ selected }: Props) => {
                 className="pr-5 chat chat-end justify-end flex flex-col"
               >
                 <div className="chat-header mr-1">{message.from.username}</div>
-                <div className="chat-bubble">{message.content}</div>
+                <div className="chat-bubble max-w-[50%] ">
+                  {addLineBreaks(message.content, linebreak)}
+                </div>
               </div>
               /*               <div key={message.id} className="messageWrapper">
                 <div className="myUsername"> me</div>
@@ -65,7 +92,7 @@ const ChatMessages = ({ selected }: Props) => {
               <div key={index} className="pl-5 chat chat-start flex flex-col">
                 <div className="chat-header ml-1">{message.from.username}</div>
 
-                <div className="chat-bubble chat-bubble-primary">
+                <div className="chat-bubble chat-bubble-primary max-w-[10%]">
                   {message.content}
                 </div>
               </div>
