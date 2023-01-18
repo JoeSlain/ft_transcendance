@@ -11,7 +11,7 @@ export const ContextMenu = styled.div<ContextMenuProps>`
   box-sizing: border-box;
   position: fixed;
   z-index: 1;
-  
+
   box-shadow: 0px 1px 8px 0px grey;
   ${({ top, left }: ContextMenuProps) => css`
     top: ${top}px;
@@ -28,6 +28,6 @@ export const ContextMenu = styled.div<ContextMenuProps>`
   }
   ul li:hover {
     cursor: pointer;
-    background-color: grey;
+    background-color: #ee9994;
   }
 `;
