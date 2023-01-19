@@ -59,7 +59,7 @@ const AddChannel = () => {
   const createChannel = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const res = validateUserInput(chanName);
-    if (res.res === false) {
+    if (res.res === false || chanName === "") {
       setModal({
         header: "Error",
         body: (
