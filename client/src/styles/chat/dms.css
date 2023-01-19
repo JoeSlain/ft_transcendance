@@ -1,0 +1,24 @@
+.dms {
+  display: flex;
+}
+
+.dmTitle {
+  width: 200px;
+  margin-right: 5px;
+  position: relative;
+  text-align: center;
+  color: yellow;
+  background-color: #f32c43;
+  border: 1px solid rgba(0, 0, 0, 0.836);
+}
+
+.dmContent {
+  width: 200px;
+  height: 100px;
+  margin-right: 10px;
+  position: absolute;
+  bottom: 2px;
+  z-index: 1;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.836);
+}
