@@ -15,7 +15,6 @@ function getWindowDimensions() {
   };
 }
 
-
 const ChatMessages = ({ selected }: Props) => {
   const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()

@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
 import { BACK_ROUTE } from "../../../../services/back_route";
-import validateUsername from "../../../../services/zod/validateUsername";
-import Error from "../../../../components/error"
+import validateUserInput from "../../../../services/zod/validateUserInput";
+import Error from "../../../../components/error";
 
 type avatarState = {
   url: string;
@@ -34,10 +34,11 @@ export default function UserInfos() {
   useEffect(() => {
     if (user.avatar != null) {
       console.log("effect");
-      getAvatar(user.id).then((res) => {
-        setAvatar({ url: res, file: null });
-      })
-      .catch((e) => console.log("Error gtting avatar: ", e.message));
+      getAvatar(user.id)
+        .then((res) => {
+          setAvatar({ url: res, file: null });
+        })
+        .catch((e) => console.log("Error gtting avatar: ", e.message));
       console.log("avatar modified?: ", avatar.url);
     }
   }, []);
@@ -67,13 +68,12 @@ export default function UserInfos() {
       setAvatar({ ...avatar, url: user.avatar });
     }
     if (formValue.username !== user.username) {
-      const isValidUsername = validateUsername(formValue.username);
-      if (isValidUsername.res === false)
-      {
-          setUsernameErr(true);
-          saveItem("user", user);
-          console.log("invalid username");
-          return ;
+      const isValidUsername = validateUserInput(formValue.username);
+      if (isValidUsername.res === false) {
+        setUsernameErr(true);
+        saveItem("user", user);
+        console.log("invalid username");
+        return;
       }
       user.username = formValue.username;
       await axios
@@ -103,7 +103,7 @@ export default function UserInfos() {
   return (
     <>
       {usernameErr && (
-        <div >
+        <div>
           <Error
             err={
               "Username can only contain alphanumerical characters aswell as - and _"

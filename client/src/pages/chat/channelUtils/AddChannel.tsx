@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
 import { ModalContext } from "../../../context/modalContext";
+import validateUserInput from "../../../services/zod/validateUserInput";
+import Error from "../../../components/error";
 
 type AddChanProps = {
   setShowChanMenu: (show: boolean) => void;
@@ -56,6 +58,25 @@ const AddChannel = () => {
 
   const createChannel = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    const res = validateUserInput(chanName);
+    if (res.res === false) {
+      setModal({
+        header: "Error",
+        body: (
+          <div className="flex flex-col justify-center items-center gap-5">
+            <Error err={"Wrong channel name"} />{" "}
+            <button
+              className="btn btn-primary gap-2 normal-case max-w-[50%] lg:gap-3 "
+              onClick={() => setModal(null)}
+            >
+              {" "}
+              Cancel{" "}
+            </button>
+          </div>
+        ),
+      });
+      return;
+    }
     const newChan = {
       name: chanName,
       type: selected,

@@ -2,9 +2,10 @@ import * as z from "zod";
 
 const usernameSchema = z.string().regex(/^[a-zA-Z0-9_-]+$/);
 
-export default function validateUsername(
-  username: string
-): { res: boolean; err: string } {
+export default function validateUserInput(username: string): {
+  res: boolean;
+  err: string;
+} {
   try {
     usernameSchema.parse(username);
     return { res: true, err: "" };
