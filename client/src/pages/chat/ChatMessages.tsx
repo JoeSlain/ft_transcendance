@@ -60,7 +60,7 @@ const ChatMessages = ({ selected }: Props) => {
         className="chatMessages mx-2 max-h-[400px] sm:max-h-[700px] overflow-y-auto rounded-md bg-base-200"
       >
         {messages.map((message, index) => {
-          console.log("message", message);
+          //console.log("message", message);
           if (!message.from) {
             return (
               <div
