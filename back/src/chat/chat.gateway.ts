@@ -328,8 +328,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.channel
     );
     //console.log("postleave", data.channel);
-    if (data.channel.type === "private")
-      this.server.to(client.id).emit("removeChannel", data.channel);
+    if (!channel) this.server.emit("removeChannel", data.channel);
+    else this.server.to(client.id).emit("removeChannel", data.channel);
     if (channel)
       this.server.to(data.channel.socketId).emit("leftChannel", channel);
     client.leave(data.channel.socketId);
@@ -343,9 +343,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.channel
     );
     //console.log("postleave", data.channel);
-    if (channel) {
-      this.server.to(data.channel.socketId).emit("leftChannel", channel);
-    }
+    if (!channel)
+      this.server.to(data.channel.socketId).emit("removeChannel", data.channel);
+    else this.server.to(channel.socketId).emit("leftChannel", channel);
     client.leave(data.channel.socketId);
   }
 
@@ -452,7 +452,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       content: `${data.user.username} has been banned from the channel`,
       channel: data.channel,
     });
-    //this.server.to(channel.socketId).emit("userBanned", data);
   }
 
   @SubscribeMessage("muteUser")
@@ -481,22 +480,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("setAdmin")
   async setAdmin(client: Socket, data: any) {
+    console.log("setAdmin");
     let channel = await this.channelService.findChannelById(data.channel.id);
 
     if (!channel) {
       this.server.to(client.id).emit("error", "channel not found");
       return;
     }
-    if (this.channelService.findUserInChan(data.user.id, channel)) {
-      if (!channel.admins.find((admin) => admin.id === data.user.id)) {
-        this.channelService.addUserChan(data.user, channel, "admins");
-        this.server.to(client.id).emit("newAdmin", data);
-      } else
-        this.server
-          .to(client.id)
-          .emit(`user ${data.user.username} is already an admin`);
+    if (!this.channelService.findUserInChan(data.user.id, channel)) {
+      this.server.to(client.id).emit("error", "user not found");
       return;
     }
-    this.server.to(client.id).emit("error", "user not found");
+    if (!channel.admins.find((admin) => admin.id === data.user.id)) {
+      data.channel = await this.channelService.addUserChan(
+        data.user,
+        channel,
+        "admins"
+      );
+      const to = this.chatService.getUser(data.user.id);
+      if (to) this.server.to(to).emit("setAsAdmin", data);
+      this.message(client, {
+        content: `${data.user.username} has been set as admin`,
+        channel: data.channel,
+      });
+    } else
+      this.server
+        .to(client.id)
+        .emit("error", `user ${data.user.username} is already an admin`);
   }
 }

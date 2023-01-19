@@ -16,8 +16,14 @@ export const ChanUserContextList = ({ selectedUser, channel }: Props) => {
   const chatSocket = useContext(ChatContext);
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
+  const superUser =
+    (channel.owner && channel.owner.id === user.id) ||
+    (channel.admins && channel.admins.find((admin) => admin.id === user.id));
 
-  const handleSetAdmin = () => {};
+  const handleSetAdmin = () => {
+    console.log("set admin");
+    chatSocket.emit("setAdmin", { channel, user: selectedUser });
+  };
 
   const handleBan = () => {
     setModal({
@@ -49,10 +55,14 @@ export const ChanUserContextList = ({ selectedUser, channel }: Props) => {
     <ul className="z-2">
       <li onClick={handleInvite}> Invite </li>
       <li> Block </li>
-      <li onClick={handleSetAdmin}> Promote to admin </li>
-      <li onClick={handleBan}> Ban </li>
-      <li onClick={handleMute}> Mute </li>
       <li onClick={handleGetProfile}> Get Profile </li>
+      {superUser && selectedUser.id !== channel.owner.id && (
+        <>
+          <li onClick={handleSetAdmin}> Promote to admin </li>
+          <li onClick={handleBan}> Ban </li>
+          <li onClick={handleMute}> Mute </li>
+        </>
+      )}
     </ul>
   );
 };

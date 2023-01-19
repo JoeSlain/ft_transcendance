@@ -65,6 +65,7 @@ export default function useChatEvents({
   useEffect(() => {
     console.log("use chat effect");
     const selected = getSavedItem("selected");
+    console.log("selected saved", selected);
     if (selected) {
       socket.emit("joinChannel", { user, channel: selected });
     }
@@ -90,9 +91,19 @@ export default function useChatEvents({
     // events
     socket.on("newChannel", (channel) => {
       console.log("new chan", channel);
-      if (channel.type === "private")
-        setPrivateChans((prev: any) => [...prev, channel]);
-      else setPublicChans((prev: any) => [...prev, channel]);
+      if (channel.type === "private") {
+        setPrivateChans((prev: any) => {
+          if (prev && !prev.find((chan: channelType) => chan.id === channel.id))
+            return [...prev, channel];
+          return prev;
+        });
+      } else {
+        setPublicChans((prev: any) => {
+          if (prev && !prev.find((chan: channelType) => chan.id === channel.id))
+            return [...prev, channel];
+          return prev;
+        });
+      }
     });
 
     socket.on("joinedChannel", (channel) => {
@@ -114,10 +125,9 @@ export default function useChatEvents({
 
     socket.on("removeChannel", (channel) => {
       console.log("removeChan", channel);
-      if (channel.type === "private")
-        setPrivateChans((prev: any) =>
-          prev.filter((chan: any) => chan.id !== channel.id)
-        );
+      setPrivateChans((prev: any) =>
+        prev.filter((chan: any) => chan.id !== channel.id)
+      );
       /*else
         setPublicChans((prev: any) =>
           prev.filter((chan: any) => chan.id !== channel.id)
@@ -161,7 +171,7 @@ export default function useChatEvents({
           return null;
         }
       });
-      socket.emit("leaveChannel", { user: data.user, channel: data.channel });
+      //socket.emit("leaveChannel", { user: data.user, channel: data.channel });
     });
 
     socket.on("muted", (data) => {
@@ -177,6 +187,11 @@ export default function useChatEvents({
       });
     });
 
+    socket.on("setAsAdmin", (data) => {
+      console.log("set as admin", data);
+      updateChannel(data.channel);
+    });
+
     return () => {
       socket.off("newChannel");
       socket.off("joinedChannel");
@@ -184,6 +199,8 @@ export default function useChatEvents({
       socket.off("leftChannel");
       socket.off("newMessage");
       socket.off("banned");
+      socket.off("muted");
+      socket.off("setAsAdmin");
     };
   }, []);
 }

@@ -43,19 +43,19 @@ export default function ChanUsers({ selected, setSelected }: Props) {
           </div>
           <div className="chanUsersBody">
             <AddChanUser selected={selected} />
-            {selected.users.map((user) => {
-              if (me.id !== user.id)
+            {selected.users.map((u) => {
+              if (me.id !== u.id)
                 return (
                   <div
                     className="userEntry"
-                    key={user.username}
+                    key={u.id}
                     onContextMenu={(e) => {
                       e.preventDefault();
                       setPoint({ x: e.pageX, y: e.pageY });
-                      setUser(user);
+                      setUser(u);
                     }}
                   >
-                    {user.username}
+                    {u.username}
                   </div>
                 );
             })}

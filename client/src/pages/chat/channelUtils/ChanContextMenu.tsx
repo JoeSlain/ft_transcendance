@@ -66,7 +66,7 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
 
   const handleLeave = () => {
     setModal({
-      header: `Delete ${channel.name}`,
+      header: `Leave ${channel.name}`,
       body: <LeaveChannel channel={channel} />,
     });
   };
@@ -103,7 +103,7 @@ const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
 
   const handleLeave = () => {
     setModal({
-      header: `Delete ${channel.name}`,
+      header: `Leave ${channel.name}`,
       body: <LeaveChannel channel={channel} />,
     });
   };
