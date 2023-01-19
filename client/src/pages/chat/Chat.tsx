@@ -29,11 +29,13 @@ export default function Chat() {
   return (
     <div className="flex ">
       <div className="heightMinusNav">
-        {selected ? (
-          <ChanUsers selected={selected} setSelected={setSelected} />
-        ) : (
-          <Channels privateChans={privateChans} publicChans={publicChans} />
-        )}
+        <div className="">
+          {selected ? (
+            <ChanUsers selected={selected} setSelected={setSelected} />
+          ) : (
+            <Channels privateChans={privateChans} publicChans={publicChans} />
+          )}
+        </div>
       </div>
       <div className="wholechat flex flex-col justify-center flex-grow ">
         <div className="chatMain  heightMinusNav bg-base-300">

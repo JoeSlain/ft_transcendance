@@ -94,7 +94,7 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
         </button>
       </div>
 
-      <div className="channelBody">
+      <div className="channelBody max-h-[100vh - 60px]">
         <div className="channelCategory">
           <h2 className="chanType"> Private </h2>
           <Channel channels={privateChans} />
