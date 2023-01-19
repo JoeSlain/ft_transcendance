@@ -15,14 +15,6 @@ function getWindowDimensions() {
   };
 }
 
-function addLineBreaks(str: string, n: number) {
-  let slicedString = "";
-  for (let i = 0; i < str.length; i += n) {
-    slicedString += str.slice(i, i + n) + "\n";
-  }
-  console.log("🚀 ~ file: ChatMessages.tsx:25 ~ addLineBreaks ~ slicedString", slicedString)
-  return slicedString;
-}
 
 const ChatMessages = ({ selected }: Props) => {
   const [windowDimensions, setWindowDimensions] = useState(
