@@ -30,6 +30,7 @@ export class RestrictionService {
   }
 
   async isBanned(userId: number, channel: Channel) {
+    console.log("isbanned channel", channel);
     if (!channel.banned || !channel.banned.length) return false;
     const restriction = channel.banned.find(
       (restrict) => restrict.userId === userId
@@ -93,6 +94,7 @@ export class RestrictionService {
       restrict = await this.restrictionRepo.save(restrict);
       channel.banned.push(restrict);
     }
+    console.log("return ban channel", channel);
     return await this.chanRepo.save(channel);
   }
 
@@ -109,6 +111,8 @@ export class RestrictionService {
       restrict = await this.restrictionRepo.save(restrict);
       channel.muted.push(restrict);
     }
-    return await this.chanRepo.save(channel);
+    channel = await this.chanRepo.save(channel);
+    console.log("return mute channel", channel);
+    return channel;
   }
 }

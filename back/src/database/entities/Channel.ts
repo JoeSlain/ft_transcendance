@@ -48,10 +48,10 @@ export class Channel {
   @JoinTable()
   muted: User[];*/
 
-  @OneToMany(() => Restriction, (restriction) => restriction.channel)
+  @OneToMany(() => Restriction, (restriction) => restriction.banChannel)
   banned: Restriction[];
 
-  @OneToMany(() => Restriction, (restriction) => restriction.channel)
+  @OneToMany(() => Restriction, (restriction) => restriction.muteChannel)
   muted: Restriction[];
 
   @OneToMany(() => ChanMessage, (message) => message.channel)

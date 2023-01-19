@@ -13,5 +13,8 @@ export class Restriction {
   end: Date;
 
   @ManyToOne(() => Channel)
-  channel: Channel;
+  banChannel: Channel;
+
+  @ManyToOne(() => Channel)
+  muteChannel: Channel;
 }

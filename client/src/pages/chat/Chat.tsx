@@ -6,9 +6,12 @@ import ChanUsers from "./channelUtils/ChanUsers";
 import MessageForm from "./MessageForm";
 import ChatMessages from "./ChatMessages";
 import "../../styles/chat/chat.css";
+import { getSavedItem } from "../../utils/storage";
 
 export default function Chat() {
-  const [selected, setSelected] = useState<channelType | null>(null);
+  const [selected, setSelected] = useState<channelType | null>(
+    getSavedItem("selected")
+  );
   const [privateChans, setPrivateChans] = useState([]);
   const [publicChans, setPublicChans] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
