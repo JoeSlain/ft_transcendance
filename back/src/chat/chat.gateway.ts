@@ -473,5 +473,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (to) {
       this.server.to(to).emit("muted", data);
     }
+    this.message(client, {
+      content: `${data.user.username} has been muted`,
+      channel: data.channel,
+    });
+  }
+
+  @SubscribeMessage("setAdmin")
+  async setAdmin(client: Socket, data: any) {
+    let channel = await this.channelService.findChannelById(data.channel.id);
+
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return;
+    }
+    if (this.channelService.findUserInChan(data.user.id, channel)) {
+      if (!channel.admins.find((admin) => admin.id === data.user.id)) {
+        this.channelService.addUserChan(data.user, channel, "admins");
+        this.server.to(client.id).emit("newAdmin", data);
+      } else
+        this.server
+          .to(client.id)
+          .emit(`user ${data.user.username} is already an admin`);
+      return;
+    }
+    this.server.to(client.id).emit("error", "user not found");
   }
 }
