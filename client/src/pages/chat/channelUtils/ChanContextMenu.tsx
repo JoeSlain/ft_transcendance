@@ -55,18 +55,17 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
   };
 
   const removePassword = () => {
-    const handleAccept = () => {
-      console.log("remove pass");
-    };
+    console.log("remove pass");
+
     setModal({
       header: `Remove ${channel.name} Password`,
-      body: <RemovePassword handleAccept={handleAccept} />,
+      body: <RemovePassword channel={channel} />,
     });
   };
 
   const handleLeave = () => {
     setModal({
-      header: `Delete ${channel.name}`,
+      header: `Leave ${channel.name}`,
       body: <LeaveChannel channel={channel} />,
     });
   };
@@ -103,7 +102,7 @@ const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
 
   const handleLeave = () => {
     setModal({
-      header: `Delete ${channel.name}`,
+      header: `Leave ${channel.name}`,
       body: <LeaveChannel channel={channel} />,
     });
   };

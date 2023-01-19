@@ -1,6 +1,6 @@
 import { ConsoleLogger, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Channel, User } from "src/database";
+import { Channel, Restriction, User } from "src/database";
 import { ChannelData } from "src/utils/types";
 import { Brackets, Repository, createQueryBuilder } from "typeorm";
 import * as bcrypt from "bcrypt";
@@ -11,6 +11,8 @@ export class ChannelService {
   constructor(
     @InjectRepository(Channel) private chanRepo: Repository<Channel>,
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(Restriction)
+    private restrictionRepo: Repository<Restriction>,
     private readonly notifService: NotifService
   ) {}
 
@@ -76,21 +78,20 @@ export class ChannelService {
   }
 
   async getPrivateChannels(userId: number) {
-    const bannedId = userId;
     const tmp = await this.chanRepo
       .createQueryBuilder("channels")
       .leftJoinAndSelect("channels.users", "user")
       .leftJoinAndSelect("channels.owner", "owner")
       .leftJoinAndSelect("channels.banned", "banned")
       .where("channels.type = :type", { type: "private" })
-      .andWhere(
-        new Brackets((qb) => {
+      .andWhere("user.id = :userId", { userId })
+      /*new Brackets((qb) => {
           qb.where("banned.userId = :bannedId", { bannedId }).orWhere(
             "user.id = :userId",
             { userId }
           );
         })
-      )
+      )*/
       .getMany();
 
     /*const tmp = await this.chanRepo.find({
@@ -152,6 +153,12 @@ export class ChannelService {
     return chan;
   }
 
+  async removeChanPassword(channel: Channel) {
+    channel.password = null;
+    channel.type = "public";
+    return await this.chanRepo.save(channel);
+  }
+
   async setChanOwner(user: User, channel: Channel) {
     channel.owner = user;
     return await this.chanRepo.save(channel);
@@ -210,6 +217,12 @@ export class ChannelService {
   async deleteChan(chan: Channel) {
     const notifs = await this.notifService.getChanNotifs(chan);
 
+    chan.banned.forEach(async (ban) => {
+      await this.restrictionRepo.remove(ban);
+    });
+    chan.muted.forEach(async (mute) => {
+      await this.restrictionRepo.remove(mute);
+    });
     notifs.forEach(async (notif) => {
       await this.notifService.deleteNotif(notif);
     });
