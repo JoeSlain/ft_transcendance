@@ -12,7 +12,7 @@ type Props = {
   user: userType;
 };
 
-export default function BanUser({ channel, user }: Props) {
+export default function MuteUser({ channel, user }: Props) {
   const { setModal } = useContext(ModalContext);
   const [date, setDate] = useState(new Date());
   const socket = useContext(ChatContext);
@@ -23,7 +23,7 @@ export default function BanUser({ channel, user }: Props) {
     else {
       console.log("date", date);
       console.log("user", user);
-      socket.emit("banUser", {
+      socket.emit("muteUser", {
         user,
         channel,
         date,
@@ -36,7 +36,7 @@ export default function BanUser({ channel, user }: Props) {
     <form className="modalForm" onSubmit={handleSubmit}>
       <div className="modalBody">
         <div className="banModal">
-          <div className="dropDownTitle">Select ban time</div>
+          <div className="dropDownTitle">Select mute time</div>
           <DatePicker selected={date} onChange={(d: Date) => setDate(d)} />
         </div>
       </div>

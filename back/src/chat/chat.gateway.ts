@@ -283,8 +283,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("joinChannel")
   async joinChannel(client: Socket, data: any) {
+    console.log("joinChannel data channel", data.channel);
+
     let channel = await this.channelService.findChannelById(data.channel.id);
-    console.log("joinChannel");
+    console.log("joinChannel", channel);
 
     if (await this.restrictionService.isBanned(data.user.id, channel)) {
       const ban = await this.restrictionService.getBanned(
@@ -374,7 +376,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage("chanMessage")
-  async message(client: Socket, data: ChanMessage) {
+  async message(client: Socket, data: MessageData) {
+    const channel = await this.channelService.findChannelById(data.channel.id);
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return;
+    }
+    if (
+      data.from &&
+      (await this.restrictionService.isMuted(data.from.id, channel))
+    ) {
+      const mute = await this.restrictionService.getMuted(
+        data.from.id,
+        channel
+      );
+      this.server
+        .to(client.id)
+        .emit(
+          "error",
+          `You cannot write in this channel because you have been muted until ${mute.end}`
+        );
+      return;
+    }
     const message = await this.messageService.createChanMessage({
       content: data.content,
       from: data.from,
@@ -425,6 +448,55 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (to) {
       this.server.to(to).emit("banned", data);
     }
-    this.server.to(channel.socketId).emit("userBanned", data);
+    this.message(client, {
+      content: `${data.user.username} has been banned from the channel`,
+      channel: data.channel,
+    });
+    //this.server.to(channel.socketId).emit("userBanned", data);
+  }
+
+  @SubscribeMessage("muteUser")
+  async muteUser(client: Socket, data: any) {
+    console.log("mute user event");
+    let channel = await this.channelService.findChannelById(data.channel.id);
+
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return;
+    }
+    data.channel = await this.restrictionService.mute(
+      data.user,
+      channel,
+      data.date
+    );
+    const to = this.chatService.getUser(data.user.id);
+    if (to) {
+      this.server.to(to).emit("muted", data);
+    }
+    this.message(client, {
+      content: `${data.user.username} has been muted`,
+      channel: data.channel,
+    });
+  }
+
+  @SubscribeMessage("setAdmin")
+  async setAdmin(client: Socket, data: any) {
+    let channel = await this.channelService.findChannelById(data.channel.id);
+
+    if (!channel) {
+      this.server.to(client.id).emit("error", "channel not found");
+      return;
+    }
+    if (this.channelService.findUserInChan(data.user.id, channel)) {
+      if (!channel.admins.find((admin) => admin.id === data.user.id)) {
+        this.channelService.addUserChan(data.user, channel, "admins");
+        this.server.to(client.id).emit("newAdmin", data);
+      } else
+        this.server
+          .to(client.id)
+          .emit(`user ${data.user.username} is already an admin`);
+      return;
+    }
+    this.server.to(client.id).emit("error", "user not found");
   }
 }

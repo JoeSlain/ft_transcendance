@@ -5,6 +5,7 @@ import User from "../../../hooks/User";
 import { channelType } from "../../../types/channelType";
 import { userType } from "../../../types/userType";
 import BanUser from "./BanUser";
+import MuteUser from "./MuteUser";
 
 export type Props = {
   selectedUser: userType;
@@ -25,7 +26,12 @@ export const ChanUserContextList = ({ selectedUser, channel }: Props) => {
     });
   };
 
-  const handleMute = () => {};
+  const handleMute = () => {
+    setModal({
+      header: `Mute ${selectedUser.username} on channel ${channel.name}`,
+      body: <MuteUser user={selectedUser} channel={channel} />,
+    });
+  };
 
   const handleGetProfile = () => {};
 

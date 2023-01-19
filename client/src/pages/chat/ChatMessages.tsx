@@ -25,21 +25,21 @@ function addLineBreaks(str: string, n: number) {
 }
 
 const ChatMessages = ({ selected }: Props) => {
-   const [windowDimensions, setWindowDimensions] = useState(
+  const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()
   );
   const [linebreak, setLineBreak] = useState(90);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useContext(User);
 
-   useEffect(() => {
+  useEffect(() => {
     function handleResize() {
       setWindowDimensions(getWindowDimensions());
     }
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []); 
+  }, []);
   useEffect(() => {
     if (windowDimensions.width <= 1200)
       setLineBreak(10);
@@ -70,7 +70,17 @@ const ChatMessages = ({ selected }: Props) => {
       >
         {messages.map((message, index) => {
           console.log("message", message);
-          if (message.from.id === user.id) {
+          if (!message.from) {
+            return (
+              <div
+                key={index}
+                className="pr-5 chat chat-end justify-end flex flex-col"
+              >
+                <div className="chat-header mr-1">Server</div>
+                <div className="chat-bubble">{message.content}</div>
+              </div>
+            );
+          } else if (message.from.id === user.id) {
             return (
               <div
                 key={index}
