@@ -20,6 +20,7 @@ function addLineBreaks(str: string, n: number) {
   for (let i = 0; i < str.length; i += n) {
     slicedString += str.slice(i, i + n) + "\n";
   }
+  console.log("🚀 ~ file: ChatMessages.tsx:25 ~ addLineBreaks ~ slicedString", slicedString)
   return slicedString;
 }
 
@@ -43,7 +44,7 @@ const ChatMessages = ({ selected }: Props) => {
     if (windowDimensions.width <= 1200)
       setLineBreak(10);
     else
-      setLineBreak(90);  
+      setLineBreak(100);  
   }, [windowDimensions]);
 
   //console.log("win dimensions: ", windowDimensions);
@@ -76,8 +77,8 @@ const ChatMessages = ({ selected }: Props) => {
                 className="pr-5 chat chat-end justify-end flex flex-col"
               >
                 <div className="chat-header mr-1">{message.from.username}</div>
-                <div className="chat-bubble max-w-[90%] ">
-                  {addLineBreaks(message.content, linebreak)}
+                <div className="bubbleOverflow chat-bubble max-w-[90%] ">
+                  {message.content}
                 </div>
               </div>
               /*               <div key={message.id} className="messageWrapper">
@@ -92,8 +93,8 @@ const ChatMessages = ({ selected }: Props) => {
               <div key={index} className="pl-5 chat chat-start flex flex-col">
                 <div className="chat-header ml-1">{message.from.username}</div>
 
-                <div className="chat-bubble chat-bubble-primary max-w-[90%]">
-                  {addLineBreaks(message.content, linebreak)}
+                <div className="bubbleOverflow chat-bubble chat-bubble-primary max-w-[90%]">
+                  {message.content}
                 </div>
               </div>
               /*               <div key={message.id} className="messageWrapper">
