@@ -346,6 +346,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!channel)
       this.server.to(data.channel.socketId).emit("removeChannel", data.channel);
     else this.server.to(channel.socketId).emit("leftChannel", channel);
+    this.server.to(client.id).emit("leftChannel", channel);
     client.leave(data.channel.socketId);
   }
 
@@ -425,9 +426,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage("removeChannelPassword")
-  async removeChannelPassword(client: Socket, data: any) {
-    console.log("remove chan pass", data);
-    if (!this.checkChanPassword) return;
+  async removeChannelPassword(client: Socket, channel: Channel) {
+    console.log("remove chan pass", channel);
+    if (!(await this.checkChanPassword(client, { channel }))) return;
+    channel = await this.channelService.findChannelById(channel.id);
+    channel = await this.channelService.removeChanPassword(channel);
+    this.server.emit("updateChannel", channel);
   }
 
   @SubscribeMessage("banUser")

@@ -55,12 +55,11 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
   };
 
   const removePassword = () => {
-    const handleAccept = () => {
-      console.log("remove pass");
-    };
+    console.log("remove pass");
+
     setModal({
       header: `Remove ${channel.name} Password`,
-      body: <RemovePassword handleAccept={handleAccept} />,
+      body: <RemovePassword channel={channel} />,
     });
   };
 

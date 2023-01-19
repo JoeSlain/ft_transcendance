@@ -153,6 +153,12 @@ export class ChannelService {
     return chan;
   }
 
+  async removeChanPassword(channel: Channel) {
+    channel.password = null;
+    channel.type = "public";
+    return await this.chanRepo.save(channel);
+  }
+
   async setChanOwner(user: User, channel: Channel) {
     channel.owner = user;
     return await this.chanRepo.save(channel);

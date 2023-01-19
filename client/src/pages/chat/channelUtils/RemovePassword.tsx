@@ -1,13 +1,22 @@
 import { useContext, useState } from "react";
 import { ModalContext } from "../../../context/modalContext";
+import { channelType } from "../../../types/channelType";
+import { ChatContext } from "../../../context/socketContext";
 
 type Props = {
-  handleAccept: () => void;
+  channel: channelType;
 };
 
-export default function RemovePassword({ handleAccept }: Props) {
+export default function RemovePassword({ channel }: Props) {
   const [pass, setPass] = useState("");
+  const socket = useContext(ChatContext);
   const { setModal } = useContext(ModalContext);
+
+  const handleAccept = () => {
+    channel.password = pass;
+    socket.emit("removeChannelPassword", channel);
+    setModal(null);
+  };
 
   return (
     <>
