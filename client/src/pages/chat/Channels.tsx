@@ -50,7 +50,7 @@ function Channel({ channels }: ChannelProps) {
       {channels &&
         channels.map((chan) => (
           <div
-            className="chanEntries"
+            className="chanEntries break-all"
             key={chan.id}
             onContextMenu={(e) => {
               e.preventDefault();
