@@ -10,7 +10,7 @@
   align-items: flex-start;
 }
 
-.myMessage {
+/*.myMessage {
   display: flex;
   align-items: center;
   align-self: flex-end;
@@ -35,9 +35,8 @@
   background-color: rgba(165, 3, 3, 0.541);
   box-shadow: 2px 2px 2px 2px rgba(9, 9, 9, 0.23);
   text-align: justify;
-}
+}*/
 
-.bubbleOverflow{
-    word-break: break-all;
-
+.bubbleOverflow {
+  word-break: break-all;
 }
