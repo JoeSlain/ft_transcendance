@@ -42,6 +42,19 @@
   cursor: pointer;
 }
 
+/* FILTER */
+.chanFilter {
+  margin-top: 5px;
+}
+
+.filterInput {
+  width: 80%;
+}
+
+.channelCheckBox {
+  margin-left: 5px;
+}
+
 /* ADD CHANNEL */
 #chanAddButton {
   width: 100px;

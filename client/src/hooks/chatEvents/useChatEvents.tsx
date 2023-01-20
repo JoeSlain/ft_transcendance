@@ -77,7 +77,7 @@ export default function useChatEvents({
       })
       .then((response) => {
         console.log("privateChans", response.data);
-        setPrivateChans(privateChans.concat(response.data));
+        setPrivateChans(response.data);
       });
     axios
       .get("http://localhost:3001/api/chat/publicChannels", {
@@ -85,7 +85,7 @@ export default function useChatEvents({
       })
       .then((response) => {
         console.log("publicChans", response.data);
-        setPublicChans(publicChans.concat(response.data));
+        setPublicChans(response.data);
       });
 
     // events

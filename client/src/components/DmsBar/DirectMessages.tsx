@@ -25,7 +25,7 @@ export default function DirectMessages() {
     <div className="dms">
       {dms &&
         dms.map((dm) => (
-          <div className="dmEntry">
+          <div className="dmEntry" key={dm.from}>
             {show && <MessageContent content={dm.content} />}
             <div className="dmTitle" onClick={() => setShow(!show)}>
               {" "}

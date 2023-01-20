@@ -72,7 +72,7 @@ export default function Router() {
             </div>
             <div className="w-[20%]">{isLogged === true && <Contact />}</div>
           </div>
-          <DirectMessages />
+          {isLogged && <DirectMessages />}
         </ModalContext.Provider>
       </User.Provider>
     </Auth.Provider>
