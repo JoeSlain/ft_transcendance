@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ModalContext } from "../../../context/modalContext";
 import { ChatContext } from "../../../context/socketContext";
 import User from "../../../hooks/User";
@@ -39,7 +40,11 @@ export const ChanUserContextList = ({ selectedUser, channel }: Props) => {
     });
   };
 
-  const handleGetProfile = () => {};
+  let navigate = useNavigate(); 
+
+  const handleGetProfile = () => {
+    navigate(`/profile/${selectedUser.id}`);
+  };
 
   const handleInvite = () => {
     chatSocket.emit("notif", {

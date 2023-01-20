@@ -6,20 +6,12 @@ import { getSavedItem, saveItem } from "../../../../utils/storage";
 import { BACK_ROUTE } from "../../../../services/back_route";
 import validateUserInput from "../../../../services/zod/validateUserInput";
 import Error from "../../../../components/error";
+import getAvatar from "../../../../services/User/useGetAvatar";
 
 type avatarState = {
   url: string;
   file: any;
 };
-
-async function getAvatar(userId: number) {
-  const res = await fetch(`${BACK_ROUTE}users/getAvatar/${userId}`, {
-    method: "GET",
-    credentials: "include",
-  });
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
-}
 
 //Username and avatar component
 export default function UserInfos() {
@@ -38,7 +30,7 @@ export default function UserInfos() {
         .then((res) => {
           setAvatar({ url: res, file: null });
         })
-        .catch((e) => console.log("Error gtting avatar: ", e.message));
+        .catch((e) => console.log("Error getting avatar: ", e.message));
       console.log("avatar modified?: ", avatar.url);
     }
   }, []);
