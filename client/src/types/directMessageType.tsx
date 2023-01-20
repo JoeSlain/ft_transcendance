@@ -1,4 +1,7 @@
+import { userType } from "./userType";
+
 export type directMessageType = {
   content: string;
-  from: string;
+  from: userType;
+  to: userType;
 };

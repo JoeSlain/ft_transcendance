@@ -5,10 +5,14 @@ import { Repository } from "typeorm";
 import { ChatService } from "./chat.service";
 import { TwoFactorGuard } from "src/auth/2fa/2fa.guard";
 import { ChannelService } from "./channel.service";
+import { MessageService } from "./message.service";
 
 @Controller("chat")
 export class ChatController {
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(
+    private readonly channelService: ChannelService,
+    private readonly messageService: MessageService
+  ) {}
 
   @Get("privateChannels")
   @UseGuards(TwoFactorGuard)
@@ -25,4 +29,8 @@ export class ChatController {
 
     return chans;
   }
+
+  @Get("messages")
+  @UseGuards(TwoFactorGuard)
+  async getMessages(@Req() req) {}
 }
