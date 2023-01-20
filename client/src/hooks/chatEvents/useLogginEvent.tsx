@@ -48,6 +48,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
           setIsLogged(false);
           deleteItem("user");
           deleteItem("isLogged");
+          deleteItem("selected");
         })
         .catch((e) => console.log("Post logout err: " + e));
     });

@@ -25,6 +25,7 @@ import { ModalType } from "./types/modalType";
 import { ModalContext } from "./context/modalContext";
 import Modal from "./components/modal";
 import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
+import DirectMessages from "./components/DmsBar/DirectMessages";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -71,6 +72,7 @@ export default function Router() {
             </div>
             <div className="w-[20%]">{isLogged === true && <Contact />}</div>
           </div>
+          {isLogged && <DirectMessages />}
         </ModalContext.Provider>
       </User.Provider>
     </Auth.Provider>
