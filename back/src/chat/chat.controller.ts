@@ -32,5 +32,9 @@ export class ChatController {
 
   @Get("messages")
   @UseGuards(TwoFactorGuard)
-  async getMessages(@Req() req) {}
+  async getMessages(@Req() req) {
+    const messages = await this.messageService.getMessages(req.user.id);
+
+    return messages;
+  }
 }

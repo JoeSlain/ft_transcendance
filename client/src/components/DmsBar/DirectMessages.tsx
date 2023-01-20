@@ -1,8 +1,7 @@
 import User from "../../hooks/User";
 import "../../styles/chat/dms.css";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { directMessageType } from "../../types/directMessageType";
-import axios from "axios";
 
 type Props = {
   dms: directMessageType[];
@@ -17,7 +16,7 @@ const MessageForm = ({ dms, setDms }: Props) => {
     e.preventDefault();
     setDms(
       dms.concat({
-        from: user.username,
+        from: user,
         content,
       })
     );
@@ -40,7 +39,7 @@ const MessageContent = ({ dms, setDms }: Props) => {
   return (
     <div className="dmContent">
       {dms.map((dm, index) => {
-        if (dm.from === user.username) {
+        if (dm.from === user) {
           return (
             <div className="myDm" key={index}>
               <div className="myName"> me</div>
@@ -52,7 +51,7 @@ const MessageContent = ({ dms, setDms }: Props) => {
         } else {
           return (
             <div className="theirDm" key={index}>
-              <div className="theirName"> {dm.from}</div>
+              <div className="theirName"> {dm.from.username}</div>
               <div className="theirMessage">
                 <div className="content">{dm.content}</div>
               </div>
@@ -65,35 +64,8 @@ const MessageContent = ({ dms, setDms }: Props) => {
   );
 };
 
-const MessageEntry = () => {}
-
 export default function DirectMessages() {
-  const [show, setShow] = useState('');
-  const [dms, setDms] = useState(new Map<string, directMessageType[]>());
-  const { user } = useContext(User);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3001/api/chat/messages", {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.data) {
-          const map = new Map();
-
-          response.data.forEach((msg: directMessageType) => {
-            const otherUser =
-              msg.from.username === user.username ? msg.to.username : msg.from.username;
-            if (map.has(otherUser)) {
-              map.get(otherUser).push(msg);
-            } else {
-              map.set(otherUser, [msg]);
-            }
-          });
-          setDms(map);
-        }
-      });
-  }, []);
+  const [show, setShow] = useState<any | null>(null);
   /*const [dms, setDms] = useState([
     {
       from: "test2",
@@ -117,26 +89,27 @@ export default function DirectMessages() {
     },
   ]);*/
 
-  const handleClick = (key: string) => {
+  const handleClick = (selected: any) => {
+    console.log("selected", selected);
     console.log("show", show);
-    if (show && show === key) setShow('');
-    else setShow(key);
+    if (show && show.from === selected.from) setShow(null);
+    else setShow(selected);
   };
 
   return (
     <div className="dms">
       {dms &&
-        Array.from(dms).map((dm, index) => 
-          <div className='dmEntry' key={index}>
-            {show && show === key && 
-            <MessageContent dms={value} setDms={setDms} /> }
-            <div className="dmTitle" onClick={() => handleClick(key)}>
-              {key}
+        dms.map((dm) => (
+          <div className="dmEntry" key={dm.from}>
+            {show && show.from === dm.from && (
+              <MessageContent dms={show.messages} setDms={setDms} />
+            )}
+            <div className="dmTitle" onClick={() => handleClick(dm)}>
+              {" "}
+              {dm.from}{" "}
             </div>
           </div>
-        })
-      }
-
+        ))}
     </div>
   );
 }

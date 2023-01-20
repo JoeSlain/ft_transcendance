@@ -1,8 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
+import { Conversation } from "./Conversation";
 
 @Entity({ name: "directMessages" })
-export class DirectMessages {
+export class DirectMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -15,4 +16,7 @@ export class DirectMessages {
 
   @ManyToOne(() => User)
   from: User;
+
+  @ManyToOne(() => Conversation)
+  conversation: Conversation;
 }

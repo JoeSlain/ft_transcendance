@@ -52,7 +52,7 @@ export class User {
   date_of_sign: Date;
 
   @ManyToOne(() => User)
-   games: Game[];
+  games: Game[];
 
   // relations
   @ManyToMany((type) => User, (user) => user.friends)

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ChanMessage, Channel, DirectMessages } from "src/database";
+import { ChanMessage, Channel, DirectMessage } from "src/database";
 import { MessageData } from "src/utils/types";
 import { Repository } from "typeorm";
 
@@ -8,7 +8,7 @@ import { Repository } from "typeorm";
 export class MessageService {
   constructor(
     @InjectRepository(ChanMessage) private msgRepo: Repository<ChanMessage>,
-    @InjectRepository(DirectMessages) private dmRepo: Repository<DirectMessages>
+    @InjectRepository(DirectMessage) private dmRepo: Repository<DirectMessage>
   ) {}
 
   async findById(id: number) {

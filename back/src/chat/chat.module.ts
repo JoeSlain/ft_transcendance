@@ -7,7 +7,7 @@ import {
   Notif,
   User,
   Restriction,
-  DirectMessages,
+  DirectMessage,
 } from "src/database";
 import { GameModule } from "src/game/game.module";
 import { RoomService } from "src/game/room.service";
@@ -32,7 +32,7 @@ import { RestrictionService } from "./restrictions.service";
       User,
       ChanMessage,
       Restriction,
-      DirectMessages,
+      DirectMessage,
     ]),
   ],
   providers: [
