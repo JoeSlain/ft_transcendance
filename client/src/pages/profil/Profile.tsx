@@ -20,36 +20,41 @@ export default function Profile() {
     queryKey: ["avatar", userId],
     queryFn: ({ queryKey }) => getAvatar(parseInt(queryKey[1])),
   });
-  const {isLoading:  isCurrentLoading, error: currentError, data: user } = useCurrentUserQuery();
-  const { isLoading, error, data } = useUserQuery(userId);
+  const {
+    isLoading: isCurrentLoading,
+    data: user,
+    isSuccess: isCurrentUserSucces,
+  } = useCurrentUserQuery();
+  const {
+    isLoading,
+    error,
+    data,
+    isSuccess: isFetchedUserSucces,
+  } = useUserQuery(userId);
   if (error) return <Error err="Profil not found" />;
-  if (isLoading) {
+  if (isLoading || isCurrentLoading) {
     return <Loading />;
   }
-  if (data && user) {
-    console.log("uerid: ", data.id, " param: ", userId);
+  if (isFetchedUserSucces && isCurrentUserSucces) {
+    if (userId === user.id.toString()) {
+      return <MyProfile />;
+    }
     return (
       <>
         <ProfileNavbar userId={parseInt(userId)} />
-        {userId === user.id.toString() ? (
-          <MyProfile />
-        ) : (
-          <div className="profil flex flex-col items-center relative">
-            <p className="text-slate-200">Username:</p>
-            <p className="text-slate-200">{data.username}</p>
-            <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
-              <img
-                src={avatar != null ? avatar : data.profile_pic}
-                alt="Avatar"
-                className="w-32 sm:w-64 rounded-full"
-              />
-            </label>
-          </div>
-        )}
-        ;
+        <div className="profil flex flex-col items-center relative">
+          <p className="text-slate-200">Username:</p>
+          <p className="text-slate-200">{data.username}</p>
+          <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
+            <img
+              src={avatar != null ? avatar : data.profile_pic}
+              alt="Avatar"
+              className="w-32 sm:w-64 rounded-full"
+            />
+          </label>
+        </div>
       </>
     );
   }
-
   return <></>;
 }
