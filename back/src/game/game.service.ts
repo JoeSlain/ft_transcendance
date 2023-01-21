@@ -2,145 +2,149 @@ import { Injectable } from "@nestjs/common";
 import { Room } from "src/utils/types";
 import { RoomService } from "./room.service";
 import { Socket, Namespace } from "socket.io";
+import { GameType, PlayerType, BallType, PaddleType } from "../utils/types";
 @Injectable()
 export class GameService {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    private readonly roomService: RoomService
+  ) { }
 
   users: Map<number, string> = new Map();
   games = new Map<number, GameType>()
-  
 
-  createGame(gameData: { width: number; height: number }): GameType {
-    const game: GameType = {
-      id: Date.now(), // utiliser l'horodatage actuel comme identifiant unique de la partie
-      players: [],
-      ball: {
-        x: 0,
-        y: 0,
-        speedX: 0,
-        speedY: 0,
-        xVel: 1
+  startGameLoop(game: GameType, clients, roomId: string) {
+    const gameLoop = setInterval(() => {
+      // Mise à jour de l'état du jeu
+      this.updateGame(game);
 
-      },
-      running: false,
-      height: gameData.height || 500,
-      width: gameData.width || 800
-    };
-    this.addBall(game);
-    this.saveGame(game);
-    return game;
+      // Envoi des mises à jour de l'état du jeu aux clients connectés à la salle
+      clients.forEach(client => {
+        client.emit('updateGameState', { game, roomId });
+      });
+    }, 1000 / 60);
   }
 
-  addPlayer(game: GameType, playerId: string, client: Socket): void {
-    const PADDLE_HEIGHT: number = 60
-    const PADDLE_WIDTH: number = 20
-    const newPlayer: PlayerType = {
-      id: playerId,
+  private updateGame(game: GameType) {
+    this.updatePaddle(game, game.player1.x, game.player1.y);
+    this.updatePaddle(game, game.player2.x, game.player2.y);
+    this.updateBall(game);
+  }
+
+  createGame(room: Room): GameType {
+    const width = 800; // largeur de la zone de jeu
+    const height = 600; // hauteur de la zone de jeu
+    const player1 = {
+      x: 30,
+      y: height / 2 - 30,
+      width: 20,
+      height: 60,
       score: 0,
       paddle: {
         x: 0,
         y: 0,
-        width: PADDLE_WIDTH, 
-        height: PADDLE_HEIGHT,
-        xVel : 1,
-        yVel : 0,
+        width: 0,
+        height: 0,
+        xVel: 0,
+        yVel: 0,
       },
     };
-    game.players.push(newPlayer);
-  }
-  addBall(game: GameType): void {
-    const INITIAL_SPEED: number = 3
-    game.ball = {
-      x: 0,
-      y: 0,
-      speedX: INITIAL_SPEED, 
-      speedY: INITIAL_SPEED, 
-      xVel : 1,
+    const player2 = {
+      x: width - 50,
+      y: height / 2 - 30,
+      width: 20,
+      height: 60,
+      score: 0,
+      paddle: {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        xVel: 0,
+        yVel: 0,
+      },
     };
+    const ball = {
+      x: width / 2 - 5,
+      y: height / 2 - 5,
+      speedX: 10,
+      speedY: 5,
+      xVel: 1,
+    };
+    return { width, height, player1, player2, ball };
+  }
+
+  // Fonction pour mettre à jour la position d'un paddle
+  updatePaddle(game: GameType, playerId: number, y: number) {
+    const player = playerId === 1 ? game.player1 : game.player2;
+
+    // Vérifier que le paddle ne sort pas des limites du canvas
+    if (y < 0) y = 0;
+    if (y + player.height > game.height) y = game.height - player.height;
+
+    player.y = y;
+  }
+
+  // Fonction pour mettre à jour la position d'une balle
+  updateBall(game: GameType) {
+    const ball = game.ball;
+    // Mettre à jour la position de la balle en fonction de sa vitesse
+    ball.x += ball.speedX * ball.xVel;
+    ball.y += ball.speedY;
+
+    // Vérifier la collision avec les limites du canvas
+    if (ball.y < 0 || ball.y + 10 > game.height) ball.speedY *= -1;
+
+    // Vérifier la collision avec les paddles
+    if (
+      (ball.x < game.player1.x + game.player1.width &&
+        ball.y > game.player1.y &&
+        ball.y < game.player1.y + game.player1.height) ||
+      (ball.x + 10 > game.player2.x &&
+        ball.y > game.player2.y &&
+        ball.y < game.player2.y + game.player2.height)
+    ) {
+      ball.speedX *= -1;
+    }
+    if (game.ball.x <= 0) {
+      game.player2.score++;
+      this.resetBall(game);
+    } else if (game.ball.x >= game.width) {
+      game.player1.score++;
+      this.resetBall(game);
+    }
   }
   saveGame(game: GameType): void {
-    this.games.set(game.id, game);
+    // this.games.set(game.id, game);
+  }
+  resetBall(game: GameType): GameType {
+    // Réinitialisation de la position de la balle au centre du canvas
+    game.ball.x = game.width / 2 - 5;
+    game.ball.y = game.height / 2 - 5;
+    
+    // Réinitialisation de la vitesse de la balle
+    game.ball.speedX = 10;
+    game.ball.speedY = 5;
+
+    // Sélection aléatoire de la direction initiale de la balle
+    if (Math.random() > 0.5) {
+      game.ball.xVel = 1;
+    } else {
+      game.ball.xVel = -1;
+    }
+    return game;
   }
 
   startGame(game: GameType) {
-    game.running = true;
+    // game.running = true;
   }
 
   stopGame(game: GameType) {
-    game.running = false;
+    // game.running = false;
   }
 
   deleteGame(gameId: number): void {
     this.games.delete(gameId);
   }
- 
-
-movePaddle(game: GameType, playerId: string, direction: string, speed: number): PaddleType {
-  // Trouve le joueur à qui appartient la raquette
-  const player = game.players.find((p) => p.id === playerId);
-  if (!player) return player.paddle; // Retourne la position actuelle de la raquette si le joueur est introuvable
-
-  // Crée un nouvel objet de type 'PaddleType' à partir de l'objet actuel
-  const newPaddle = {...player.paddle};
-
-  // Met à jour la coordonnée y de la raquette en fonction de la direction et de la vitesse
-  if (direction === 'up') newPaddle.y -= speed;
-  else if (direction === 'down') newPaddle.y += speed;
-
-  // S'assure que la raquette reste dans les limites de l'aire de jeu
-  if (newPaddle.y < 0) newPaddle.y = 0;
-  if (newPaddle.y + newPaddle.height > game.height) newPaddle.y = game.height - newPaddle.height;
-
-  return newPaddle;
-}
 
 
-moveBall(game: GameType): GameType {
-  const ball = game.ball;
-
-  // mettre à jour la position de la balle en fonction de sa vitesse
-  ball.x += ball.speedX;
-  ball.y += ball.speedY;
-
-  // si la balle touche un bord, changer sa direction (inverser sa vitesse)
-  if (ball.y + ball.speedY < 0 || ball.y + ball.speedY > game.height)
-    ball.speedY = -ball.speedY;
-  if (ball.x + ball.speedX < 0 || ball.x + ball.speedX > game.width)
-    ball.speedX = -ball.speedX;
-
-  return game;
-}
-
-}
-
-export interface GameType {
-  id: number; // un identifiant unique pour chaque partie
-  players: PlayerType[]; // un tableau contenant les joueurs de la partie
-  ball: BallType; // les coordonnées et la vitesse de la balle dans la partie
-  running: boolean; // indique si la partie est en cours ou non
-  height: number;
-  width: number;
-}
-
-export interface PlayerType {
-  id: string; // un identifiant unique pour chaque joueur
-  score: number; // le score du joueur
-  paddle: PaddleType; // les coordonnées et les dimensions de la raquette du joueur
-}
-
-export interface BallType {
-  x: number; // la coordonnée x de la balle
-  y: number; // la coordonnée y de la balle
-  speedX: number; // la vitesse de la balle en x
-  speedY: number; // la vitesse de la balle en y
-  xVel: number; // la vitesse de la raquette en x
-}
-
-export interface PaddleType {
-  x: number; // la coordonnée x de la raquette
-  y: number; // la coordonnée y de la raquette
-  width: number; // la largeur de la raquette
-  height: number; // la hauteur de la raquette
-  xVel: number; // la vitesse de la raquette en x
-  yVel: number; // la vitesse de la raquette en y
 }

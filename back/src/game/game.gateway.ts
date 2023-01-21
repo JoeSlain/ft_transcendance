@@ -8,7 +8,7 @@ import { userInfo } from "os";
 import { Socket, Namespace } from "socket.io";
 import { User } from "src/database";
 import { NotifData, Room } from "src/utils/types";
-import { GameService, GameType, PlayerType, BallType, PaddleType } from "./game.service";
+import { GameService} from "./game.service";
 import { RoomService } from "./room.service";
 
 @WebSocketGateway(3003, {
@@ -21,7 +21,7 @@ export class GameGateway {
   constructor(
     private readonly roomService: RoomService,
     private readonly gameService: GameService
-  ) {}
+  ) { }
 
   @WebSocketServer() server: Namespace;
 
@@ -121,37 +121,17 @@ export class GameGateway {
     this.server.to(data.roomId).emit("ready", data.room);
   }
 
-  @SubscribeMessage('createGame')
-createGame(client: Socket, game: GameType, gameData: { width: number; height: number }) {
-  console.log("createGame event");
-  game = this.gameService.createGame(gameData);
-  // ajouter le joueur à la partie
-  this.gameService.addPlayer(game, client.id, client); 
-  
-  this.gameService.startGame(game);
+  @SubscribeMessage('startGame')
+  startGame(client: Socket, room: Room) {
+    console.log('start game event');
+    const game = this.gameService.createGame(room);
+    client.to(room.id).emit('gameStarted', game);
+    this.gameService.startGameLoop(game, client, room.id);
+    return game;
+  }
 
-  while (game.running) {
-    game = this.gameService.moveBall(game);
 
-    this.server.to(game.id.toString()).emit('updateGame', game);
-    
- }
-}
 
-@SubscribeMessage('movePaddle')
-movePaddle(client: Socket, data: any) {
-  console.log("movePaddle event");
-  const game = this.gameService.games.get(data.roomId);
-  if (!game) return; // si la partie n'existe pas, on ne fait rien
-
-  const player = game.players.find(p => p.id === client.id);
-  if (!player) return; // si le joueur n'est pas dans la partie, on ne fait rien
-
-  // on met à jour la position de la raquette du joueur
-  player.paddle = this.gameService.movePaddle(game, player.id, data.direction, data.speed);
-  // on envoie les nouvelles données de la partie à tous les joueurs
-  this.server.to(data.roomId).emit('updateGame', game);
-}
 
 
 }
