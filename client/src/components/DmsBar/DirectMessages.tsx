@@ -14,12 +14,16 @@ const MessageForm = ({ dms, setDms }: Props) => {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    setDms(
+    dms.push({
+      from: user,
+      content,
+    });
+    /*setDms(
       dms.concat({
         from: user,
         content,
       })
-    );
+    );*/
   };
 
   return (
@@ -66,7 +70,7 @@ const MessageContent = ({ dms, setDms }: Props) => {
 
 export default function DirectMessages() {
   const [show, setShow] = useState<any | null>(null);
-  /*const [dms, setDms] = useState([
+  const [dms, setDms] = useState([
     {
       from: "test2",
       messages: [
@@ -87,7 +91,7 @@ export default function DirectMessages() {
         { from: "test3", content: "sup" },
       ],
     },
-  ]);*/
+  ]);
 
   const handleClick = (selected: any) => {
     console.log("selected", selected);

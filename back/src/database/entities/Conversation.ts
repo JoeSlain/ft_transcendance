@@ -15,6 +15,9 @@ export class Conversation {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ default: false })
+  newMessages: boolean;
+
   // relations
   @ManyToMany(() => User)
   @JoinTable()

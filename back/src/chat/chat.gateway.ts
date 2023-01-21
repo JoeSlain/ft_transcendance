@@ -513,6 +513,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .emit("error", `user ${data.user.username} is already an admin`);
   }
 
+  @SubscribeMessage("getConversation")
+  async getConversation(client: Socket, data: any) {
+    let conv = await this.messageService.getConversation(
+      data.user1.id,
+      data.user2.id
+    );
+
+    if (!conv)
+      conv = await this.messageService.createConversation(
+        data.user1,
+        data.user2
+      );
+    this.server.to(client.id).emit("openConversation", conv);
+  }
+
   @SubscribeMessage("directMessage")
-  async directMessage(client: Socket, data: any) {}
+  async directMessage(client: Socket, data: any) {
+    this.server.to(client.id).emit("newDirectMessage");
+  }
 }

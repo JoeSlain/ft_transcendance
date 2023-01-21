@@ -33,7 +33,7 @@ export class ChatController {
   @Get("getConversations")
   @UseGuards(TwoFactorGuard)
   async getMessages(@Req() req) {
-    const convs = await this.messageService.getConversations(req.user.id);
+    const convs = await this.messageService.getNewMessages(req.user.id);
 
     return convs;
   }
