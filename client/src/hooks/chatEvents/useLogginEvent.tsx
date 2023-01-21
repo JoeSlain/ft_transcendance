@@ -24,6 +24,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
     console.log("use login");
     chatSocket.on("connect", () => {
       if (user) {
+        console.log("login");
         chatSocket.emit("login", user);
       }
     });
@@ -47,6 +48,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
           setIsLogged(false);
           deleteItem("user");
           deleteItem("isLogged");
+          deleteItem("selected");
         })
         .catch((e) => console.log("Post logout err: " + e));
     });

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
 import User from "../../hooks/User";
@@ -15,9 +15,40 @@ type ChannelProps = {
   channels: channelType[];
 };
 
+type FilterProps = {
+  owned: boolean;
+  setOwned: (owned: boolean) => void;
+  setFilter: (filter: string) => void;
+};
+
+const Filter = ({ owned, setOwned, setFilter }: FilterProps) => {
+  return (
+    <div className="chanFilter">
+      <div className="filterOwned">
+        Show owned
+        <input
+          className="channelCheckBox"
+          type="checkbox"
+          onChange={() => setOwned(!owned)}
+        />
+      </div>
+      <div className="filterName">
+        <input
+          className="filterInput"
+          type="text"
+          placeholder="Search channel"
+          onChange={(e) => setFilter(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+};
+
 function Channel({ channels }: ChannelProps) {
   const [points, setPoints] = useState({ x: 0, y: 0 });
   const [selected, setSelected] = useState<channelType | null>(null);
+  const [owned, setOwned] = useState(false);
+  const [filter, setFilter] = useState("");
   const socket = useContext(ChatContext);
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
@@ -38,19 +69,29 @@ function Channel({ channels }: ChannelProps) {
     }
   };
 
+  const getFilter = () => {
+    let ret = channels;
+    if (owned)
+      ret = ret.filter((chan) => chan.owner && chan.owner.id == user.id);
+    if (filter) return ret.filter((chan) => chan.name.includes(filter));
+    return ret;
+  };
+
+  const chans = getFilter();
   useClickListener({ selected, setSelected });
 
   return (
     <>
+      <Filter owned={owned} setOwned={setOwned} setFilter={setFilter} />
       <ChanContextMenu
         channel={selected}
         setChannel={setSelected}
         points={points}
       />
-      {channels &&
-        channels.map((chan) => (
+      {chans &&
+        chans.map((chan) => (
           <div
-            className="chanEntries"
+            className="chanEntries break-all"
             key={chan.id}
             onContextMenu={(e) => {
               e.preventDefault();
@@ -94,7 +135,7 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
         </button>
       </div>
 
-      <div className="channelBody">
+      <div className="channelBody max-h-[100vh - 60px]">
         <div className="channelCategory">
           <h2 className="chanType"> Private </h2>
           <Channel channels={privateChans} />

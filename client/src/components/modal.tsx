@@ -10,7 +10,7 @@ const Modal: React.FC<Props> = ({ header, body }) => {
   console.log("header", header);
   console.log("body", body);
   return (
-    <div className="modalCss">
+    <div className="modalCss z-1">
       <div className="modalHeader ">{header}</div>
       {body}
     </div>

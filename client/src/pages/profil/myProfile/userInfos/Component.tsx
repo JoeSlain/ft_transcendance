@@ -4,24 +4,19 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getSavedItem, saveItem } from "../../../../utils/storage";
 import { BACK_ROUTE } from "../../../../services/back_route";
+import validateUserInput from "../../../../services/zod/validateUserInput";
+import Error from "../../../../components/error";
+import getAvatar from "../../../../services/User/useGetAvatar";
 
 type avatarState = {
   url: string;
   file: any;
 };
 
-async function getAvatar(userId: number) {
-  const res = await fetch(`${BACK_ROUTE}users/getAvatar/${userId}`, {
-    method: "GET",
-    credentials: "include",
-  });
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
-}
-
 //Username and avatar component
 export default function UserInfos() {
   let { user } = useContext(User); //user data to print
+  const [usernameErr, setUsernameErr] = useState(false);
   const { register, handleSubmit } = useForm();
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
@@ -31,10 +26,11 @@ export default function UserInfos() {
   useEffect(() => {
     if (user.avatar != null) {
       console.log("effect");
-      getAvatar(user.id).then((res) => {
-        setAvatar({ url: res, file: null });
-      })
-      .catch((e) => console.log("Error gtting avatar: ", e.message));
+      getAvatar(user.id)
+        .then((res) => {
+          setAvatar({ url: res, file: null });
+        })
+        .catch((e) => console.log("Error getting avatar: ", e.message));
       console.log("avatar modified?: ", avatar.url);
     }
   }, []);
@@ -64,8 +60,14 @@ export default function UserInfos() {
       setAvatar({ ...avatar, url: user.avatar });
     }
     if (formValue.username !== user.username) {
+      const isValidUsername = validateUserInput(formValue.username);
+      if (isValidUsername.res === false) {
+        setUsernameErr(true);
+        saveItem("user", user);
+        console.log("invalid username");
+        return;
+      }
       user.username = formValue.username;
-      console.log("In username avatar is:  ", user.avatar)
       await axios
         .post(
           `${BACK_ROUTE}users/updateUsername`,
@@ -92,6 +94,16 @@ export default function UserInfos() {
   }
   return (
     <>
+      {usernameErr && (
+        <div>
+          <Error
+            err={
+              "Username can only contain alphanumerical characters aswell as - and _"
+            }
+          />{" "}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSave)}>
         <label className="w-64 flex justify-center items-center px-4 py-6 rounded-lg  tracking-wide uppercase  hover:text-white">
           <img
@@ -107,7 +119,11 @@ export default function UserInfos() {
         <div className="flex flex-col items-center justify-center">
           <div>
             <p className="text-slate-200">Username</p>
-            <input defaultValue={user.username} {...register("username")} />
+            <input
+              defaultValue={user.username}
+              {...register("username")}
+              onChange={() => setUsernameErr(false)}
+            />
           </div>
           <button
             className="btn mt-2 normal-case text-slate-200 center"

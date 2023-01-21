@@ -1,7 +1,8 @@
 .modalCss {
   display: flex;
   flex-direction: column;
-  position: absolute;
+  position: fixed;
+  z-index: 1;
   top: 40%;
   left: 50%;
   margin-right: -50%;

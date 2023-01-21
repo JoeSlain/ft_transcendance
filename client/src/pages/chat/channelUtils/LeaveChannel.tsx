@@ -1,35 +1,33 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { ModalContext } from "../../../context/modalContext";
 import { channelType } from "../../../types/channelType";
 import { ChatContext } from "../../../context/socketContext";
+import User from "../../../hooks/User";
 
 type Props = {
   channel: channelType;
 };
 
-export default function RemovePassword({ channel }: Props) {
-  const [pass, setPass] = useState("");
-  const socket = useContext(ChatContext);
+export default function LeaveChannel({ channel }: Props) {
   const { setModal } = useContext(ModalContext);
+  const socket = useContext(ChatContext);
+  const { user } = useContext(User);
 
   const handleAccept = () => {
-    channel.password = pass;
-    socket.emit("removeChannelPassword", channel);
+    socket.emit("leaveChannel", { channel, user });
     setModal(null);
   };
 
   return (
     <>
-      <div className="modalBody">
-        <div>Password : </div>
-        <input value={pass} onChange={(e) => setPass(e.target.value)} />
-      </div>
+      <div className="modalBody">Leave {channel.name} ?</div>
       <div className="modalButtons">
         <button className="modalButton" onClick={handleAccept}>
-          Confirm
+          Yes
         </button>
         <button className="modalButton" onClick={() => setModal(null)}>
-          Cancel
+          {" "}
+          No{" "}
         </button>
       </div>
     </>

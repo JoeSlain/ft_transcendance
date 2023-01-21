@@ -6,6 +6,8 @@
 
 .channelBody {
   width: 100%;
+  overflow-y: scroll;
+  
 }
 
 .channelCategory {
@@ -40,6 +42,19 @@
 .chanEntry:hover {
   color: yellow;
   cursor: pointer;
+}
+
+/* FILTER */
+.chanFilter {
+  margin-top: 5px;
+}
+
+.filterInput {
+  width: 80%;
+}
+
+.channelCheckBox {
+  margin-left: 5px;
 }
 
 /* ADD CHANNEL */

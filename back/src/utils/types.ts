@@ -48,6 +48,6 @@ export type ChannelData = {
 // message data
 export type MessageData = {
   content: string;
-  from: User;
+  from?: User;
   channel: any;
 };

@@ -7,6 +7,7 @@ import { ModalContext } from "../../../context/modalContext";
 import RemovePassword from "./RemovePassword";
 import SetPassword from "./SetPassword";
 import DeleteChannel from "./DeleteChannel";
+import LeaveChannel from "./LeaveChannel";
 
 type ContextMenuProps = {
   channel: channelType | null;
@@ -42,7 +43,7 @@ const PrivateContextMenu = ({ channel, setChannel }: ChannelProps) => {
 const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
-  const owned = channel.owner.id === user.id;
+  const owned = channel.owner && channel.owner.id === user.id;
   const userInChannel =
     channel.users && channel.users.find((u) => u.id === user.id);
 
@@ -54,19 +55,18 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
   };
 
   const removePassword = () => {
-    const handleAccept = () => {
-      console.log("remove pass");
-    };
+    console.log("remove pass");
+
     setModal({
       header: `Remove ${channel.name} Password`,
-      body: <RemovePassword handleAccept={handleAccept} />,
+      body: <RemovePassword channel={channel} />,
     });
   };
 
-  const handleDelete = () => {
+  const handleLeave = () => {
     setModal({
-      header: `Delete ${channel.name}`,
-      body: <DeleteChannel channel={channel} />,
+      header: `Leave ${channel.name}`,
+      body: <LeaveChannel channel={channel} />,
     });
   };
 
@@ -79,7 +79,7 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
             <li onClick={setPassword}> Change Password </li>
           </>
         )}
-        <li onClick={handleDelete}> Leave </li>
+        <li onClick={handleLeave}> Leave </li>
       </ul>
     );
   }
@@ -89,7 +89,7 @@ const ProtectedContextMenu = ({ channel, setChannel }: ChannelProps) => {
 const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
   const { user } = useContext(User);
   const { setModal } = useContext(ModalContext);
-  const owned = channel.owner.id === user.id;
+  const owned = channel.owner && channel.owner.id === user.id;
   const userInChannel =
     channel.users && channel.users.find((u) => u.id === user.id);
 
@@ -100,10 +100,10 @@ const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
     });
   };
 
-  const handleDelete = () => {
+  const handleLeave = () => {
     setModal({
-      header: `Delete ${channel.name}`,
-      body: <DeleteChannel channel={channel} />,
+      header: `Leave ${channel.name}`,
+      body: <LeaveChannel channel={channel} />,
     });
   };
 
@@ -115,7 +115,7 @@ const PublicContextMenu = ({ channel, setChannel }: ChannelProps) => {
             <li onClick={setPassword}> Set Password </li>
           </>
         )}
-        <li onClick={handleDelete}> Leave </li>
+        <li onClick={handleLeave}> Leave </li>
       </ul>
     );
   }

@@ -7,6 +7,8 @@ import { userType } from "../../../types/userType";
 import { ContextMenu } from "../../../styles/menus";
 import { ChanUserContextList } from "./ChanUserContextList";
 import useClickListener from "../../../hooks/useClickListener";
+import User from "../../../hooks/User";
+import { saveItem } from "../../../utils/storage";
 
 type Props = {
   selected: channelType | null;
@@ -16,6 +18,7 @@ type Props = {
 export default function ChanUsers({ selected, setSelected }: Props) {
   const [user, setUser] = useState<userType | null>(null);
   const [point, setPoint] = useState({ x: 0, y: 0 });
+  const me = useContext(User).user;
 
   useClickListener({
     selected: user,
@@ -24,32 +27,41 @@ export default function ChanUsers({ selected, setSelected }: Props) {
 
   if (selected && selected.users) {
     return (
-      <div className="channelAside">
+      <div className="channelAside heightMinusNav pt-5">
         <div className="chanUsersBar">
           <div className="chanUsersHeader">
-            <h1 className="backButton" onClick={() => setSelected(null)}>
+            <button
+              className="btn btn-sm font-bold"
+              onClick={() => {
+                setSelected(null);
+                saveItem("selected", null);
+              }}
+            >
               ←
-            </h1>
-            <h1 className="usersTitle">Users</h1>
+            </button>
+            <h1 className="usersTitle font-retro">Users</h1>
           </div>
           <div className="chanUsersBody">
             <AddChanUser selected={selected} />
-            {selected.users.map((user) => (
-              <div
-                className="userEntry"
-                key={user.username}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setPoint({ x: e.pageX, y: e.pageY });
-                  setUser(user);
-                }}
-              >
-                {user.username}
-              </div>
-            ))}
+            {selected.users.map((u) => {
+              if (me.id !== u.id)
+                return (
+                  <div
+                    className="userEntry"
+                    key={u.id}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setPoint({ x: e.pageX, y: e.pageY });
+                      setUser(u);
+                    }}
+                  >
+                    {u.username}
+                  </div>
+                );
+            })}
             {user && (
               <ContextMenu top={point.y} left={point.x}>
-                <ChanUserContextList selectedUser={user} />
+                <ChanUserContextList selectedUser={user} channel={selected} />
               </ContextMenu>
             )}
           </div>

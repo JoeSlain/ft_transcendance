@@ -4,8 +4,8 @@ export default function ProfileNavbar(props: { userId: number }) {
   return (
     <>
       <nav className="navigation mt-5 ">
-        <div className=" ml-8">
-          <ul className="flex justify-center space-x-10 text-slate-100 text-xl ">
+        <div className=" ">
+          <ul className="flex justify-center space-x-5 sm:space-x-10 text-slate-100 text-xl ">
             <li>
               <NavLink
                 className="navlink font-retro"

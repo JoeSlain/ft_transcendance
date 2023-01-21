@@ -2,7 +2,6 @@
   height: 80%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .messageWrapper {
@@ -38,13 +37,7 @@
   text-align: justify;
 }
 
-.myUsername {
-  width: 70%;
-  align-self: flex-end;
-  color: white;
-}
+.bubbleOverflow{
+    word-break: break-all;
 
-.theirUsername {
-  width: 70%;
-  color: red;
 }

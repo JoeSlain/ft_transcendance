@@ -13,7 +13,7 @@ export default function MyProfile() {
   return (
     <>
       <ProfileNavbar userId={user.id} />
-      <div className="profil flex flex-col items-center relative">
+      <div className="profil pt-3 flex flex-col items-center relative">
         <UserInfos />
         <TwoFa />
       </div>

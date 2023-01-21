@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import User from "../../hooks/User";
 import { channelType } from "../../types/channelType";
+import "../../styles/chat/chat.css";
 
 type Props = {
   selected: channelType | null;
@@ -13,27 +14,40 @@ export default function MessageForm({ selected }: Props) {
   const socket = useContext(ChatContext);
 
   const submitMessage = () => {
+    if (message === "") return;
     const newMessage = { from: user, content: message, channel: selected };
     setMessage("");
+   // scrollToMyRef();
     socket.emit("chanMessage", newMessage);
   };
 
+  function handleKeyDown(e: any) {
+    if (e.key === "Enter") {
+      submitMessage();
+      setMessage("");
+    }
+  }
+
   if (selected) {
     return (
-      <div className="message">
         <div className="messageForm">
           <textarea
-            className="messageInput"
+            className="textarea max-h-24 "
             value={message}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
+              if (e.target.value === "\n") return;
+              console.log("change value=: ", e.target.value);
               setMessage(e.target.value);
             }}
           />
-          <button className="messageButton" onClick={submitMessage}>
+          <button
+            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 ml-2"
+            onClick={submitMessage}
+          >
             SEND
           </button>
         </div>
-      </div>
     );
   }
   return <></>;
