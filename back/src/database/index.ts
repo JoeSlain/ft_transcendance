@@ -6,6 +6,7 @@ import { ChanMessage } from "./entities/ChanMessage";
 import { Game } from "./entities/Game";
 import { Restriction } from "./entities/Restriction";
 import { DirectMessage } from "./entities/DirectMessages";
+import { Conversation } from "./entities/Conversation";
 
 export const entities = [
   User,
@@ -16,6 +17,7 @@ export const entities = [
   Game,
   Restriction,
   DirectMessage,
+  Conversation,
 ];
 
 export {
@@ -27,4 +29,5 @@ export {
   Game,
   Restriction,
   DirectMessage,
+  Conversation,
 };

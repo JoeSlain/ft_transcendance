@@ -8,6 +8,7 @@ import {
   User,
   Restriction,
   DirectMessage,
+  Conversation,
 } from "src/database";
 import { GameModule } from "src/game/game.module";
 import { RoomService } from "src/game/room.service";
@@ -33,6 +34,7 @@ import { RestrictionService } from "./restrictions.service";
       ChanMessage,
       Restriction,
       DirectMessage,
+      Conversation,
     ]),
   ],
   providers: [

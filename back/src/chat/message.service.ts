@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ChanMessage, Channel, DirectMessage } from "src/database";
-import { MessageData } from "src/utils/types";
+import { ChanMessage, Conversation, DirectMessage } from "src/database";
 import { Repository } from "typeorm";
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(ChanMessage) private msgRepo: Repository<ChanMessage>,
-    @InjectRepository(DirectMessage) private dmRepo: Repository<DirectMessage>
+    @InjectRepository(DirectMessage) private dmRepo: Repository<DirectMessage>,
+    @InjectRepository(Conversation) private convRepo: Repository<Conversation>
   ) {}
 
   async findById(id: number) {
@@ -36,26 +36,18 @@ export class MessageService {
     return message;
   }
 
-  async getMessages(id: number) {
-    const messages = await this.dmRepo.find({
+  async getConversations(id: number) {
+    const convs = await this.convRepo.find({
       relations: {
-        from: true,
-        to: true,
+        users: true,
       },
-      where: [
-        {
-          from: {
-            id,
-          },
+      where: {
+        users: {
+          id,
         },
-        {
-          to: {
-            id,
-          },
-        },
-      ],
+      },
     });
 
-    return messages;
+    return convs;
   }
 }

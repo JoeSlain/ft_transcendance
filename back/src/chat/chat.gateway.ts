@@ -8,7 +8,7 @@ import {
 } from "@nestjs/websockets";
 import { map } from "rxjs";
 import { Socket, Namespace } from "socket.io";
-import { ChanMessage, Channel, Notif, User } from "src/database";
+import { ChanMessage, Channel, Conversation, Notif, User } from "src/database";
 import { NotifService } from "src/users/notifs.service";
 import { UsersService } from "src/users/users.service";
 import { ChatService } from "./chat.service";
@@ -512,4 +512,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(client.id)
         .emit("error", `user ${data.user.username} is already an admin`);
   }
+
+  @SubscribeMessage("directMessage")
+  async directMessage(client: Socket, data: any) {}
 }

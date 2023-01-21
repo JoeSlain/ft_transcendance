@@ -12,9 +12,6 @@ export class DirectMessage {
 
   // relations
   @ManyToOne(() => User)
-  to: User;
-
-  @ManyToOne(() => User)
   from: User;
 
   @ManyToOne(() => Conversation)
