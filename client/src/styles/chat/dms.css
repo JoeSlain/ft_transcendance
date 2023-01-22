@@ -24,7 +24,19 @@
   z-index: 1;
   background-color: rgb(226, 200, 115);
   border: 1px solid rgba(0, 0, 0, 0.836);
+}
+
+.dmMessages {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 90%;
   overflow-y: auto;
+}
+
+.dmForm {
+  width: 100%;
+  background-color: rgb(255, 244, 210);
 }
 
 .myDm {
@@ -52,9 +64,4 @@
   background-color: rgba(165, 3, 3, 0.541);
   box-shadow: 2px 2px 2px 2px rgba(9, 9, 9, 0.23);
   text-align: justify;
-}
-
-.dmForm {
-  width: 100%;
-  background-color: rgb(255, 244, 210);
 }

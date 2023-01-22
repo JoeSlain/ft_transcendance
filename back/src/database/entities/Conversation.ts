@@ -24,5 +24,5 @@ export class Conversation {
   users: User[];
 
   @OneToMany(() => DirectMessage, (dm) => dm.conversation)
-  messages: string[];
+  messages: DirectMessage[];
 }

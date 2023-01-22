@@ -30,9 +30,9 @@ export class ChatController {
     return chans;
   }
 
-  @Get("getConversations")
+  @Get("getNewMessages")
   @UseGuards(TwoFactorGuard)
-  async getMessages(@Req() req) {
+  async getNewMessages(@Req() req) {
     const convs = await this.messageService.getNewMessages(req.user.id);
 
     return convs;

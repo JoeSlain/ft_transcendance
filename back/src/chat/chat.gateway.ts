@@ -515,16 +515,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("getConversation")
   async getConversation(client: Socket, data: any) {
-    let conv = await this.messageService.getConversation(
-      data.user1.id,
-      data.user2.id
-    );
+    let conv = await this.messageService.getConversation(data.me, data.to);
 
     if (!conv)
-      conv = await this.messageService.createConversation(
-        data.user1,
-        data.user2
-      );
+      conv = await this.messageService.createConversation(data.me, data.to);
     this.server.to(client.id).emit("openConversation", conv);
   }
 

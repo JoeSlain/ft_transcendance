@@ -49,10 +49,11 @@ export class MessageService {
       },
     });
 
+    console.log("new messages", convs);
     return convs;
   }
 
-  async getConversation(user1: number, user2: number) {
+  async getConversation(me: User, to: User) {
     const conv = await this.convRepo.findOne({
       relations: {
         users: true,
@@ -61,26 +62,37 @@ export class MessageService {
       where: [
         {
           users: {
-            id: user1,
+            id: me.id,
           },
         },
         {
           users: {
-            id: user2,
+            id: to.id,
           },
         },
       ],
     });
 
-    return conv;
+    return {
+      id: conv.id,
+      messages: conv.messages,
+      to,
+      show: true,
+    };
   }
 
-  async createConversation(user1: User, user2: User) {
-    const users = [user1, user2];
-    const conv = this.convRepo.create({
+  async createConversation(me: User, to: User) {
+    const users = [me, to];
+    let conv = this.convRepo.create({
       users,
     });
 
-    return await this.convRepo.save(conv);
+    conv = await this.convRepo.save(conv);
+    return {
+      id: conv.id,
+      messages: [],
+      to,
+      show: true,
+    };
   }
 }

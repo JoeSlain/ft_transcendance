@@ -110,7 +110,7 @@ export class ChannelService {
       ],
     });*/
 
-    console.log("tmpPrivateChans", tmp);
+    //console.log("tmpPrivateChans", tmp);
     const chans = tmp.map((chan) => {
       return { ...chan, password: null };
     });

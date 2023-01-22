@@ -38,9 +38,17 @@ export const UserContextList = ({ selected }: UserProps) => {
     console.log("spectate", selected);
   };
 
+  const handleMessage = () => {
+    chatSocket.emit("getConversation", {
+      me: user,
+      to: selected,
+    });
+  };
+
   return (
     <ul>
       <li onClick={handleInvite}> Invite </li>
+      <li onClick={handleMessage}> Message </li>
       <li> Block </li>
       <li onClick={handleDelete}> Delete </li>
       <li onClick={handleSpectate}> Spectate </li>

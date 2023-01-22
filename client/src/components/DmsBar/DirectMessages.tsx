@@ -1,29 +1,33 @@
 import User from "../../hooks/User";
 import "../../styles/chat/dms.css";
-import React, { useContext, useState } from "react";
-import { directMessageType } from "../../types/directMessageType";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  conversationType,
+  directMessageType,
+} from "../../types/directMessageType";
+import axios from "axios";
+import useDmEvents from "../../hooks/chatEvents/useDmEvents";
 
 type Props = {
-  dms: directMessageType[];
-  setDms: (dms: any[]) => void;
+  index: number;
+  convs: conversationType[];
+  setConvs: (dms: conversationType[]) => void;
 };
 
-const MessageForm = ({ dms, setDms }: Props) => {
+const MessageForm = ({ index, convs, setConvs }: Props) => {
   const [content, setContent] = useState("");
   const { user } = useContext(User);
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    dms.push({
+
+    const copy = [...convs];
+    const messages = copy[index].messages;
+    messages.push({
       from: user,
       content,
     });
-    /*setDms(
-      dms.concat({
-        from: user,
-        content,
-      })
-    );*/
+    setConvs(copy);
   };
 
   return (
@@ -37,83 +41,108 @@ const MessageForm = ({ dms, setDms }: Props) => {
   );
 };
 
-const MessageContent = ({ dms, setDms }: Props) => {
+const MessageContent = ({ index, convs, setConvs }: Props) => {
   const { user } = useContext(User);
+  const messages = [...convs[index].messages];
 
   return (
     <div className="dmContent">
-      {dms.map((dm, index) => {
-        if (dm.from === user) {
-          return (
-            <div className="myDm" key={index}>
-              <div className="myName"> me</div>
-              <div className="myMessage">
-                <div className="content">{dm.content}</div>
+      <div className="dmMessages">
+        {messages.map((msg, i) => {
+          if (msg.from.id === user.id) {
+            return (
+              <div className="myDm" key={i}>
+                <div className="myName"> me</div>
+                <div className="myMessage">
+                  <div className="content">{msg.content}</div>
+                </div>
               </div>
-            </div>
-          );
-        } else {
-          return (
-            <div className="theirDm" key={index}>
-              <div className="theirName"> {dm.from.username}</div>
-              <div className="theirMessage">
-                <div className="content">{dm.content}</div>
+            );
+          } else {
+            return (
+              <div className="theirDm" key={i}>
+                <div className="theirName"> {msg.from.username}</div>
+                <div className="theirMessage">
+                  <div className="content">{msg.content}</div>
+                </div>
               </div>
-            </div>
-          );
-        }
-      })}
-      <MessageForm dms={dms} setDms={setDms} />
+            );
+          }
+        })}
+      </div>
+      <MessageForm index={index} convs={convs} setConvs={setConvs} />
     </div>
   );
 };
 
-export default function DirectMessages() {
-  const [show, setShow] = useState<any | null>(null);
-  const [dms, setDms] = useState([
-    {
-      from: "test2",
-      messages: [
-        { from: "test2", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test2", content: "sup" },
-      ],
-    },
-    {
-      from: "test3",
-      messages: [
-        { from: "test3", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test3", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test3", content: "sup" },
-      ],
-    },
-  ]);
+const MessageEntry = () => {};
 
-  const handleClick = (selected: any) => {
-    console.log("selected", selected);
-    console.log("show", show);
-    if (show && show.from === selected.from) setShow(null);
-    else setShow(selected);
+export default function DirectMessages() {
+  const [show, setShow] = useState("");
+  const { user } = useContext(User);
+  const [convs, setConvs] = useState<conversationType[]>([]);
+
+  useDmEvents({ setConvs });
+  /*const [convs, setConvs] = useState([
+    {
+      to: "test2",
+      messages: [
+        { from: "dchheang", content: "sup" },
+        { from: "test1", content: "sup" },
+        { from: "test1", content: "sup" },
+        { from: "test1", content: "sup" },
+        { from: "dchheang", content: "sup" },
+      ],
+      show: true,
+    },
+    {
+      to: "test3",
+      messages: [
+        { from: "dchheang", content: "sup" },
+        { from: "test1", content: "sup" },
+        { from: "dchheang", content: "sup" },
+        { from: "test1", content: "sup" },
+        { from: "dchheang", content: "sup" },
+      ],
+      show: true,
+    },
+  ]);*/
+
+  const handleClick = (index: number) => {
+    const copy = [...convs];
+    copy[index].show = !copy[index].show;
+    setConvs(copy);
   };
 
   return (
     <div className="dms">
-      {dms &&
-        dms.map((dm) => (
-          <div className="dmEntry" key={dm.from}>
-            {show && show.from === dm.from && (
-              <MessageContent dms={show.messages} setDms={setDms} />
-            )}
-            <div className="dmTitle" onClick={() => handleClick(dm)}>
-              {" "}
-              {dm.from}{" "}
+      {convs &&
+        convs.map((conv, index) => {
+          console.log("conv", conv);
+          return (
+            <div className="dmEntry" key={index}>
+              {conv.show && (
+                <MessageContent
+                  index={index}
+                  convs={convs}
+                  setConvs={setConvs}
+                />
+              )}
+              <div className="dmTitle" onClick={() => handleClick(index)}>
+                {conv.to.username}
+              </div>
+            </div>
+          );
+        })}
+      {/*Array.from(dms).map((dm, index) => 
+          <div className='dmEntry' key={index}>
+            {show && show === key && 
+            <MessageContent dms={value} setDms={setDms} /> }
+            <div className="dmTitle" onClick={() => handleClick(key)}>
+              {key}
             </div>
           </div>
-        ))}
+        })*/}
     </div>
   );
 }
