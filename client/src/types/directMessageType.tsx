@@ -6,6 +6,7 @@ export type directMessageType = {
 };
 
 export type conversationType = {
+  id: number;
   to: userType;
   messages: directMessageType[];
   show: boolean;

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ChanMessage, Conversation, DirectMessage, User } from "src/database";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class MessageService {
@@ -38,9 +38,7 @@ export class MessageService {
 
   async getNewMessages(id: number) {
     const convs = await this.convRepo.find({
-      relations: {
-        users: true,
-      },
+      relations: ["users", "messages", "messages.from"],
       where: {
         newMessages: true,
         users: {
@@ -49,16 +47,36 @@ export class MessageService {
       },
     });
 
-    console.log("new messages", convs);
-    return convs;
+    const ret = [];
+    console.log("convs", convs);
+    while (convs.length) {
+      const conv = convs.shift();
+      console.log("conv shift", conv);
+      ret.push({
+        id: conv.id,
+        messages: conv.messages,
+        to: conv.users[0].id === id ? conv.users[1] : conv.users[0],
+        show: true,
+      });
+    }
+
+    console.log("new messages", ret);
+    return ret;
+  }
+
+  async findConvById(id: number) {
+    return await this.convRepo.findOne({
+      where: {
+        id,
+      },
+      relations: ["users", "messages", "messages.from"],
+    });
+    //return await this.convRepo.findOneBy({ id });
   }
 
   async getConversation(me: User, to: User) {
     const conv = await this.convRepo.findOne({
-      relations: {
-        users: true,
-        messages: true,
-      },
+      relations: ["users", "messages", "messages.from"],
       where: [
         {
           users: {
@@ -73,6 +91,7 @@ export class MessageService {
       ],
     });
 
+    if (!conv) return null;
     return {
       id: conv.id,
       messages: conv.messages,
@@ -94,5 +113,18 @@ export class MessageService {
       to,
       show: true,
     };
+  }
+
+  async createDm(from: User, content: string) {
+    const dm = this.dmRepo.create({ from, content });
+
+    return await this.dmRepo.save(dm);
+  }
+
+  async pushDm(conversation: Conversation, dm: DirectMessage) {
+    console.log("push dm", dm);
+    conversation.messages.push(dm);
+    conversation.newMessages = true;
+    return await this.convRepo.save(conversation);
   }
 }

@@ -7,27 +7,25 @@ import {
 } from "../../types/directMessageType";
 import axios from "axios";
 import useDmEvents from "../../hooks/chatEvents/useDmEvents";
+import { ChatContext } from "../../context/socketContext";
 
 type Props = {
-  index: number;
-  convs: conversationType[];
-  setConvs: (dms: conversationType[]) => void;
+  conv: conversationType;
 };
 
-const MessageForm = ({ index, convs, setConvs }: Props) => {
+const MessageForm = ({ conv }: Props) => {
   const [content, setContent] = useState("");
   const { user } = useContext(User);
+  const socket = useContext(ChatContext);
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-
-    const copy = [...convs];
-    const messages = copy[index].messages;
-    messages.push({
-      from: user,
+    socket.emit("directMessage", {
+      convId: conv.id,
+      to: conv.to,
+      user,
       content,
     });
-    setConvs(copy);
   };
 
   return (
@@ -41,36 +39,37 @@ const MessageForm = ({ index, convs, setConvs }: Props) => {
   );
 };
 
-const MessageContent = ({ index, convs, setConvs }: Props) => {
+const MessageContent = ({ conv }: Props) => {
   const { user } = useContext(User);
-  const messages = [...convs[index].messages];
+  const messages = conv.messages;
 
   return (
     <div className="dmContent">
       <div className="dmMessages">
-        {messages.map((msg, i) => {
-          if (msg.from.id === user.id) {
-            return (
-              <div className="myDm" key={i}>
-                <div className="myName"> me</div>
-                <div className="myMessage">
-                  <div className="content">{msg.content}</div>
+        {messages &&
+          messages.map((msg, i) => {
+            if (msg.from.id === user.id) {
+              return (
+                <div className="myDm" key={i}>
+                  <div className="myName"> me</div>
+                  <div className="myMessage">
+                    <div className="content">{msg.content}</div>
+                  </div>
                 </div>
-              </div>
-            );
-          } else {
-            return (
-              <div className="theirDm" key={i}>
-                <div className="theirName"> {msg.from.username}</div>
-                <div className="theirMessage">
-                  <div className="content">{msg.content}</div>
+              );
+            } else {
+              return (
+                <div className="theirDm" key={i}>
+                  <div className="theirName"> {msg.from.username}</div>
+                  <div className="theirMessage">
+                    <div className="content">{msg.content}</div>
+                  </div>
                 </div>
-              </div>
-            );
-          }
-        })}
+              );
+            }
+          })}
       </div>
-      <MessageForm index={index} convs={convs} setConvs={setConvs} />
+      <MessageForm conv={conv} />
     </div>
   );
 };
@@ -121,13 +120,7 @@ export default function DirectMessages() {
           console.log("conv", conv);
           return (
             <div className="dmEntry" key={index}>
-              {conv.show && (
-                <MessageContent
-                  index={index}
-                  convs={convs}
-                  setConvs={setConvs}
-                />
-              )}
+              {conv.show && <MessageContent conv={conv} />}
               <div className="dmTitle" onClick={() => handleClick(index)}>
                 {conv.to.username}
               </div>

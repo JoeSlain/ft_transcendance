@@ -63,9 +63,8 @@ export default function useChatEvents({
 
   // on mount
   useEffect(() => {
-    console.log("use chat effect");
     const selected = getSavedItem("selected");
-    console.log("selected saved", selected);
+
     if (selected) {
       socket.emit("joinChannel", { user, channel: selected });
     }
@@ -76,7 +75,6 @@ export default function useChatEvents({
         withCredentials: true,
       })
       .then((response) => {
-        console.log("privateChans", response.data);
         setPrivateChans(response.data);
       });
     axios
@@ -84,7 +82,6 @@ export default function useChatEvents({
         withCredentials: true,
       })
       .then((response) => {
-        console.log("publicChans", response.data);
         setPublicChans(response.data);
       });
 

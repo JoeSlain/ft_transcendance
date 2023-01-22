@@ -524,6 +524,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("directMessage")
   async directMessage(client: Socket, data: any) {
-    this.server.to(client.id).emit("newDirectMessage");
+    let conv = await this.messageService.findConvById(data.convId);
+
+    if (!conv) {
+      this.server.to(client.id).emit("error", "error: conversation not found");
+      return;
+    }
+    const msg = await this.messageService.createDm(data.user, data.content);
+    console.log("get conv by id", conv);
+    conv = await this.messageService.pushDm(conv, msg);
+    console.log("returned conv", conv);
+    const to = this.chatService.getUser(data.to.id);
+    console.log("toId", data.to.id);
+    console.log("to", to);
+    if (to) this.server.to(to).emit("newDm", conv);
+    this.server.to(client.id).emit("newDm", conv);
   }
 }

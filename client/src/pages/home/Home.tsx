@@ -27,8 +27,7 @@ let arr: gameType[] = [
   },
 ];
 
-function Games()
-{
+function Games() {
   return (
     <div className="overflow-x-auto">
       <table className="table w-full">
@@ -52,16 +51,15 @@ function Games()
   );
 }
 
-
 export default function Home() {
   const isLogged = React.useContext(Auth);
-  console.log("isLogged", isLogged);
 
   return (
-        <>
-        <h1 className="flex justify-center text-primary w-[100%] mt-5  font-retro text-5xl">Current games</h1>
-        {/*         <Games/> */}
-        </>
-  
+    <>
+      <h1 className="flex justify-center text-primary w-[100%] mt-5  font-retro text-5xl">
+        Current games
+      </h1>
+      {/*         <Games/> */}
+    </>
   );
 }
