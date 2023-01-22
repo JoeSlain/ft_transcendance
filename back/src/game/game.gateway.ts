@@ -122,11 +122,12 @@ export class GameGateway {
   }
 
   @SubscribeMessage('startGame')
-  startGame(client: Socket, room: Room) {
+  startGame(client: Socket, roomId: string) {
     console.log('start game event');
-    const game = this.gameService.createGame(room);
-    client.to(room.id).emit('gameStarted', game);
-    this.gameService.startGameLoop(game, client, room.id);
+    const game = this.gameService.createGame(roomId);
+    client.to(roomId).emit('gameStarted', game);
+    console.log('start startGameLoop');
+    this.gameService.startGameLoop(game, client, roomId);
     return game;
   }
 

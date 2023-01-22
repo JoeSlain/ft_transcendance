@@ -12,14 +12,30 @@ export class GameService {
   users: Map<number, string> = new Map();
   games = new Map<number, GameType>()
 
-  startGameLoop(game: GameType, clients, roomId: string) {
+  startGameLoop(game: GameType, clients: Socket, roomId: string) {
+    this.startGame(game);
+    // Création d'une boucle de jeu
     const gameLoop = setInterval(() => {
       // Mise à jour de l'état du jeu
       this.updateGame(game);
 
+      // Vérification de la fin de la partie
+      if (game.player1.score >= 10) {
+        clearInterval(gameLoop);
+        game.player1.win = true;
+        clients.emit('win', { game, roomId });
+        return;
+      }
+      if (game.player2.score >= 10) {
+        clearInterval(gameLoop);
+        game.player2.win = true;
+        return;
+      }
       // Envoi des mises à jour de l'état du jeu aux clients connectés à la salle
-      clients.forEach(client => {
+      const clientsArr = Array.isArray(clients) ? clients : [clients];
+      clientsArr.forEach(client => {
         client.emit('updateGameState', { game, roomId });
+        console.log('updateGameState', { game, roomId });
       });
     }, 1000 / 60);
   }
@@ -30,15 +46,17 @@ export class GameService {
     this.updateBall(game);
   }
 
-  createGame(room: Room): GameType {
+  createGame(roomId: string): GameType {
     const width = 800; // largeur de la zone de jeu
     const height = 600; // hauteur de la zone de jeu
+
     const player1 = {
       x: 30,
       y: height / 2 - 30,
       width: 20,
       height: 60,
       score: 0,
+      win: false,
       paddle: {
         x: 0,
         y: 0,
@@ -54,6 +72,7 @@ export class GameService {
       width: 20,
       height: 60,
       score: 0,
+      win: false,
       paddle: {
         x: 0,
         y: 0,
@@ -70,7 +89,7 @@ export class GameService {
       speedY: 5,
       xVel: 1,
     };
-    return { width, height, player1, player2, ball };
+    return { width, height, player1, player2, ball, roomId, gameRunning: false };
   }
 
   // Fonction pour mettre à jour la position d'un paddle
@@ -113,14 +132,12 @@ export class GameService {
       this.resetBall(game);
     }
   }
-  saveGame(game: GameType): void {
-    // this.games.set(game.id, game);
-  }
+
   resetBall(game: GameType): GameType {
     // Réinitialisation de la position de la balle au centre du canvas
     game.ball.x = game.width / 2 - 5;
     game.ball.y = game.height / 2 - 5;
-    
+
     // Réinitialisation de la vitesse de la balle
     game.ball.speedX = 10;
     game.ball.speedY = 5;
@@ -135,11 +152,11 @@ export class GameService {
   }
 
   startGame(game: GameType) {
-    // game.running = true;
+    game.gameRunning = true;
   }
 
   stopGame(game: GameType) {
-    // game.running = false;
+    game.gameRunning = false;
   }
 
   deleteGame(gameId: number): void {

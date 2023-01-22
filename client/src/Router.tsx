@@ -26,6 +26,7 @@ import { ModalContext } from "./context/modalContext";
 import Modal from "./components/modal";
 import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
 import DirectMessages from "./components/DmsBar/DirectMessages";
+import GameComponent from "./pages/games/GameComponent";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -58,7 +59,7 @@ export default function Router() {
                   <Route path="/" element={<Home />} />
                   <Route path="/home" element={<Home />} />
                   <Route path="/play" element={<Play />} />
-                  <Route path="/games" element={<Games />} />
+                  <Route path="/games" element={<GameComponent/>} />
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/profile">
                     <Route index element={<MyProfile />} />

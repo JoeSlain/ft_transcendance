@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { roomType } from "../../types/roomType";
 import User from "../../hooks/User";
 import { GameContext } from "../../context/socketContext";
+import GameComponent from "../games/GameComponent";
 
 type IProps = {
   room: roomType;
@@ -22,7 +23,9 @@ export default function Buttons({ room }: IProps) {
   const startGame = () => {
     if (playersReady) {
       if (playersReady) {
-        socket.emit("startGame", room.id);
+        console.log("start game", room.id);
+        socket.emit("startGame", {roomId: room.id});
+        <GameComponent/>
       }
     }
   };

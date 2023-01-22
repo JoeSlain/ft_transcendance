@@ -54,11 +54,13 @@ export type MessageData = {
 
 // pong game
 export type GameType = {
+  roomId: string;
   width: number;
   height: number;
   player1: PlayerType;
   player2: PlayerType;
   ball: BallType;
+  gameRunning: boolean;
 };
 
 // pong player
@@ -68,6 +70,7 @@ export type PlayerType = {
   width: number;
   height: number;
   score: number;
+  win: boolean;
   paddle: PaddleType;
 };
 

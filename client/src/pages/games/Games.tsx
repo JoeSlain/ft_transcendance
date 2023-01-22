@@ -40,7 +40,7 @@ function Games() {
   }
 
   return (
-    <div className="game">
+     <div className="game">
       <div className="game-buttons-container">
         {game && (
           <button className="btn btn-primary" onClick={stopGame}>
