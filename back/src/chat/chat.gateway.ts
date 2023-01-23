@@ -517,8 +517,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async getConversation(client: Socket, data: any) {
     let conv = await this.messageService.getConversation(data.me, data.to);
 
-    if (!conv)
+    if (!conv) {
       conv = await this.messageService.createConversation(data.me, data.to);
+      console.log("conv not found, creation new", conv);
+    } else console.log("conv found");
     this.server.to(client.id).emit("openConversation", conv);
   }
 
@@ -531,12 +533,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     const msg = await this.messageService.createDm(data.user, data.content);
-    console.log("get conv by id", conv);
     conv = await this.messageService.pushDm(conv, msg);
-    console.log("returned conv", conv);
     const to = this.chatService.getUser(data.to.id);
-    console.log("toId", data.to.id);
-    console.log("to", to);
     if (to) this.server.to(to).emit("newDm", conv);
     this.server.to(client.id).emit("newDm", conv);
   }

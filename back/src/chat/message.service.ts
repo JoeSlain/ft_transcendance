@@ -6,6 +6,7 @@ import { In, Repository } from "typeorm";
 @Injectable()
 export class MessageService {
   constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(ChanMessage) private msgRepo: Repository<ChanMessage>,
     @InjectRepository(DirectMessage) private dmRepo: Repository<DirectMessage>,
     @InjectRepository(Conversation) private convRepo: Repository<Conversation>
@@ -37,24 +38,31 @@ export class MessageService {
   }
 
   async getNewMessages(id: number) {
-    const convs = await this.convRepo.find({
-      relations: ["users", "messages", "messages.from"],
+    const user = await this.userRepo.findOne({
+      relations: [
+        "conversations",
+        "conversations.messages",
+        "conversations.messages.from",
+        "conversations.users",
+      ],
       where: {
-        newMessages: true,
-        users: {
-          id,
+        id,
+        conversations: {
+          newMessages: true,
         },
       },
     });
 
+    if (!user) return null;
+    const convs = user.conversations;
+
     const ret = [];
-    console.log("convs", convs);
     while (convs.length) {
       const conv = convs.shift();
       console.log("conv shift", conv);
       ret.push({
         id: conv.id,
-        messages: conv.messages,
+        messages: conv.messages.reverse(),
         to: conv.users[0].id === id ? conv.users[1] : conv.users[0],
         show: true,
       });
@@ -75,21 +83,21 @@ export class MessageService {
   }
 
   async getConversation(me: User, to: User) {
-    const conv = await this.convRepo.findOne({
-      relations: ["users", "messages", "messages.from"],
-      where: [
-        {
-          users: {
-            id: me.id,
-          },
-        },
-        {
-          users: {
-            id: to.id,
-          },
-        },
+    const user = await this.userRepo.findOne({
+      relations: [
+        "conversations",
+        "conversations.messages",
+        "conversations.messages.from",
+        "conversations.users",
       ],
+      where: {
+        id: me.id,
+      },
     });
+
+    const conv = user.conversations.find((conv) =>
+      conv.users.find((user) => user.id === to.id)
+    );
 
     if (!conv) return null;
     return {

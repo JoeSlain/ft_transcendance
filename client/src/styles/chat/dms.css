@@ -2,7 +2,9 @@
   display: flex;
 }
 
-.dmTitle {
+.dmToggle {
+  display: flex;
+  justify-content: center;
   width: 200px;
   margin-right: 5px;
   position: relative;
@@ -10,6 +12,15 @@
   color: yellow;
   background-color: #f32c43;
   border: 1px solid rgba(0, 0, 0, 0.836);
+}
+
+.dmName {
+  width: 90%;
+}
+
+.dmClose {
+  color: black;
+  font-weight: bold;
 }
 
 .dmContent {

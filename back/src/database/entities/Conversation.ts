@@ -19,7 +19,7 @@ export class Conversation {
   newMessages: boolean;
 
   // relations
-  @ManyToMany(() => User)
+  @ManyToMany((type) => User, (user) => user.conversations)
   @JoinTable()
   users: User[];
 

@@ -1,11 +1,7 @@
 import User from "../../hooks/User";
 import "../../styles/chat/dms.css";
-import React, { useContext, useEffect, useState } from "react";
-import {
-  conversationType,
-  directMessageType,
-} from "../../types/directMessageType";
-import axios from "axios";
+import React, { useContext, useState } from "react";
+import { conversationType } from "../../types/directMessageType";
 import useDmEvents from "../../hooks/chatEvents/useDmEvents";
 import { ChatContext } from "../../context/socketContext";
 
@@ -74,38 +70,10 @@ const MessageContent = ({ conv }: Props) => {
   );
 };
 
-const MessageEntry = () => {};
-
 export default function DirectMessages() {
-  const [show, setShow] = useState("");
-  const { user } = useContext(User);
   const [convs, setConvs] = useState<conversationType[]>([]);
 
   useDmEvents({ setConvs });
-  /*const [convs, setConvs] = useState([
-    {
-      to: "test2",
-      messages: [
-        { from: "dchheang", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "dchheang", content: "sup" },
-      ],
-      show: true,
-    },
-    {
-      to: "test3",
-      messages: [
-        { from: "dchheang", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "dchheang", content: "sup" },
-        { from: "test1", content: "sup" },
-        { from: "dchheang", content: "sup" },
-      ],
-      show: true,
-    },
-  ]);*/
 
   const handleClick = (index: number) => {
     const copy = [...convs];
@@ -113,29 +81,35 @@ export default function DirectMessages() {
     setConvs(copy);
   };
 
+  const handleClose = (conv: conversationType) => {
+    setConvs((prev: any) => {
+      return prev.filter((p: any) => p.id !== conv.id);
+    });
+  };
+
   return (
     <div className="dms">
       {convs &&
         convs.map((conv, index) => {
-          console.log("conv", conv);
           return (
             <div className="dmEntry" key={index}>
               {conv.show && <MessageContent conv={conv} />}
-              <div className="dmTitle" onClick={() => handleClick(index)}>
-                {conv.to.username}
+              <div className="dmToggle" onClick={() => handleClick(index)}>
+                <div className="dmName">{conv.to.username} </div>
+                <button
+                  className="dmClose"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClose(conv);
+                  }}
+                >
+                  {" "}
+                  x{" "}
+                </button>
               </div>
             </div>
           );
         })}
-      {/*Array.from(dms).map((dm, index) => 
-          <div className='dmEntry' key={index}>
-            {show && show === key && 
-            <MessageContent dms={value} setDms={setDms} /> }
-            <div className="dmTitle" onClick={() => handleClick(key)}>
-              {key}
-            </div>
-          </div>
-        })*/}
     </div>
   );
 }
