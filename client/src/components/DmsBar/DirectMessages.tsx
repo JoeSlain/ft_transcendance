@@ -22,6 +22,7 @@ const MessageForm = ({ conv }: Props) => {
       user,
       content,
     });
+    setContent("");
   };
 
   return (
