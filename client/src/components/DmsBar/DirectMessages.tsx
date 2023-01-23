@@ -4,6 +4,10 @@ import React, { useContext, useState } from "react";
 import { conversationType } from "../../types/directMessageType";
 import useDmEvents from "../../hooks/chatEvents/useDmEvents";
 import { ChatContext } from "../../context/socketContext";
+import { userType } from "../../types/userType";
+import { ContextMenu } from "../../styles/menus";
+import { CommonContext } from "../contextMenus/commonContext";
+import useClickListener from "../../hooks/useClickListener";
 
 type Props = {
   conv: conversationType;
@@ -39,6 +43,13 @@ const MessageForm = ({ conv }: Props) => {
 const MessageContent = ({ conv }: Props) => {
   const { user } = useContext(User);
   const messages = conv.messages;
+  const [selectedUser, setSelectedUser] = useState<userType | null>(null);
+  const [point, setPoint] = useState({ x: 0, y: 0 });
+
+  useClickListener({
+    selected: selectedUser,
+    setSelected: setSelectedUser,
+  });
 
   return (
     <div className="dmContent">
@@ -57,10 +68,25 @@ const MessageContent = ({ conv }: Props) => {
             } else {
               return (
                 <div className="theirDm" key={i}>
-                  <div className="theirName"> {msg.from.username}</div>
+                  <div
+                    className="theirName"
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setSelectedUser(msg.from);
+                      setPoint({ x: e.pageX, y: e.pageY });
+                    }}
+                  >
+                    {" "}
+                    {msg.from.username}
+                  </div>
                   <div className="theirMessage">
                     <div className="content">{msg.content}</div>
                   </div>
+                  {selectedUser && (
+                    <ContextMenu top={point.y} left={point.x}>
+                      <CommonContext selected={selectedUser} />
+                    </ContextMenu>
+                  )}
                 </div>
               );
             }
