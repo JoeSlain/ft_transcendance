@@ -9,24 +9,39 @@ function GameComponent () {
 	const canvasRef: CanvasRef = useRef<HTMLCanvasElement>(null);
 	const [game, setGame] = useState<GameType>();
   const socket = useContext(GameContext);
-  
+
 
   useEffect(() => {
     if (!socket) return;
    
     socket.on('updateGameState', (data: GameUpdateData, roomId) => {
         setGame(data.game);
-        console.log("updateGameState", data.game);
+        console.log("Game state updated: ", data.game);
     });
     socket.on('win', (data) => {
       const { game } = data;
       
       if (game.player1.win) {
         //..
+        console.log("Player 1 win the game!");
       } else if (game.player2.win) {
         //..
+        console.log("Player 2 win the game!");
       }
     });
+
+    // 
+    const handleMovePaddle = (event: KeyboardEvent) => {
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        socket.emit("movePaddle", { direction: event.key }
+        );
+      }
+    };
+    document.addEventListener("keydown", handleMovePaddle);
+    return () => {
+      document.removeEventListener("keydown", handleMovePaddle);
+    };
+
   }, [socket]);
 
   
@@ -68,16 +83,16 @@ function GameComponent () {
       ctx.fillRect(game.width / 2 - 10, i + 10, 15, 20);
     }
     //draw scores
-    // this.gameContext.fillText(Game.player1Score.toString(), 320, 50);
-    // this.gameContext.fillText(Game.player2Score.toString(), 450, 50);
+    ctx.fillText(game.player1.score.toString(), 320, 50);
+    ctx.fillText(game.player2.score.toString(), 450, 50);
   }
 
   return (
-    <div>
+    <div className="game-canvas-container">
         <canvas ref={canvasRef} width={game? game.width : 800} height={game? game.height : 500} />
     </div>
 
   );
-};
+}
 
 export default GameComponent;

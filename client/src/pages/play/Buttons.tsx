@@ -23,8 +23,8 @@ export default function Buttons({ room }: IProps) {
   const startGame = () => {
     if (playersReady) {
       if (playersReady) {
-        console.log("start game", room.id);
-        socket.emit("startGame", {roomId: room.id});
+        console.log("start game", room);
+        socket.emit("startGame", {room});
         <GameComponent/>
       }
     }
