@@ -70,7 +70,6 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
 
   // first render
   useEffect(() => {
-    console.log("ueeee");
     socket.emit("getGame", user.id);
 
     socket.on("newGame", (data) => {
