@@ -1,5 +1,5 @@
 .chatMessages {
-  height: 80%;
+  height: 600px;
   display: flex;
   flex-direction: column;
 }

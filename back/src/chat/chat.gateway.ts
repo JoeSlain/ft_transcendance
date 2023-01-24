@@ -164,8 +164,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage("acceptFriendRequest")
   async addFriend(client: Socket, notif: Notif) {
     console.log("addFriend event");
-    console.log("from", notif.from);
-    console.log("to", notif.to);
 
     const newFriend = await this.usersService.addFriend(notif.from, notif.to);
     if (newFriend) {
@@ -266,8 +264,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (channel.type === "protected") {
       let check = false;
       if (data.channel.password) {
-        console.log("data pass", data.channel.password);
-        console.log("chan pass", channel.password);
         check = await this.channelService.checkChanPassword(
           data.channel.password,
           channel.password
@@ -283,10 +279,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("joinChannel")
   async joinChannel(client: Socket, data: any) {
-    console.log("joinChannel data channel", data.channel);
-
     let channel = await this.channelService.findChannelById(data.channel.id);
-    console.log("joinChannel", channel);
 
     if (await this.restrictionService.isBanned(data.user.id, channel)) {
       const ban = await this.restrictionService.getBanned(
@@ -367,7 +360,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("acceptChannelInvite")
   async acceptChanInvite(client: Socket, notif: Notif) {
-    console.log("accept chan invite", notif.channel);
     await this.notifService.deleteNotif(notif);
     const channel = await this.joinChannel(client, {
       user: notif.to,
@@ -378,6 +370,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("chanMessage")
   async message(client: Socket, data: MessageData) {
+    console.log("new message");
     const channel = await this.channelService.findChannelById(data.channel.id);
     if (!channel) {
       this.server.to(client.id).emit("error", "channel not found");
@@ -399,12 +392,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         );
       return;
     }
+    console.log("creating msg");
     const message = await this.messageService.createChanMessage({
       content: data.content,
       from: data.from,
-      channel: data.channel,
+      channel,
     });
     //console.log("ret msg", message);
+    console.log("returning new msg");
     if (!message)
       this.server.to(client.id).emit("error", "error creating message");
     else this.server.to(data.channel.socketId).emit("newMessage", message);
@@ -412,7 +407,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage("setChannelPassword")
   async setChannelPassword(client: Socket, data: any) {
-    console.log("set chan pass", data);
     if (!this.checkChanPassword(client, data)) return;
     const channel = await this.channelService.setChanPassword(
       data.channel,
@@ -420,14 +414,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
     if (data.channel.type === "public") {
       channel.password = null;
-      console.log("channel returned", channel);
       this.server.emit("updateChannel", channel);
     }
   }
 
   @SubscribeMessage("removeChannelPassword")
   async removeChannelPassword(client: Socket, channel: Channel) {
-    console.log("remove chan pass", channel);
     if (!(await this.checkChanPassword(client, { channel }))) return;
     channel = await this.channelService.findChannelById(channel.id);
     channel = await this.channelService.removeChanPassword(channel);

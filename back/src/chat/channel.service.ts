@@ -1,6 +1,6 @@
 import { ConsoleLogger, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Channel, Restriction, User } from "src/database";
+import { ChanMessage, Channel, Restriction, User } from "src/database";
 import { ChannelData } from "src/utils/types";
 import { Brackets, Repository, createQueryBuilder } from "typeorm";
 import * as bcrypt from "bcrypt";
@@ -10,6 +10,7 @@ import { NotifService } from "src/users/notifs.service";
 export class ChannelService {
   constructor(
     @InjectRepository(Channel) private chanRepo: Repository<Channel>,
+    @InjectRepository(ChanMessage) private msgRepo: Repository<ChanMessage>,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Restriction)
     private restrictionRepo: Repository<Restriction>,
@@ -28,7 +29,7 @@ export class ChannelService {
   }
 
   async findChannelById(id: number) {
-    const channel = await this.chanRepo.find({
+    const channel = await this.chanRepo.findOne({
       where: {
         id,
       },
@@ -38,13 +39,20 @@ export class ChannelService {
         banned: true,
         admins: true,
         muted: true,
-        messages: {
-          from: true,
-        },
       },
     });
+
+    const messages = await this.msgRepo
+      .createQueryBuilder("message")
+      .leftJoinAndSelect("message.channel", "chan")
+      .where("chan.id = :id", { id })
+      .orderBy("chan.id", "DESC")
+      .take(10)
+      .getMany();
+
+    channel.messages = messages;
     //console.log("chanfound", channel);
-    return channel[0];
+    return channel;
   }
 
   async getChannelWithUsers(id: number) {

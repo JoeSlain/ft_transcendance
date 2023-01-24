@@ -28,6 +28,14 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
       }
     });
 
+    /*chatSocket.on("disconnect", () => {
+      console.log("disconnect");
+      if (user) {
+        console.log("logout");
+        chatSocket.emit("logout", user);
+      }
+    });*/
+
     chatSocket.on("loggedIn", (data) => {
       setUser(data);
       saveItem("user", data);
@@ -38,6 +46,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
     });
 
     chatSocket.on("loggedOut", () => {
+      console.log("logout");
       axios
         .post("http://localhost:3001/api/auth/logout", {
           withCredentials: true,
@@ -54,6 +63,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
 
     return () => {
       chatSocket.off("connect");
+      //chatSocket.off("disconnect");
       chatSocket.off("loggedIn");
     };
   }, []);

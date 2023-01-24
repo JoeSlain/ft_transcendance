@@ -26,14 +26,12 @@ export class MessageService {
   }
 
   async createChanMessage(data: any) {
-    console.log("create chan message, with data", data);
     let message = this.msgRepo.create({
       content: data.content,
       from: data.from,
       channel: data.channel,
     });
     message = await this.msgRepo.save(message);
-    console.log("create message", message);
     return message;
   }
 
@@ -59,7 +57,6 @@ export class MessageService {
     const ret = [];
     while (convs.length) {
       const conv = convs.shift();
-      console.log("conv shift", conv);
       ret.push({
         id: conv.id,
         messages: conv.messages.reverse(),
@@ -68,7 +65,6 @@ export class MessageService {
       });
     }
 
-    console.log("new messages", ret);
     return ret;
   }
 
@@ -79,7 +75,6 @@ export class MessageService {
       },
       relations: ["users", "messages", "messages.from"],
     });
-    //return await this.convRepo.findOneBy({ id });
   }
 
   async getConversation(me: User, to: User) {
@@ -130,7 +125,6 @@ export class MessageService {
   }
 
   async pushDm(conversation: Conversation, dm: DirectMessage) {
-    console.log("push dm", dm);
     conversation.messages.push(dm);
     conversation.newMessages = true;
     return await this.convRepo.save(conversation);

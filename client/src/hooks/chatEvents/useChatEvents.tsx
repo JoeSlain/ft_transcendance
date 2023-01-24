@@ -63,6 +63,7 @@ export default function useChatEvents({
 
   // on mount
   useEffect(() => {
+    console.log("useeffect");
     const selected = getSavedItem("selected");
 
     if (selected) {
@@ -150,7 +151,7 @@ export default function useChatEvents({
             ...prev,
             messages: prev.messages.concat(message),
           };
-          saveItem("selected", newSelected);
+          //saveItem("selected", newSelected);
           return newSelected;
         }
         return prev;

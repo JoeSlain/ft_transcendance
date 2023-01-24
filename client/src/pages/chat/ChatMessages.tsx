@@ -23,7 +23,6 @@ const ChatMessages = ({ selected }: Props) => {
   useEffect(() => {
     if (messagesEndRef && messagesEndRef.current) {
       let lastChild = messagesEndRef.current.lastElementChild;
-      console.log("USERFFECT");
       if (selected?.messages)
         lastChild?.scrollIntoView({
           behavior: "smooth",

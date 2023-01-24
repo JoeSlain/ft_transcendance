@@ -28,6 +28,12 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(cookieParser());
+  /* const express = require("express");
+  const bodyParser = require("body-parser");
+  // Express 4.0
+  app.use(bodyParser.json({ limit: "10mb" }));
+  app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
+*/
   const config = new DocumentBuilder()
     .setTitle("Cats example")
     .setDescription("The cats API description")
