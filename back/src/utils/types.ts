@@ -54,7 +54,6 @@ export type MessageData = {
 
 // pong game
 export type GameType = {
-  room: Room;
   width: number;
   height: number;
   player1: PlayerType;
@@ -73,6 +72,7 @@ export type PlayerType = {
   score: number;
   win: boolean;
   paddle: PaddleType;
+  id: number;
 };
 
 // pong ball

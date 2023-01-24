@@ -14,8 +14,6 @@ type IProps = {
 };
 
 export default function useChatEvents({
-  publicChans,
-  privateChans,
   setPrivateChans,
   setPublicChans,
   setSelected,

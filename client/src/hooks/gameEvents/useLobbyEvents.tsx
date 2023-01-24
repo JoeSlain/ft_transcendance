@@ -2,12 +2,14 @@ import { useContext, useEffect } from "react";
 import { ChatContext, GameContext } from "../../context/socketContext";
 import { roomType } from "../../types/roomType";
 import User from "../User";
+import { gameData } from "../../types/gameType";
 
 type IProps = {
   setRoom: (props: roomType | null) => void;
+  setGameStart: (props: boolean) => void;
 };
 
-export default function useLobbyEvents({ setRoom }: IProps) {
+export default function useLobbyEvents({ setRoom, setGameStart }: IProps) {
   const gameSocket = useContext(GameContext);
   const { user } = useContext(User);
 
@@ -17,6 +19,7 @@ export default function useLobbyEvents({ setRoom }: IProps) {
 
     // new room
     gameSocket.on("newRoom", (room) => {
+      console.log("newroom", room);
       setRoom(room);
     });
 
@@ -39,6 +42,11 @@ export default function useLobbyEvents({ setRoom }: IProps) {
       setRoom(room);
     });
 
+    gameSocket.on("gameCreated", () => {
+      console.log("game created");
+      setGameStart(true);
+    });
+
     return () => {
       gameSocket.off("getRoom");
       gameSocket.off("newRoom");
@@ -46,6 +54,7 @@ export default function useLobbyEvents({ setRoom }: IProps) {
       gameSocket.off("leftRoom");
       gameSocket.off("clearRoom");
       gameSocket.off("ready");
+      gameSocket.off("gameCreated");
     };
   }, []);
 }

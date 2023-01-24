@@ -59,7 +59,7 @@ export default function Router() {
                   <Route path="/" element={<Home />} />
                   <Route path="/home" element={<Home />} />
                   <Route path="/play" element={<Play />} />
-                  <Route path="/games" element={<Games/>} />
+                  <Route path="/games" element={<Games />} />
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/profile">
                     <Route index element={<MyProfile />} />

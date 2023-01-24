@@ -8,7 +8,7 @@ import { userInfo } from "os";
 import { Socket, Namespace } from "socket.io";
 import { User } from "src/database";
 import { NotifData, Room } from "src/utils/types";
-import { GameService} from "./game.service";
+import { GameService } from "./game.service";
 import { RoomService } from "./room.service";
 
 @WebSocketGateway(3003, {
@@ -21,7 +21,7 @@ export class GameGateway {
   constructor(
     private readonly roomService: RoomService,
     private readonly gameService: GameService
-  ) { }
+  ) {}
 
   @WebSocketServer() server: Namespace;
 
@@ -121,22 +121,43 @@ export class GameGateway {
     this.server.to(data.roomId).emit("ready", data.room);
   }
 
-  @SubscribeMessage('startGame')
-  startGame(client: Socket, room: Room) {
-    console.log('start game event');
+  @SubscribeMessage("createGame")
+  createGame(client: Socket, room: Room) {
+    console.log("create game event");
     const game = this.gameService.createGame(room);
+
+    console.log("game", game);
+    this.server.to(room.id).emit("gameCreated");
+  }
+
+  @SubscribeMessage("getGame")
+  getGame(client: Socket, userId: number) {
+    const game = this.gameService.getGameForUser(userId);
+
+    if (game) this.server.to(client.id).emit("newGame", game);
+  }
+
+  /* @SubscribeMessage("startGame")
+  startGame(client: Socket, room: Room) {
+    console.log("start game event");
+    const game = this.gameService.createGame();
     // this.gameService.addUsersFromRoom(room)
     this.gameService.startGame(game);
-    client.to(room.id).emit('gameStarted', game);
-    console.log('start startGameLoop');
-    this.gameService.startGameLoop(game, client, room);
+    this.server.to(room.id).emit("updateGameState", game);
+    /*client.to(room.id).emit("gameStarted", game);
+    console.log("start startGameLoop");
+    this.gameService.startGameLoop(game, room);
     return game;
-  }
+  }*/
 
   @SubscribeMessage("movePaddle")
   movePaddle(client: Socket, data: any) {
-    this.gameService.movePaddle(client, data);
+    const game = this.gameService.movePaddle(
+      data.game,
+      data.playerId,
+      data.direction
+    );
+
+    this.server.to(game.gameId).emit("updateGameState", game);
   }
-
-
 }

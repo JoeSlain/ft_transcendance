@@ -1,8 +1,9 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { roomType } from "../../types/roomType";
 import User from "../../hooks/User";
 import { GameContext } from "../../context/socketContext";
 import GameComponent from "../games/GameComponent";
+import { useNavigate } from "react-router-dom";
 
 type IProps = {
   room: roomType;
@@ -24,8 +25,7 @@ export default function Buttons({ room }: IProps) {
     if (playersReady) {
       if (playersReady) {
         console.log("start game", room);
-        socket.emit("startGame", {room});
-        <GameComponent/>
+        socket.emit("createGame", room);
       }
     }
   };
@@ -39,8 +39,9 @@ export default function Buttons({ room }: IProps) {
       {showStart && (
         <button
           onClick={startGame}
-          className={`btn ${playersReady ? "" : "btn-disabled"
-            } btn-sm md:btn-md gap-2 normal-case lg:gap-3 `}
+          className={`btn ${
+            playersReady ? "" : "btn-disabled"
+          } btn-sm md:btn-md gap-2 normal-case lg:gap-3 `}
           style={{
             width: "70px",
             color: playersReady ? "white" : "grey",
