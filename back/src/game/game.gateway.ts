@@ -7,7 +7,7 @@ import {
 import { userInfo } from "os";
 import { Socket, Namespace } from "socket.io";
 import { User } from "src/database";
-import { NotifData, Room } from "src/utils/types";
+import { GameType, NotifData, Room } from "src/utils/types";
 import { GameService } from "./game.service";
 import { RoomService } from "./room.service";
 
@@ -135,6 +135,29 @@ export class GameGateway {
     const game = this.gameService.getGameForUser(userId);
 
     if (game) this.server.to(client.id).emit("newGame", game);
+  }
+
+  @SubscribeMessage("startGame")
+  startGame(client: Socket, game: GameType) {
+    const gameLoop = setInterval(() => {
+      game = this.gameService.updateBall(game);
+
+      // Vérification de la fin de la partie
+      if (game.player1.score >= 10) {
+        clearInterval(gameLoop);
+        game.player1.win = true;
+        game.gameRunning = false;
+        return game;
+      }
+      if (game.player2.score >= 10) {
+        clearInterval(gameLoop);
+        game.player2.win = true;
+        game.gameRunning = false;
+        return game;
+      }
+      console.log("gameLoop", game);
+      this.server.to(game.gameId).emit("updateGameState", game);
+    }, 1000 / 60);
   }
 
   /* @SubscribeMessage("startGame")

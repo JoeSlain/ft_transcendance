@@ -35,3 +35,11 @@
   display: flex;
   justify-content: center;
 }
+
+.timer {
+  position: absolute;
+  top: 40%;
+  left: 25%;
+  color: white;
+  font-size: 200px;
+}

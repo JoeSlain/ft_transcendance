@@ -23,46 +23,34 @@ export class GameService {
   //   this.users.delete(userId);
   // }
 
-  startGameLoop(game: GameType, clients: Socket, room: Room) {
-    this.startGame(game);
+  /*  startGameLoop(game: GameType) {
+    game.gameRunning = true;
     // Création d'une boucle de jeu
     const gameLoop = setInterval(() => {
       // Mise à jour de l'état du jeu
-      this.updateGame(game, clients);
+      this.updateBall(game);
 
       // Vérification de la fin de la partie
       if (game.player1.score >= 10) {
         clearInterval(gameLoop);
         game.player1.win = true;
-        clients.emit("win", { game, room: room.id });
-        this.stopGame(game);
-        return;
+        game.gameRunning = false;
+        return game;
       }
       if (game.player2.score >= 10) {
         clearInterval(gameLoop);
         game.player2.win = true;
-        clients.emit("win", { game, room: room.id });
-        this.stopGame(game);
-
-        return;
+        game.gameRunning = false;
+        return game;
       }
       console.log("gameLoop", game);
-
-      // Envoi des mises à jour de l'état du jeu aux clients connectés à la salle
-
-      this.users.forEach((users) => {
-        clients.emit("updateGameState", { game, room: room.id });
-        console.log("updateGameState", { game, room: room.id });
-      });
     }, 1000 / 60);
   }
 
-  private updateGame(game: GameType, clients: Socket) {
-    this.updatePaddle(game, clients);
-    this.updatePaddle(game, clients);
+  private updateGame(game: GameType) {
     this.updateBall(game);
     // console.log('updateGame');
-  }
+  }*/
 
   createGame(room: Room): GameType {
     const width = 800; // largeur de la zone de jeu
@@ -148,32 +136,33 @@ export class GameService {
 
   // Fonction pour mettre à jour la position d'une balle
   updateBall(game: GameType) {
-    const ball = game.ball;
     // Mettre à jour la position de la balle en fonction de sa vitesse
-    ball.x += ball.speedX * ball.xVel;
-    ball.y += ball.speedY;
+    game.ball.x += game.ball.speedX * game.ball.xVel;
+    game.ball.y += game.ball.speedY;
 
     // Vérifier la collision avec les limites du canvas
-    if (ball.y < 0 || ball.y + 10 > game.height) ball.speedY *= -1;
+    if (game.ball.y < 0 || game.ball.y + 10 > game.height)
+      game.ball.speedY *= -1;
 
     // Vérifier la collision avec les paddles
     if (
-      (ball.x < game.player1.x + game.player1.width &&
-        ball.y > game.player1.y &&
-        ball.y < game.player1.y + game.player1.height) ||
-      (ball.x + 10 > game.player2.x &&
-        ball.y > game.player2.y &&
-        ball.y < game.player2.y + game.player2.height)
+      (game.ball.x < game.player1.x + game.player1.width &&
+        game.ball.y > game.player1.y &&
+        game.ball.y < game.player1.y + game.player1.height) ||
+      (game.ball.x + 10 > game.player2.x &&
+        game.ball.y > game.player2.y &&
+        game.ball.y < game.player2.y + game.player2.height)
     ) {
-      ball.speedX *= -1;
+      game.ball.speedX *= -1;
     }
     if (game.ball.x <= 0) {
       game.player2.score++;
-      this.resetBall(game);
+      game = this.resetBall(game);
     } else if (game.ball.x >= game.width) {
       game.player1.score++;
-      this.resetBall(game);
+      game = this.resetBall(game);
     }
+    return game;
   }
 
   resetBall(game: GameType): GameType {

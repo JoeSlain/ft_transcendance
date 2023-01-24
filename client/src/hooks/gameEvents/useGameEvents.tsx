@@ -15,6 +15,7 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
   const socket = useContext(GameContext);
   const { user } = useContext(User);
   const [playerId, setPlayerId] = useState(0);
+  const [key, setKey] = useState<string | null>(null);
 
   function drawBoardDetails(ctx: CanvasRenderingContext2D, game: gameData) {
     console.log("game data", game);
@@ -97,7 +98,15 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
       }
     });
 
+    const handKeyDown = (event: KeyboardEvent) => {
+      event.preventDefault();
+      setKey(event.key);
+    };
+
+    window.addEventListener("keydown", handKeyDown);
+
     return () => {
+      window.removeEventListener("keydown", handKeyDown);
       socket.off("newGame");
       socket.off("updateGameState");
       socket.off("win");
@@ -105,24 +114,15 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
   }, []);
 
   useEffect(() => {
-    const handleMovePaddle = (event: KeyboardEvent) => {
-      event.preventDefault();
-
-      if (!game) {
-        console.log("game null");
-        return;
-      }
-      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-        console.log("key pressed", event.key);
-        console.log("game", game);
-        socket.emit("movePaddle", { game, playerId, direction: event.key });
-      }
-    };
-
-    window.addEventListener("keydown", handleMovePaddle);
-
-    return () => {
-      window.removeEventListener("keydown", handleMovePaddle);
-    };
-  }, [game]);
+    if (!key) {
+      console.log("key null");
+      return;
+    }
+    if (key === "ArrowUp" || key === "ArrowDown") {
+      console.log("key pressed", key);
+      console.log("game", game);
+      socket.emit("movePaddle", { game, playerId, direction: key });
+      setKey(null);
+    }
+  }, [key, game]);
 }
