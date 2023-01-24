@@ -39,18 +39,27 @@ export class ChannelService {
         banned: true,
         admins: true,
         muted: true,
+        messages: {
+          from: true,
+        },
+      },
+      order: {
+        messages: {
+          id: "ASC",
+        },
       },
     });
 
-    const messages = await this.msgRepo
+    /* const messages = await this.msgRepo
       .createQueryBuilder("message")
       .leftJoinAndSelect("message.channel", "chan")
+      .leftJoinAndSelect("message.from", "from")
       .where("chan.id = :id", { id })
       .orderBy("chan.id", "DESC")
       .take(10)
       .getMany();
 
-    channel.messages = messages;
+    channel.messages = messages;*/
     //console.log("chanfound", channel);
     return channel;
   }
