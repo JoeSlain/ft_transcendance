@@ -5,7 +5,7 @@ import { channelType } from "../../../types/channelType";
 import { ChatContext } from "../../../context/socketContext";
 
 type Props = {
-  selected: channelType | null;
+  selected: channelType;
 };
 
 export default function AddChanUser({ selected }: Props) {
@@ -23,7 +23,7 @@ export default function AddChanUser({ selected }: Props) {
         if (response.data) {
           console.log("sending chan", selected);
           socket.emit("chanInvite", {
-            type: "Chan Invite",
+            type: `Chan Invite ${selected.name}`,
             from: user,
             to: response.data,
             channel: selected,

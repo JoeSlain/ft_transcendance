@@ -1,7 +1,15 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
-import { Channel, ChanMessage, Notif, User, Restriction } from "src/database";
+import {
+  Channel,
+  ChanMessage,
+  Notif,
+  User,
+  Restriction,
+  DirectMessage,
+  Conversation,
+} from "src/database";
 import { GameModule } from "src/game/game.module";
 import { RoomService } from "src/game/room.service";
 import { NotifService } from "src/users/notifs.service";
@@ -19,7 +27,15 @@ import { RestrictionService } from "./restrictions.service";
     UsersModule,
     AuthModule,
     GameModule,
-    TypeOrmModule.forFeature([Notif, Channel, User, ChanMessage, Restriction]),
+    TypeOrmModule.forFeature([
+      Notif,
+      Channel,
+      User,
+      ChanMessage,
+      Restriction,
+      DirectMessage,
+      Conversation,
+    ]),
   ],
   providers: [
     ChatGateway,

@@ -1,22 +1,28 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import User from "../../hooks/User";
 import { channelType } from "../../types/channelType";
 import "../../styles/chat/chatMessages.css";
+import { ChanUserContextList } from "./channelUtils/ChanUserContextList";
+import { userType } from "../../types/userType";
+import { ContextMenu } from "../../styles/menus";
+import useClickListener from "../../hooks/useClickListener";
 
 type Props = {
   selected: channelType | null;
 };
 
-
 const ChatMessages = ({ selected }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useContext(User);
+  const [selectedUser, setSelectedUser] = useState<userType | null>(null);
+  const [point, setPoint] = useState({ x: 0, y: 0 });
+
+  useClickListener({ selected: selectedUser, setSelected: setSelectedUser });
 
   //console.log("win dimensions: ", windowDimensions);
   useEffect(() => {
     if (messagesEndRef && messagesEndRef.current) {
       let lastChild = messagesEndRef.current.lastElementChild;
-      console.log("USERFFECT");
       if (selected?.messages)
         lastChild?.scrollIntoView({
           behavior: "smooth",
@@ -66,11 +72,28 @@ const ChatMessages = ({ selected }: Props) => {
           } else {
             return (
               <div key={index} className="pl-5 chat chat-start flex flex-col">
-                <div className="chat-header ml-1">{message.from.username}</div>
+                <div
+                  className="chat-header ml-1"
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setPoint({ x: e.pageX, y: e.pageY });
+                    setSelectedUser(message.from);
+                  }}
+                >
+                  {message.from.username}
+                </div>
 
                 <div className="bubbleOverflow chat-bubble chat-bubble-primary max-w-[90%]">
                   {message.content}
                 </div>
+                {selectedUser && (
+                  <ContextMenu top={point.y} left={point.x}>
+                    <ChanUserContextList
+                      selectedUser={selectedUser}
+                      channel={selected}
+                    />
+                  </ContextMenu>
+                )}
               </div>
               /*               <div key={message.id} className="messageWrapper">
                 <div className="theirUsername">{message.from.username}</div>

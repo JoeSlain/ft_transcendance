@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 
 import { Game } from "./Game";
+import { Conversation } from "./Conversation";
 
 @Entity({ name: "users" })
 export class User {
@@ -52,16 +53,13 @@ export class User {
   date_of_sign: Date;
 
   @ManyToOne(() => User)
-   games: Game[];
+  games: Game[];
 
   // relations
   @ManyToMany((type) => User, (user) => user.friends)
   @JoinTable()
   friends: User[];
 
-  /*    @OneToMany(() => Notif, (notif) => notif.from)
-    received: Notif[]
-
-    @OneToMany(() => Notif, (notif) => notif.to)
-    sent: Notif[]*/
+  @ManyToMany((type) => Conversation, (conversation) => conversation.users)
+  conversations: Conversation[];
 }

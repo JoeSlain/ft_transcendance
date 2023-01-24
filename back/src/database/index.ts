@@ -5,6 +5,8 @@ import { Channel } from "./entities/Channel";
 import { ChanMessage } from "./entities/ChanMessage";
 import { Game } from "./entities/Game";
 import { Restriction } from "./entities/Restriction";
+import { DirectMessage } from "./entities/DirectMessages";
+import { Conversation } from "./entities/Conversation";
 
 export const entities = [
   User,
@@ -14,6 +16,18 @@ export const entities = [
   ChanMessage,
   Game,
   Restriction,
+  DirectMessage,
+  Conversation,
 ];
 
-export { User, TypeORMSession, Notif, Channel, ChanMessage, Game, Restriction };
+export {
+  User,
+  TypeORMSession,
+  Notif,
+  Channel,
+  ChanMessage,
+  Game,
+  Restriction,
+  DirectMessage,
+  Conversation,
+};

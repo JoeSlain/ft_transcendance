@@ -17,7 +17,8 @@ export default function MessageForm({ selected }: Props) {
     if (message === "") return;
     const newMessage = { from: user, content: message, channel: selected };
     setMessage("");
-   // scrollToMyRef();
+    // scrollToMyRef();
+    console.log("emitting new message");
     socket.emit("chanMessage", newMessage);
   };
 
@@ -30,24 +31,23 @@ export default function MessageForm({ selected }: Props) {
 
   if (selected) {
     return (
-        <div className="messageForm">
-          <textarea
-            className="textarea max-h-24 "
-            value={message}
-            onKeyDown={handleKeyDown}
-            onChange={(e) => {
-              if (e.target.value === "\n") return;
-              console.log("change value=: ", e.target.value);
-              setMessage(e.target.value);
-            }}
-          />
-          <button
-            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 ml-2"
-            onClick={submitMessage}
-          >
-            SEND
-          </button>
-        </div>
+      <div className="messageForm">
+        <textarea
+          className="textarea max-h-24 "
+          value={message}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => {
+            if (e.target.value === "\n") return;
+            setMessage(e.target.value);
+          }}
+        />
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 ml-2"
+          onClick={submitMessage}
+        >
+          SEND
+        </button>
+      </div>
     );
   }
   return <></>;

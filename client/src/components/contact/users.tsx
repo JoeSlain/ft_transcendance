@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import useClickListener from "../../hooks/useClickListener";
 import useFriendsEvent from "../../hooks/chatEvents/useFriendsEvent";
 import { DotStyle } from "../../styles/dot";
@@ -7,6 +7,8 @@ import { ContextMenu } from "../../styles/menus";
 import { UserContextList } from "./userContextList";
 import "../../styles/contact.css";
 import AddFriend from "./addFriendForm";
+import { ChatContext } from "../../context/socketContext";
+import User from "../../hooks/User";
 
 const getColor = (status?: string) => {
   switch (status) {
@@ -24,9 +26,24 @@ export default function Users() {
   const [selected, setSelected] = useState<userType | null>(null);
   const [friends, setFriends] = useState<userType[]>([]);
   const [statuses, setStatuses] = useState(new Map<number, string>());
+  const socket = useContext(ChatContext);
+  const { user } = useContext(User);
 
   useClickListener({ selected, setSelected });
   useFriendsEvent({ setFriends, setStatuses });
+
+  const handleClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    friend: userType
+  ) => {
+    console.log(e.detail);
+    if (e.detail === 2) {
+      socket.emit("getConversation", {
+        me: user,
+        to: friend,
+      });
+    }
+  };
 
   return (
     <div className="users">
@@ -36,6 +53,7 @@ export default function Users() {
           <div
             key={friend.id}
             className="userEntry"
+            onClick={(e) => handleClick(e, friend)}
             onContextMenu={(e) => {
               e.preventDefault();
               setSelected(friend);
