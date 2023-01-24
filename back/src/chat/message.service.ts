@@ -94,7 +94,9 @@ export class MessageService {
       conv.users.find((user) => user.id === to.id)
     );
 
-    if (!conv) return null;
+    if (!conv) {
+      return null;
+    }
     return {
       id: conv.id,
       messages: conv.messages,

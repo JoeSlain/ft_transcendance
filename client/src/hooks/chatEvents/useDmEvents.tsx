@@ -27,7 +27,15 @@ export default function useDmEvents({ setConvs }: Props) {
 
     socket.on("openConversation", (conv) => {
       console.log("open conv", conv);
-      setConvs((prev: conversationType[]) => [...prev, conv]);
+      setConvs((prev: conversationType[]) => {
+        const index = prev.findIndex((p) => p.id === conv.id);
+        if (index >= 0) {
+          const copy = [...prev];
+          copy[index] = conv;
+          return copy;
+        }
+        return [...prev, conv];
+      });
     });
 
     socket.on("newDm", (conv) => {
