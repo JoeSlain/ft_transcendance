@@ -7,6 +7,7 @@ import { BACK_ROUTE } from "../../../../services/back_route";
 import validateUserInput from "../../../../services/zod/validateUserInput";
 import Error from "../../../../components/error";
 import getAvatar from "../../../../services/User/useGetAvatar";
+import { ChatContext } from "../../../../context/socketContext";
 
 type avatarState = {
   url: string;
@@ -18,6 +19,7 @@ export default function UserInfos() {
   let { user } = useContext(User); //user data to print
   const [usernameErr, setUsernameErr] = useState(false);
   const { register, handleSubmit } = useForm();
+  const socket = useContext(ChatContext);
   const [avatar, setAvatar] = useState<avatarState>({
     //State to update avatar when user uploads img
     url: user.avatar != null ? user.avatar : user.profile_pic,
@@ -77,13 +79,18 @@ export default function UserInfos() {
           }
         )
         .then((data) => {
-          console.log("Username changed: ", data.data);
+          if (!data.data) {
+            alert("invalid username");
+          } else {
+            saveItem("user", data.data);
+            socket.emit("updateUser", data.data);
+            console.log("Username changed: ", data.data);
+          }
         })
         .catch((err) => {
           console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ err", err);
         });
     }
-    saveItem("user", user);
   }
   function handleAvatar(data: any) {
     //Handles avatar upload

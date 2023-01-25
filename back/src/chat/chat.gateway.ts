@@ -82,6 +82,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(client.id).emit("loggedOut");
   }
 
+  @SubscribeMessage("updateUser")
+  async updateUser(client: Socket, user: User) {
+    console.log("update user", user);
+    client.broadcast.emit("updateStatus", { user, status: "online" });
+    client.broadcast.emit("updateConvs", user);
+    client.broadcast.emit("updateSelectedChan", user);
+  }
+
   /* GET FRIENDS
   ** description: recupere les amis de l'utilisateur user dans la db
       et renvoie les amis dans un array d'utilisateurs au client,

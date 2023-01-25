@@ -4,6 +4,8 @@ import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
 import { getSavedItem, saveItem } from "../../utils/storage";
 import User from "../User";
+import { userType } from "../../types/userType";
+import { chanMessageType } from "../../types/chanMessageType";
 
 type IProps = {
   privateChans: channelType[];
@@ -114,9 +116,21 @@ export default function useChatEvents({
       updateChannel(channel);
     });
 
-    socket.on("updateSelected", (data) => {
+    socket.on("updateSelectedChan", (user) => {
       console.log("updating selected");
-      updateSelected(data.channel);
+      setSelected((prev: channelType) => {
+        const newUsers = prev.users.map((u: userType) => {
+          if (u.id === user.id) return user;
+          return u;
+        });
+        const newMessages = prev.messages.map((msg: chanMessageType) => {
+          if (msg.from.id === user.id) {
+            return { ...msg, from: user };
+          }
+          return msg;
+        });
+        return { ...prev, users: newUsers, messages: newMessages };
+      });
     });
 
     socket.on("removeChannel", (channel) => {
@@ -191,6 +205,8 @@ export default function useChatEvents({
     return () => {
       socket.off("newChannel");
       socket.off("joinedChannel");
+      socket.off("updateChannel");
+      socket.off("updateSelectedChan");
       socket.off("removeChannel");
       socket.off("leftChannel");
       socket.off("newMessage");
