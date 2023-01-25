@@ -133,16 +133,15 @@ export default function DirectMessages() {
   };
 
   return (
-    <div className="  ml-2">
+    <div className="flex  ml-2" style={{ position: "fixed", bottom: 0 }}>
       {convs &&
         convs.map((conv, index) => {
           return (
-            <div
-              className="dmEntry"
-              key={index}
-              style={{ position: "fixed", bottom: 0 }}
-            >
-              <div className="dmToggle bg-primary h-[4vh] " onClick={() => handleClick(index)}>
+            <div className="dmEntry" key={index}>
+              <div
+                className="dmToggle bg-primary h-[4vh] "
+                onClick={() => handleClick(index)}
+              >
                 <div className="dmName">{conv.to.username} </div>
                 <button
                   className="dmClose"
