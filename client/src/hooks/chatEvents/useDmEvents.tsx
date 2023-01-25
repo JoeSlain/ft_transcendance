@@ -65,9 +65,27 @@ export default function useDmEvents({ setConvs }: Props) {
       });
     });
 
+    socket.on("updateConvs", (user) => {
+      setConvs((prev: conversationType[]) => {
+        if (prev) {
+          return prev.map((p) => {
+            if (p.to.id === user.id) {
+              const newMessages = p.messages.map((m) => {
+                if (m.from.id === user.id) return { ...m, from: user };
+                return m;
+              });
+              return { ...p, to: user, messages: newMessages };
+            }
+            return p;
+          });
+        }
+      });
+    });
+
     return () => {
       socket.off("openConversation");
       socket.off("newDm");
+      socket.off("updateConvs");
     };
   }, []);
 }

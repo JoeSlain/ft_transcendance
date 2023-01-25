@@ -86,6 +86,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async updateUser(client: Socket, user: User) {
     console.log("update user", user);
     client.broadcast.emit("updateStatus", { user, status: "online" });
+    client.broadcast.emit("updateConvs", user);
+    client.broadcast.emit("updateSelectedChan", user);
   }
 
   /* GET FRIENDS
