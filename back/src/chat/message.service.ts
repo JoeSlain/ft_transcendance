@@ -36,7 +36,7 @@ export class MessageService {
   }
 
   async getNewMessages(id: number) {
-    const user = await this.userRepo.findOne({
+    /*const user = await this.userRepo.findOne({
       relations: [
         "conversations",
         "conversations.messages",
@@ -49,17 +49,28 @@ export class MessageService {
           newMessages: true,
         },
       },
-    });
+    });*/
+
+    const user = await this.userRepo
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.conversations", "conv")
+      .leftJoinAndSelect("conv.messages", "msg")
+      .leftJoinAndSelect("conv.users", "users")
+      .leftJoinAndSelect("msg.from", "from")
+      .where("user.id = :id AND conv.newMessages = :new", { id, new: true })
+      .orderBy({ "msg.id": "ASC" })
+      .getOne();
 
     if (!user) return null;
     const convs = user.conversations;
+    console.log("convs", convs);
 
     const ret = [];
     while (convs.length) {
       const conv = convs.shift();
       ret.push({
         id: conv.id,
-        messages: conv.messages.reverse(),
+        messages: conv.messages,
         to: conv.users[0].id === id ? conv.users[1] : conv.users[0],
         show: true,
       });

@@ -132,8 +132,10 @@ export class UsersController {
   @UseGuards(TwoFactorGuard)
   async updateUsername(@Req() req) {
     console.log("REQUEST BODY: ", req.body);
-    const user = await this.usersService.updateUsername(req.body.id, req.body.username).then((res) => {console.log("Username updated: ", res)})
-    .catch((e) => console.log("failed to update username: ", e.message));
+    const user = await this.usersService.updateUsername(
+      req.body.id,
+      req.body.username
+    );
     return user;
   }
 

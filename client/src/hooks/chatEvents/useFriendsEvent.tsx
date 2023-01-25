@@ -32,7 +32,13 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
 
     // update friend status
     socket.on("updateStatus", (data) => {
-      console.log("friend update event");
+      console.log("friend update event", data);
+      /*setFriends((prev: userType[]) => {
+        return prev.map((friend) => {
+          if (friend.id === data.user.id) return data.user;
+          return friend;
+        });
+      });*/
       setStatuses((prev: Map<number, string>) => {
         if (prev.has(data.user.id)) {
           console.log("user found, changing status");

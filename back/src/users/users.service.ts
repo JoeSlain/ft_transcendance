@@ -116,13 +116,16 @@ export class UsersService {
   }
 
   async updateUsername(userId: number, username: string) {
-    console.log("🚀 ~ file: users.service.ts:119 ~ UsersService ~ updateUsername ~ username", username)
-
+    console.log(
+      "🚀 ~ file: users.service.ts:119 ~ UsersService ~ updateUsername ~ username",
+      username
+    );
+    if (!username) return null;
+    if (await this.getByUsername(username)) return null;
     await this.usersRepository.update(userId, {
       username: username,
     });
-    console.log("getting USERBYID: ", await this.getById(userId));
-    return this.getById(userId);
+    return await this.getById(userId);
   }
   async updateUser(newUser: User): Promise<User> {
     console.log(
@@ -130,7 +133,7 @@ export class UsersService {
       newUser
     );
     await this.usersRepository.update(newUser.id, newUser);
-    return this.getById(newUser.id);
+    return await this.getById(newUser.id);
     /*
     let user = await this.getById(id);
     user = newUser;
@@ -141,6 +144,6 @@ export class UsersService {
     await this.usersRepository.update(userId, {
       avatar: url,
     });
-    return this.getById(userId);
+    return await this.getById(userId);
   }
 }

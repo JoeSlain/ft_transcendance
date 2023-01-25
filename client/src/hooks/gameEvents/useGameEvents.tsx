@@ -33,7 +33,7 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
     ctx.fillText(game.player2.score.toString(), 450, 50);
   }
 
-  const updateCanvas = (game: gameData) => {
+  const updateCanvas = () => {
     if (!game) {
       console.log("game null");
       return;
@@ -76,12 +76,12 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
       console.log("game", data);
       setGame(data);
       setPlayerId(data.player1.id === user.id ? 1 : 2);
-      updateCanvas(data);
+      updateCanvas();
     });
 
     socket.on("updateGameState", (game: gameData) => {
       setGame(game);
-      updateCanvas(game);
+      updateCanvas();
       console.log("Game state updated: ", game);
     });
 
@@ -124,4 +124,8 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
       setKey(null);
     }
   }, [key, game]);
+
+  useEffect(() => {
+    updateCanvas();
+  }, [game]);
 }
