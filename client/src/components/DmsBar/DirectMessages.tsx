@@ -137,11 +137,12 @@ export default function DirectMessages() {
       {convs &&
         convs.map((conv, index) => {
           return (
-            <div className="dmEntry" key={index}>
-              <div
-                className="dmToggle bg-primary h-[4vh] "
-                onClick={() => handleClick(index)}
-              >
+            <div
+              className="dmEntry "
+              key={index}
+              
+            >
+              <div className="dmToggle bg-primary h-[4vh] " onClick={() => handleClick(index)}>
                 <div className="dmName">{conv.to.username} </div>
                 <button
                   className="dmClose"
