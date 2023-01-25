@@ -34,7 +34,7 @@ const Filter = ({ owned, setOwned, setFilter }: FilterProps) => {
       </div>
       <div className="filterName">
         <input
-          className="filterInput"
+          className="input w-full max-w-xs bg-base-200"
           type="text"
           placeholder="Search channel"
           onChange={(e) => setFilter(e.target.value)}
@@ -72,7 +72,7 @@ function Channel({ channels }: ChannelProps) {
   const getFilter = () => {
     let ret = channels;
     if (owned)
-      ret = ret.filter((chan) => chan.owner && chan.owner.id == user.id);
+      ret = ret.filter((chan) => chan.owner && chan.owner.id === user.id);
     if (filter) return ret.filter((chan) => chan.name.includes(filter));
     return ret;
   };
@@ -135,7 +135,7 @@ export default function Channels({ privateChans, publicChans }: ChannelsProps) {
         </button>
       </div>
 
-      <div className="channelBody max-h-[100vh - 60px]">
+      <div className="channelBody max-h-[100vh - 60px] scrollbar scrollbar-thumb-gray-900 scrollbar-track-gray-100 scrollbar-w-10 overflow-y-scroll">
         <div className="channelCategory">
           <h2 className="chanType"> Private </h2>
           <Channel channels={privateChans} />

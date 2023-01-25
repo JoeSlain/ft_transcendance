@@ -1,6 +1,5 @@
 import User from "../../hooks/User";
-import "../../styles/chat/dms.css";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { conversationType } from "../../types/directMessageType";
 import useDmEvents from "../../hooks/chatEvents/useDmEvents";
 import { ChatContext } from "../../context/socketContext";
@@ -8,6 +7,7 @@ import { userType } from "../../types/userType";
 import { ContextMenu } from "../../styles/menus";
 import { CommonContext } from "../contextMenus/commonContext";
 import useClickListener from "../../hooks/useClickListener";
+import "../../styles/chat/dms.css";
 
 type Props = {
   conv: conversationType;
@@ -30,9 +30,10 @@ const MessageForm = ({ conv }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form  onSubmit={handleSubmit}>
       <input
-        className="dmForm"
+        className="dmForm ml-2 max-w-[90%]"
+        type='text'
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
@@ -43,6 +44,7 @@ const MessageForm = ({ conv }: Props) => {
 const MessageContent = ({ conv }: Props) => {
   const { user } = useContext(User);
   const messages = conv.messages;
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [selectedUser, setSelectedUser] = useState<userType | null>(null);
   const [point, setPoint] = useState({ x: 0, y: 0 });
 
@@ -51,35 +53,49 @@ const MessageContent = ({ conv }: Props) => {
     setSelected: setSelectedUser,
   });
 
+  useEffect(() => {
+    if (messagesEndRef && messagesEndRef.current) {
+      let lastChild = messagesEndRef.current.lastElementChild;
+      if (messages)
+        lastChild?.scrollIntoView({
+          behavior: "auto",
+          block: "end",
+          inline: "nearest",
+        });
+    }
+  }, [messages]);
+
   return (
-    <div className="dmContent">
-      <div className="dmMessages">
+    <div className="pb-2 dmContent bg-base-200">
+      <div
+        className="mb-2 dmMessages scrollbar scrollbar-thumb-gray-900 scrollbar-track-gray-100 overflow-y-scroll"
+        ref={messagesEndRef}
+      >
         {messages &&
           messages.map((msg, i) => {
             if (msg.from.id === user.id) {
               return (
-                <div className="myDm" key={i}>
-                  <div className="myName"> me</div>
-                  <div className="myMessage">
-                    <div className="content">{msg.content}</div>
-                  </div>
+                <div className="chat chat-end mx-3 flex flex-col" key={i}>
+                  <div className="chat-header"> me</div>
+                    <div className="chat-bubble bubbleOverflow">
+                      {msg.content}
+                    </div>
                 </div>
               );
             } else {
               return (
-                <div className="theirDm" key={i}>
+                <div className="chat chat-start flex flex-col mx-3" key={i}>
                   <div
-                    className="theirName"
+                    className="chat-header"
                     onContextMenu={(e) => {
                       e.preventDefault();
                       setSelectedUser(msg.from);
                       setPoint({ x: e.pageX, y: e.pageY });
                     }}
                   >
-                    {" "}
                     {msg.from.username}
                   </div>
-                  <div className="theirMessage">
+                  <div className="chat-bubble chat-bubble-primary bubbleOverflow">
                     <div className="content">{msg.content}</div>
                   </div>
                   {selectedUser && (
@@ -92,7 +108,9 @@ const MessageContent = ({ conv }: Props) => {
             }
           })}
       </div>
-      <MessageForm conv={conv} />
+      <div className="align-self-center">
+        <MessageForm conv={conv} />
+      </div>
     </div>
   );
 };
@@ -115,13 +133,16 @@ export default function DirectMessages() {
   };
 
   return (
-    <div className="dms">
+    <div className="  ml-2">
       {convs &&
         convs.map((conv, index) => {
           return (
-            <div className="dmEntry" key={index}>
-              {conv.show && <MessageContent conv={conv} />}
-              <div className="dmToggle" onClick={() => handleClick(index)}>
+            <div
+              className="dmEntry"
+              key={index}
+              style={{ position: "fixed", bottom: 0 }}
+            >
+              <div className="dmToggle bg-primary h-[4vh] " onClick={() => handleClick(index)}>
                 <div className="dmName">{conv.to.username} </div>
                 <button
                   className="dmClose"
@@ -134,6 +155,7 @@ export default function DirectMessages() {
                   x{" "}
                 </button>
               </div>
+              {conv.show && <MessageContent conv={conv} />}
             </div>
           );
         })}
