@@ -57,7 +57,7 @@ export default function useDmEvents({ setConvs }: Props) {
             {
               id: conv.id,
               messages: conv.messages,
-              to: conv.users[0].id === user.id ? conv.users[1] : conv.users[0],
+              to: conv.user1.id === user.id ? conv.user2 : conv.user1,
               show: true,
             },
           ];

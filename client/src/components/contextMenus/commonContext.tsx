@@ -3,6 +3,7 @@ import { ChatContext, GameContext } from "../../context/socketContext";
 import { userType } from "../../types/userType";
 import User from "../../hooks/User";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export type UserProps = {
   selected: userType;
@@ -36,6 +37,22 @@ export const CommonContext = ({ selected }: UserProps) => {
     });
   };
 
+  const handleBlock = () => {
+    axios
+      .post(
+        "http://localhost:3001/api/users/blockUser",
+        {
+          userId: selected.id,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        console.log("blocked", response.data);
+      });
+  };
+
   const handleGetProfile = () => {
     navigate(`/profile/${selected.id}`);
   };
@@ -44,7 +61,7 @@ export const CommonContext = ({ selected }: UserProps) => {
     <ul>
       <li onClick={handleInvite}> Invite </li>
       <li onClick={handleMessage}> Message </li>
-      <li> Block </li>
+      <li onClick={handleBlock}> Block </li>
       <li onClick={handleGetProfile}> Get Profile </li>
       <li onClick={handleSpectate}> Spectate </li>
     </ul>
