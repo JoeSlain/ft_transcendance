@@ -191,6 +191,8 @@ export default function useChatEvents({
     return () => {
       socket.off("newChannel");
       socket.off("joinedChannel");
+      socket.off("updateChannel");
+      socket.off("updateSelected");
       socket.off("removeChannel");
       socket.off("leftChannel");
       socket.off("newMessage");

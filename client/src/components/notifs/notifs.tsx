@@ -16,7 +16,7 @@ type notif = {
 };
 
 export default function Notifs() {
-  const user = useContext(User);
+  const { user } = useContext(User);
   const [selected, setSelected] = useState<boolean | null>(null);
   const [notifs, setNotifs] = useState<notifType[]>([]);
   const socket = useContext(ChatContext);

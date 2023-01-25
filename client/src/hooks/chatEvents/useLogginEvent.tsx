@@ -65,6 +65,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
       chatSocket.off("connect");
       //chatSocket.off("disconnect");
       chatSocket.off("loggedIn");
+      chatSocket.off("loggedOut");
     };
   }, []);
 }
