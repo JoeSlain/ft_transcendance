@@ -30,10 +30,10 @@ const MessageForm = ({ conv }: Props) => {
   };
 
   return (
-    <form  onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <input
         className="dmForm ml-2 max-w-[90%]"
-        type='text'
+        type="text"
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
@@ -77,9 +77,9 @@ const MessageContent = ({ conv }: Props) => {
               return (
                 <div className="chat chat-end mx-3 flex flex-col" key={i}>
                   <div className="chat-header"> me</div>
-                    <div className="chat-bubble bubbleOverflow">
-                      {msg.content}
-                    </div>
+                  <div className="chat-bubble bubbleOverflow">
+                    {msg.content}
+                  </div>
                 </div>
               );
             } else {
@@ -133,7 +133,8 @@ export default function DirectMessages() {
   };
 
   return (
-    <div className="  ml-2">
+    //<div className="  ml-2">
+    <div className="dms">
       {convs &&
         convs.map((conv, index) => {
           return (
@@ -142,7 +143,10 @@ export default function DirectMessages() {
               key={index}
               style={{ position: "fixed", bottom: 0 }}
             >
-              <div className="dmToggle bg-primary h-[4vh] " onClick={() => handleClick(index)}>
+              <div
+                className="dmToggle bg-primary h-[4vh] "
+                onClick={() => handleClick(index)}
+              >
                 <div className="dmName">{conv.to.username} </div>
                 <button
                   className="dmClose"
