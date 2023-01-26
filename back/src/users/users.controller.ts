@@ -192,4 +192,13 @@ export class UsersController {
       return res.sendFile(user.avatar, { root: "./uploads" });
     console.log("error getting avatar: invalid user or file path");
   }
+
+  @Post("blockUser")
+  @UseGuards(TwoFactorGuard)
+  async blockUser(@Req() req, @Body() { userId }) {
+    //console.log('delete friend')
+    const user = await this.usersService.block(req.user.id, userId);
+
+    return user;
+  }
 }

@@ -52,6 +52,9 @@ export class User {
   @Column()
   date_of_sign: Date;
 
+  @Column("int", { array: true, unique: true, nullable: true })
+  blocked: number[];
+
   @ManyToOne(() => User)
   games: Game[];
 
@@ -60,6 +63,6 @@ export class User {
   @JoinTable()
   friends: User[];
 
-  @ManyToMany((type) => Conversation, (conversation) => conversation.users)
-  conversations: Conversation[];
+  /*@ManyToMany((type) => Conversation, (conversation) => conversation.users)
+  conversations: Conversation[];*/
 }

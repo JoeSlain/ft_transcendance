@@ -14,5 +14,6 @@ export type userType = {
   n_win: number;
   n_lose: number;
   date_of_sign: Date;
+  blocked?: number[];
   games: gameType[];
 };

@@ -36,22 +36,7 @@ export class MessageService {
   }
 
   async getNewMessages(id: number) {
-    /*const user = await this.userRepo.findOne({
-      relations: [
-        "conversations",
-        "conversations.messages",
-        "conversations.messages.from",
-        "conversations.users",
-      ],
-      where: {
-        id,
-        conversations: {
-          newMessages: true,
-        },
-      },
-    });*/
-
-    const user = await this.userRepo
+    /*const user = await this.userRepo
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.conversations", "conv")
       .leftJoinAndSelect("conv.messages", "msg")
@@ -59,10 +44,34 @@ export class MessageService {
       .leftJoinAndSelect("msg.from", "from")
       .where("user.id = :id AND conv.newMessages = :new", { id, new: true })
       .orderBy({ "msg.id": "ASC" })
-      .getOne();
+      .getOne();*/
+    const user = await this.userRepo.findOneBy({ id });
+    if (!user) return;
 
-    if (!user) return null;
-    const convs = user.conversations;
+    let convs = await this.convRepo
+      .createQueryBuilder("conv")
+      .leftJoinAndSelect("conv.messages", "msg")
+      .leftJoinAndSelect("conv.user1", "user1")
+      .leftJoinAndSelect("conv.user2", "user2")
+      .leftJoinAndSelect("msg.from", "from")
+      .where("conv.user1.id = :uid1 AND conv.new1 = :new1", {
+        uid1: id,
+        new1: true,
+      })
+      .orWhere("conv.user2.id = :uid2 AND conv.new2 = :new2", {
+        uid2: id,
+        new2: true,
+      })
+      .orderBy({ "msg.id": "ASC" })
+      .getMany();
+
+    if (convs && user.blocked)
+      convs = convs.filter(
+        (conv) =>
+          !user.blocked.includes(conv.user1.id) &&
+          !user.blocked.includes(conv.user2.id)
+      );
+
     console.log("convs", convs);
 
     const ret = [];
@@ -71,7 +80,7 @@ export class MessageService {
       ret.push({
         id: conv.id,
         messages: conv.messages,
-        to: conv.users[0].id === id ? conv.users[1] : conv.users[0],
+        to: conv.user1.id === id ? conv.user2 : conv.user1,
         show: true,
       });
     }
@@ -84,17 +93,18 @@ export class MessageService {
       where: {
         id,
       },
-      relations: ["users", "messages", "messages.from"],
+      relations: ["user1", "user2", "messages", "messages.from"],
     });
   }
 
   async getConversation(me: User, to: User) {
-    const user = await this.userRepo.findOne({
+    /*const user = await this.userRepo.findOne({
       relations: [
         "conversations",
         "conversations.messages",
         "conversations.messages.from",
-        "conversations.users",
+        "conversations.user1",
+        'conversations.user2'
       ],
       where: {
         id: me.id,
@@ -103,7 +113,35 @@ export class MessageService {
 
     const conv = user.conversations.find((conv) =>
       conv.users.find((user) => user.id === to.id)
-    );
+    );*/
+
+    const conv = await this.convRepo.findOne({
+      relations: {
+        messages: {
+          from: true,
+        },
+        user1: true,
+        user2: true,
+      },
+      where: [
+        {
+          user1: {
+            id: me.id,
+          },
+          user2: {
+            id: to.id,
+          },
+        },
+        {
+          user1: {
+            id: to.id,
+          },
+          user2: {
+            id: me.id,
+          },
+        },
+      ],
+    });
 
     if (!conv) {
       return null;
@@ -117,9 +155,9 @@ export class MessageService {
   }
 
   async createConversation(me: User, to: User) {
-    const users = [me, to];
     let conv = this.convRepo.create({
-      users,
+      user1: me,
+      user2: to,
     });
 
     conv = await this.convRepo.save(conv);
@@ -138,8 +176,9 @@ export class MessageService {
   }
 
   async pushDm(conversation: Conversation, dm: DirectMessage) {
+    if (dm.from.id === conversation.user1.id) conversation.new2 = true;
+    else conversation.new1 = true;
     conversation.messages.push(dm);
-    conversation.newMessages = true;
     return await this.convRepo.save(conversation);
   }
 }

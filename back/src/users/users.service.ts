@@ -146,4 +146,28 @@ export class UsersService {
     });
     return await this.getById(userId);
   }
+
+  async block(myId: number, userId: number) {
+    const me = await this.getById(myId);
+    const user = await this.getById(userId);
+
+    if (me && user) {
+      if (me.blocked && me.blocked.includes(userId)) return;
+      if (!me.blocked) me.blocked = [userId];
+      else me.blocked.push(userId);
+      return await this.usersRepository.save(me);
+    }
+    console.log("me", me);
+    return me;
+  }
+
+  async checkBlocked(myId: number, userId: number) {
+    const me = await this.getById(myId);
+
+    if (me && me.blocked && me.blocked.includes(userId)) {
+      console.log("blocked");
+      return true;
+    }
+    return false;
+  }
 }

@@ -21,7 +21,7 @@ export default function useChatEvents({
   setSelected,
 }: IProps) {
   const socket = useContext(ChatContext);
-  const user = useContext(User);
+  const { user } = useContext(User);
 
   // update functions
   const updateSelected = (newChan: channelType) => {
@@ -40,6 +40,12 @@ export default function useChatEvents({
   const updateChannel = (newChan: channelType) => {
     console.log("channel in updateChan", newChan);
     if (newChan.type === "private") {
+      if (user.blocked) {
+        newChan.messages = newChan.messages.filter((msg: chanMessageType) => {
+          if (user.blocked?.includes(msg.from.id)) return false;
+          return true;
+        });
+      }
       setPrivateChans((prev: any) =>
         prev.map((chan: any) => {
           if (chan.id === newChan.id) {
@@ -106,6 +112,12 @@ export default function useChatEvents({
 
     socket.on("joinedChannel", (channel) => {
       console.log("joined channel", channel);
+      if (user.blocked) {
+        channel.messages = channel.messages.filter((msg: chanMessageType) => {
+          if (user.blocked?.includes(msg.from.id)) return false;
+          return true;
+        });
+      }
       setSelected(channel);
       saveItem("selected", channel);
       updateChannel(channel);
@@ -157,6 +169,7 @@ export default function useChatEvents({
     socket.on("newMessage", (message) => {
       console.log("newmessage", message);
 
+      if (user.blocked && user.blocked.includes(message.from.id)) return;
       setSelected((prev: any) => {
         if (prev && prev.id === message.channel.id) {
           const newSelected = {

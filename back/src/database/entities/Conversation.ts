@@ -16,12 +16,21 @@ export class Conversation {
   id: number;
 
   @Column({ default: false })
-  newMessages: boolean;
+  new1: boolean;
+
+  @Column({ default: false })
+  new2: boolean;
 
   // relations
-  @ManyToMany((type) => User, (user) => user.conversations)
+  /*@ManyToMany((type) => User, (user) => user.conversations)
   @JoinTable()
-  users: User[];
+  users: User[];*/
+
+  @ManyToOne(() => User)
+  user1: User;
+
+  @ManyToOne(() => User)
+  user2: User;
 
   @OneToMany(() => DirectMessage, (dm) => dm.conversation)
   messages: DirectMessage[];
