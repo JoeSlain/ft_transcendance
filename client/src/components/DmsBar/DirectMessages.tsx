@@ -117,12 +117,18 @@ const MessageContent = ({ conv }: Props) => {
 
 export default function DirectMessages() {
   const [convs, setConvs] = useState<conversationType[]>([]);
+  const socket = useContext(ChatContext);
+  const { user } = useContext(User);
 
   useDmEvents({ setConvs });
 
   const handleClick = (index: number) => {
     const copy = [...convs];
     copy[index].show = !copy[index].show;
+    socket.emit("updateNewMessages", {
+      convId: copy[index].id,
+      userId: user.id,
+    });
     setConvs(copy);
   };
 

@@ -2,6 +2,8 @@ import { string } from "joi";
 import { Channel } from "src/database";
 import { User } from "src/database/entities/User";
 
+// I. CHAT
+
 // done type for serializer
 export type Done = (err: Error, user: User) => void;
 
@@ -22,21 +24,6 @@ export type NotifData = {
   channel?: Channel;
 };
 
-// room user
-export type RoomUser = {
-  infos: User;
-  ready: boolean;
-};
-
-// room
-export type Room = {
-  id: string;
-  host: RoomUser;
-  guest: RoomUser;
-  spectators: Array<User>;
-  gameStarted: boolean;
-};
-
 // channel data
 export type ChannelData = {
   name: string;
@@ -52,6 +39,25 @@ export type MessageData = {
   channel: any;
 };
 
+// II. GAME
+
+// 1. ROOM
+// room user
+export type RoomUser = {
+  infos: User;
+  ready: boolean;
+};
+
+// room
+export type Room = {
+  id: string;
+  host: RoomUser;
+  guest: RoomUser;
+  spectators: Array<User>;
+  gameStarted: boolean;
+};
+
+// 2. GAME
 // pong game
 export type GameType = {
   width: number;
@@ -84,6 +90,7 @@ export type BallType = {
   xVel: number;
 };
 
+// paddle
 export type PaddleType = {
   x: number;
   y: number;

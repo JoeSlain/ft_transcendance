@@ -12,13 +12,29 @@ type IProps = {
 export default function Buttons({ room }: IProps) {
   const { user } = useContext(User);
   const socket = useContext(GameContext);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdown, setCountDown] = useState(0);
   let showStart = false;
   let playersReady = false;
+  let showSearch = false;
   const showLeave = room.spectators.find((sp) => sp.id === user.id);
 
+  useEffect(() => {
+    socket.on("stopQueue", () => {
+      console.log("stop queue");
+      setShowCountdown(false);
+    });
+
+    return () => {
+      socket.off("stopQueue");
+    };
+  }, []);
+
   if (room.host && room.host.infos.id === user.id) {
-    showStart = true;
-    if (room.host.ready && room.guest && room.guest.ready) playersReady = true;
+    if (room.guest) {
+      showStart = true;
+      if (room.host.ready && room.guest.ready) playersReady = true;
+    } else showSearch = true;
   }
 
   const startGame = () => {
@@ -32,6 +48,23 @@ export default function Buttons({ room }: IProps) {
 
   const leaveRoom = () => {
     socket.emit("leaveRoom", { roomId: room.id, user });
+  };
+
+  const searchOpponent = () => {
+    socket.emit("searchOpponent", user);
+    setShowCountdown(true);
+    const interval = setInterval(() => {
+      if (!showCountdown) {
+        clearInterval(interval);
+        return;
+      }
+      setCountDown((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const stopSearch = () => {
+    socket.emit("stopQueue", user);
+    setShowCountdown(false);
   };
 
   return (
@@ -51,6 +84,16 @@ export default function Buttons({ room }: IProps) {
           Start{" "}
         </button>
       )}
+      {showSearch && (
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
+          style={{ width: "70px" }}
+          onClick={searchOpponent}
+        >
+          {" "}
+          Search Opponent{" "}
+        </button>
+      )}
       {showLeave && (
         <button
           className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
@@ -61,6 +104,17 @@ export default function Buttons({ room }: IProps) {
           Leave{" "}
         </button>
       )}
+      {showCountdown && (
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
+          style={{ width: "70px" }}
+          onClick={stopSearch}
+        >
+          {" "}
+          Stop search{" "}
+        </button>
+      )}
+      {showCountdown && <div className="countdown"> {countdown} </div>}
     </div>
   );
 }

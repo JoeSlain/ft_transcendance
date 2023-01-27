@@ -10,6 +10,7 @@ import { User } from "src/database";
 import { GameType, NotifData, Room } from "src/utils/types";
 import { GameService } from "./game.service";
 import { RoomService } from "./room.service";
+import { QueueService } from "./queue.service";
 
 @WebSocketGateway(3003, {
   cors: {
@@ -20,7 +21,8 @@ import { RoomService } from "./room.service";
 export class GameGateway {
   constructor(
     private readonly roomService: RoomService,
-    private readonly gameService: GameService
+    private readonly gameService: GameService,
+    private readonly queueService: QueueService
   ) {}
 
   @WebSocketServer() server: Namespace;
@@ -182,5 +184,58 @@ export class GameGateway {
     );
 
     this.server.to(game.gameId).emit("updateGameState", game);
+  }
+
+  emitOpponent(client: Socket, user: User, opponent: User) {
+    console.log("emit stop queue");
+    this.server.to(client.id).emit("stopQueue");
+    if (!opponent) {
+      console.log("opponent null, returning");
+      return;
+    }
+    const room = this.roomService.getUserRoom(opponent.id);
+    console.log(`user ${user.username} joining room ${room.id}`);
+    this.joinRoom(client, { user, id: room.id });
+  }
+
+  @SubscribeMessage("searchOpponent")
+  searchOpponent(client: Socket, user: User) {
+    console.log("search opponent event");
+    let eloRange = 50;
+    let opponent = this.queueService.findOpponent(user.id, user.elo, eloRange);
+
+    if (opponent) {
+      console.log(`opponent found ${opponent.username}`);
+      this.emitOpponent(client, user, opponent);
+    }
+    console.log(`opponent not found, queueing user ${user.username}`);
+    const index = this.queueService.queueUp(user);
+    const interval = setInterval(() => {
+      console.log("interval");
+      eloRange += 50;
+      console.log("index", index);
+      if (!this.queueService.checkQueued(index, user.id)) {
+        console.log(`user ${user.username} not queued`);
+        clearInterval(interval);
+        this.emitOpponent(client, user, opponent);
+        return;
+      }
+      console.log(`user ${user.username} queued`);
+      opponent = this.queueService.findOpponent(user.id, user.elo, eloRange);
+      if (opponent) {
+        console.log(`opponent found ${opponent.username}`);
+        this.queueService.queue.splice(index, index);
+        clearInterval(interval);
+        this.emitOpponent(client, user, opponent);
+        return;
+      }
+    }, 3000);
+    console.log("out interval");
+  }
+
+  @SubscribeMessage("stopQueue")
+  stopQueue(client: Socket, user: User) {
+    console.log("stopQueue");
+    this.queueService.stopQueue(user.id);
   }
 }
