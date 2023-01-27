@@ -11,22 +11,21 @@ export class QueueService {
   findOpponent(userId: number, elo: number, eloRange: number) {
     const maxElo = elo + eloRange;
     const index = this.queue.findIndex(
-      (user) => userId !== user.id && user.elo <= maxElo
+      (user) => userId !== user.id && user.elo >= elo && user.elo <= maxElo
     );
 
     console.log("find opponent");
+    console.log(`user elo = ${elo}`);
+    console.log(`max elo search = ${maxElo}`);
     if (index >= 0) {
+      console.log(`opponent elo found = ${this.queue[index].elo}`);
       console.log(`removing opponent ${this.queue[index].username} from queue`);
-      return this.queue.splice(index, index)[0];
+      return this.queue.splice(index, 1)[0];
     }
     return null;
   }
 
   checkQueued(index: number, userId: number) {
-    console.log("queue", this.queue);
-    console.log(`queue[${index}]`, this.queue[index]);
-    console.log("user id", userId);
-
     return this.queue[index] && this.queue[index].id === userId;
   }
 
@@ -34,8 +33,11 @@ export class QueueService {
     if (index === undefined) {
       console.log("index undefined");
       index = this.queue.findIndex((user) => user.id === userId);
-      if (index >= 0) this.queue.splice(index, index);
-    } else if (this.checkQueued(index, userId)) this.queue.splice(index, index);
+      if (index >= 0) {
+        console.log("index found", index);
+        this.queue.splice(index, 1);
+      }
+    } else if (this.checkQueued(index, userId)) this.queue.splice(index, 1);
   }
 
   queueUp(user: User) {

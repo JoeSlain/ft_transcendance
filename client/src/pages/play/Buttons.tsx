@@ -13,7 +13,10 @@ export default function Buttons({ room }: IProps) {
   const { user } = useContext(User);
   const socket = useContext(GameContext);
   const [showCountdown, setShowCountdown] = useState(false);
-  const [countdown, setCountDown] = useState(0);
+  const [countdown, setCountDown] = useState({
+    min: 0,
+    sec: 0,
+  });
   let showStart = false;
   let playersReady = false;
   let showSearch = false;
@@ -22,6 +25,7 @@ export default function Buttons({ room }: IProps) {
   useEffect(() => {
     socket.on("stopQueue", () => {
       console.log("stop queue");
+      setCountDown({ min: 0, sec: 0 });
       setShowCountdown(false);
     });
 
@@ -29,6 +33,24 @@ export default function Buttons({ room }: IProps) {
       socket.off("stopQueue");
     };
   }, []);
+
+  useEffect(() => {
+    if (showCountdown) {
+      const interval = setInterval(() => {
+        console.log("countdown", countdown);
+        let min = countdown.min;
+        let sec = countdown.sec + 1;
+        if (sec === 60) {
+          min += 1;
+          sec = 0;
+        }
+        setCountDown({ min, sec });
+      }, 1000);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [showCountdown, countdown]);
 
   if (room.host && room.host.infos.id === user.id) {
     if (room.guest) {
@@ -53,17 +75,15 @@ export default function Buttons({ room }: IProps) {
   const searchOpponent = () => {
     socket.emit("searchOpponent", user);
     setShowCountdown(true);
-    const interval = setInterval(() => {
-      if (!showCountdown) {
-        clearInterval(interval);
-        return;
-      }
+    /*const interval = setInterval(() => {
       setCountDown((prev) => prev + 1);
-    }, 1000);
+      console.log("countdown", countdown);
+    }, 1000);*/
   };
 
   const stopSearch = () => {
     socket.emit("stopQueue", user);
+    setCountDown({ min: 0, sec: 0 });
     setShowCountdown(false);
   };
 
@@ -114,7 +134,12 @@ export default function Buttons({ room }: IProps) {
           Stop search{" "}
         </button>
       )}
-      {showCountdown && <div className="countdown"> {countdown} </div>}
+      {showCountdown && (
+        <div>
+          {" "}
+          Time in queue : {countdown.min}m{countdown.sec}s{" "}
+        </div>
+      )}
     </div>
   );
 }

@@ -64,7 +64,8 @@ export class AuthService {
         id42: null,
         img_url: "none",
       };
-      const newUser = await this.createUser(details);
+      let newUser = await this.createUser(details);
+      newUser.elo = 1000;
       return this.userRepository.save(newUser);
     }
     return user;

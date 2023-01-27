@@ -103,6 +103,4 @@ export class RoomService {
     }
     return null;
   }
-  
-
 }
