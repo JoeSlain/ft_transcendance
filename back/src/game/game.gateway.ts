@@ -129,6 +129,10 @@ export class GameGateway {
     const game = this.gameService.createGame(room);
 
     console.log("game", game);
+    const newRoom = { ...room, gameStarted: true };
+    this.roomService.rooms.set(room.id, newRoom);
+    this.roomService.usersRooms.set(room.host.infos.id, newRoom);
+    this.roomService.usersRooms.set(room.guest.infos.id, newRoom);
     this.server.to(room.id).emit("gameCreated");
   }
 
@@ -183,7 +187,7 @@ export class GameGateway {
       data.direction
     );
 
-    this.server.to(game.gameId).emit("updateGameState", game);
+    this.server.to(game.gameId).emit("updatePaddle", game);
   }
 
   emitOpponent(client: Socket, user: User, opponent: User) {

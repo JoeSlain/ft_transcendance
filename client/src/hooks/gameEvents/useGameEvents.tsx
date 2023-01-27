@@ -4,18 +4,18 @@ import { CanvasRef } from "../../pages/games/type";
 import User from "../User";
 import { gameData } from "../../types/gameType";
 import { getSavedItem, saveItem } from "../../utils/storage";
+import { preventOverflow } from "@popperjs/core";
 
 type Props = {
   canvasRef: CanvasRef;
-  game: gameData | null;
-  setGame: (game: gameData | null) => void;
 };
 
-export default function useGameEvents({ canvasRef, game, setGame }: Props) {
+export default function useGameEvents({ canvasRef }: Props) {
   const socket = useContext(GameContext);
   const { user } = useContext(User);
   const [playerId, setPlayerId] = useState(0);
   const [key, setKey] = useState<string | null>(null);
+  const [game, setGame] = useState<gameData | null>(null);
 
   function drawBoardDetails(ctx: CanvasRenderingContext2D, game: gameData) {
     console.log("game data", game);
@@ -76,13 +76,32 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
       console.log("game", data);
       setGame(data);
       setPlayerId(data.player1.id === user.id ? 1 : 2);
-      updateCanvas();
+      //updateCanvas();
     });
 
     socket.on("updateGameState", (game: gameData) => {
-      setGame(game);
-      updateCanvas();
+      setGame((prev: any) => {
+        if (prev)
+          return {
+            ...prev,
+            ball: game.ball,
+            player1: { ...prev.player1, score: game.player1.score },
+            player2: { ...prev.player2, score: game.player2.score },
+          };
+      });
+      //updateCanvas();
       console.log("Game state updated: ", game);
+    });
+
+    socket.on("updatePaddle", (game) => {
+      setGame((prev: any) => {
+        if (prev)
+          return {
+            ...prev,
+            player1: { ...prev.player1, y: game.player1.y },
+            player2: { ...prev.player2, y: game.player2.y },
+          };
+      });
     });
 
     socket.on("win", (data) => {
@@ -97,18 +116,19 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
       }
     });
 
-    const handKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       event.preventDefault();
       setKey(event.key);
     };
 
-    window.addEventListener("keydown", handKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("keydown", handKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
       socket.off("newGame");
       socket.off("updateGameState");
       socket.off("win");
+      socket.off("updatePaddle");
     };
   }, []);
 
@@ -128,4 +148,6 @@ export default function useGameEvents({ canvasRef, game, setGame }: Props) {
   useEffect(() => {
     updateCanvas();
   }, [game]);
+
+  return game;
 }
