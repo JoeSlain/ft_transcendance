@@ -1,11 +1,12 @@
+import { userType } from "./userType";
+
 export type gameType = {
-  userId1: number;
-  userId2: number;
+  user1?: userType;
+  user2?: userType;
   winnerId: number;
-  score: string;
-  status: string;
+  score1: number;
+  score2: number;
   date: Date;
-  gameId: number;
 };
 
 export type PaddleType = {

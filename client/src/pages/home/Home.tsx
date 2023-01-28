@@ -3,27 +3,25 @@ import "../../styles/global.css";
 import "../../styles/contact.css";
 import React from "react";
 import Auth from "../../hooks/Auth";
-import { gameType } from "../../types/gameType";
 import TableRow from "../../components/tableRow";
+import { gameType } from "../../types/gameType";
 
 let arr: gameType[] = [
   {
-    userId1: 123,
-    userId2: 999,
+    //user1: null,
+    //user2: null,
     winnerId: 123,
-    score: "3-0",
-    status: "Finished",
+    score1: 3,
+    score2: 0,
     date: new Date(),
-    gameId: 99999,
   },
   {
-    userId1: 123,
-    userId2: 999,
+    //user1: null,
+    //user2: null,
     winnerId: 123,
-    score: "3-0",
-    status: "Finished",
+    score1: 4,
+    score2: 2,
     date: new Date(),
-    gameId: 99999,
   },
 ];
 

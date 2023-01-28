@@ -55,14 +55,8 @@ export class User {
   @Column("int", { array: true, unique: true, nullable: true })
   blocked: number[];
 
-  @ManyToOne(() => User)
-  games: Game[];
-
   // relations
   @ManyToMany((type) => User, (user) => user.friends)
   @JoinTable()
   friends: User[];
-
-  /*@ManyToMany((type) => Conversation, (conversation) => conversation.users)
-  conversations: Conversation[];*/
 }

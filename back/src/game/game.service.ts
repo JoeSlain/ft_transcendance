@@ -1,56 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { Room } from "src/utils/types";
-import { RoomService } from "./room.service";
-import { Socket, Namespace } from "socket.io";
 import { GameType } from "../utils/types";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Game } from "src/database";
-import { v4 as uuidv4 } from "uuid";
+import { Repository } from "typeorm";
+import { date } from "joi";
+import { RoomService } from "./room.service";
 
 @Injectable()
 export class GameService {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    @InjectRepository(Game) private gameRepo: Repository<Game>,
+    private readonly roomService: RoomService
+  ) {}
 
   users: Map<number, GameType> = new Map();
   games = new Map<string, GameType>();
-
-  // addUsersFromRoom(room: Room) {
-  //   console.log('addUsersFromRoom', room);
-  //   this.users.set(room.host.infos.id, room.host.infos.username);
-  //   if (room.guest) this.users.set(room.guest.infos.id, room.guest.infos.username);
-  // }
-
-  // removeUserFromRoom(userId: number) {
-  //   this.users.delete(userId);
-  // }
-
-  /*  startGameLoop(game: GameType) {
-    game.gameRunning = true;
-    // Création d'une boucle de jeu
-    const gameLoop = setInterval(() => {
-      // Mise à jour de l'état du jeu
-      this.updateBall(game);
-
-      // Vérification de la fin de la partie
-      if (game.player1.score >= 10) {
-        clearInterval(gameLoop);
-        game.player1.win = true;
-        game.gameRunning = false;
-        return game;
-      }
-      if (game.player2.score >= 10) {
-        clearInterval(gameLoop);
-        game.player2.win = true;
-        game.gameRunning = false;
-        return game;
-      }
-      console.log("gameLoop", game);
-    }, 1000 / 60);
-  }
-
-  private updateGame(game: GameType) {
-    this.updateBall(game);
-    // console.log('updateGame');
-  }*/
 
   newPlayer(width: number, height: number, id: number) {
     const player = {
@@ -117,28 +82,6 @@ export class GameService {
     this.saveGame(game);
 
     return game;
-  }
-
-  generateRandomId() {
-    return uuidv4();
-  }
-  // Fonction pour mettre à jour la position d'un paddle
-  private updatePaddle(game: GameType, clients: Socket) {
-    // clients.on("movePaddle", (data) => {
-    //   const { direction} = data;
-    //     if (direction === "ArrowUp") {
-    //       if (game.player1.y > 0) game.player1.y -= 10;
-    //     } else if (direction === "ArrowDown") {
-    //       if (game.player1.y + game.player1.height < game.height) game.player1.y += 10;
-    //    }
-    //  else if () {
-    //   if (direction === "ArrowUp") {
-    //     if (game.player2.y > 0) game.player2.y -= 10;
-    //   } else if (direction === "ArrowDown") {
-    //     if (game.player2.y + game.player2.height < game.height) game.player2.y += 10;
-    //   }
-    // }
-    // });
   }
 
   // Fonction pour mettre à jour la position d'une balle
@@ -214,12 +157,6 @@ export class GameService {
   }
 
   movePaddle(game: GameType, playerId: number, direction: string) {
-    // const { direction, player} = data;
-    // const game = this.games.get(..);
-    // if (!game) {
-    //   console.error("Unable to find game for client");
-    //   return;
-    // }
     if (playerId === 1) {
       if (direction === "ArrowUp") {
         if (game.player1.y > 0) game.player1.y -= 20;
@@ -237,7 +174,22 @@ export class GameService {
     }
     this.saveGame(game);
     return game;
-    // // Envoyer les mises à jour de l'état du jeu aux clients connectés à la salle
-    // client.emit("updateGameState", { game });
+  }
+
+  async register(game: GameType) {
+    console.log("registering game", game);
+    const room = this.roomService.findRoom(game.gameId);
+    const newGame = this.gameRepo.create({
+      user1: room.host.infos,
+      user2: room.guest.infos,
+      winnerId: game.player1.win ? game.player1.id : game.player2.id,
+      score1: game.player1.score,
+      score2: game.player2.score,
+      date: new Date().toISOString().slice(0, 10),
+    });
+
+    //this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
+
+    return await this.gameRepo.save(newGame);
   }
 }

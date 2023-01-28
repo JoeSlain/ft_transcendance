@@ -129,10 +129,7 @@ export class GameGateway {
     const game = this.gameService.createGame(room);
 
     console.log("game", game);
-    const newRoom = { ...room, gameStarted: true };
-    this.roomService.rooms.set(room.id, newRoom);
-    this.roomService.usersRooms.set(room.host.infos.id, newRoom);
-    this.roomService.usersRooms.set(room.guest.infos.id, newRoom);
+    this.roomService.updateRoom(room.id, { ...room, gameStarted: true });
     this.server.to(room.id).emit("gameCreated");
   }
 
@@ -147,23 +144,29 @@ export class GameGateway {
   startGame(client: Socket, game: GameType) {
     const gameLoop = setInterval(() => {
       game = this.gameService.games.get(game.gameId);
-      game = this.gameService.updateBall(game);
-
       // Vérification de la fin de la partie
       if (game.player1.score >= 10) {
         clearInterval(gameLoop);
         game.player1.win = true;
         game.gameRunning = false;
-      }
-      if (game.player2.score >= 10) {
+        console.log("score1");
+        this.gameService.register(game);
+      } else if (game.player2.score >= 10) {
         clearInterval(gameLoop);
         game.player2.win = true;
         game.gameRunning = false;
-      }
-      console.log("gameLoop", game);
+        console.log("score2");
+        this.gameService.register(game);
+      } else game = this.gameService.updateBall(game);
       this.gameService.saveGame(game);
       this.server.to(game.gameId).emit("updateGameState", game);
+      if (!game.gameRunning) {
+        this.server.to(game.gameId).emit("endGame", game);
+        return;
+      }
     }, 1000 / 20);
+
+    console.log("out game loop");
   }
 
   @SubscribeMessage("rematch")
@@ -173,19 +176,6 @@ export class GameGateway {
     this.server.to(game.gameId).emit("gameReset", game);
     this.startGame(client, game);
   }
-
-  /* @SubscribeMessage("startGame")
-  startGame(client: Socket, room: Room) {
-    console.log("start game event");
-    const game = this.gameService.createGame();
-    // this.gameService.addUsersFromRoom(room)
-    this.gameService.startGame(game);
-    this.server.to(room.id).emit("updateGameState", game);
-    /*client.to(room.id).emit("gameStarted", game);
-    console.log("start startGameLoop");
-    this.gameService.startGameLoop(game, room);
-    return game;
-  }*/
 
   @SubscribeMessage("movePaddle")
   movePaddle(client: Socket, data: any) {

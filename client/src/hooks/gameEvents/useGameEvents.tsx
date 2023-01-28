@@ -84,13 +84,40 @@ export default function useGameEvents({ canvasRef }: Props) {
     });
 
     socket.on("updateGameState", (game: gameData) => {
-      setGame(game);
+      setGame((prev: any) => {
+        if (prev) {
+          return {
+            ...prev,
+            ball: game.ball,
+            player1: { ...prev.player1, score: game.player1.score },
+            player2: { ...prev.player2, score: game.player2.score },
+          };
+        }
+        return game;
+      });
       //updateCanvas();
-      console.log("Game state updated: ", game);
+    });
+
+    socket.on("endGame", (game) => {
+      setGame(game);
+    });
+
+    socket.on("updateBall", (ball) => {
+      setGame((prev: any) => {
+        return { ...prev, ball };
+      });
     });
 
     socket.on("updatePaddle", (game) => {
-      setGame(game);
+      setGame((prev: any) => {
+        if (prev) {
+          return {
+            ...prev,
+            player1: { ...prev.player1, y: game.player1.y },
+            player2: { ...prev.player2, y: game.player2.y },
+          };
+        }
+      });
     });
 
     socket.on("win", (data) => {
@@ -116,6 +143,7 @@ export default function useGameEvents({ canvasRef }: Props) {
       window.removeEventListener("keydown", handleKeyDown);
       socket.off("newGame");
       socket.off("resetGame");
+      socket.off("updateBall");
       socket.off("updateGameState");
       socket.off("win");
       socket.off("updatePaddle");
