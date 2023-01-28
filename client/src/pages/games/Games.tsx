@@ -10,12 +10,11 @@ function Games() {
   const socket = useContext(GameContext);
   const id = { id: socket.id };
 
-
   function startGame() {
     if (canvasRef.current) {
       const newGame = new Game(canvasRef.current, 800, 500);
       setGame(newGame);
-      socket.emit('createGame', { gameId: id });
+      socket.emit("createGame", { gameId: id });
       newGame.resetScore();
       newGame.start();
     }
@@ -23,7 +22,7 @@ function Games() {
 
   function stopGame() {
     if (game) {
-      socket.emit('stopGame', { gameId: id });
+      socket.emit("stopGame", { gameId: id });
       game.stop();
       game.resetScore();
       setGame(null);
@@ -40,7 +39,7 @@ function Games() {
   }
 
   return (
-     <div className="game">
+    <div className="game">
       <div className="game-buttons-container">
         {game && (
           <button className="btn btn-primary" onClick={stopGame}>

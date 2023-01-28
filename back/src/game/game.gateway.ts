@@ -146,6 +146,7 @@ export class GameGateway {
   @SubscribeMessage("startGame")
   startGame(client: Socket, game: GameType) {
     const gameLoop = setInterval(() => {
+      game = this.gameService.games.get(game.gameId);
       game = this.gameService.updateBall(game);
 
       // Vérification de la fin de la partie
@@ -153,17 +154,24 @@ export class GameGateway {
         clearInterval(gameLoop);
         game.player1.win = true;
         game.gameRunning = false;
-        return game;
       }
       if (game.player2.score >= 10) {
         clearInterval(gameLoop);
         game.player2.win = true;
         game.gameRunning = false;
-        return game;
       }
       console.log("gameLoop", game);
+      this.gameService.saveGame(game);
       this.server.to(game.gameId).emit("updateGameState", game);
-    }, 1000 / 60);
+    }, 1000 / 20);
+  }
+
+  @SubscribeMessage("rematch")
+  rematch(client: Socket, game: GameType) {
+    game = this.gameService.resetGame(game);
+
+    this.server.to(game.gameId).emit("gameReset", game);
+    this.startGame(client, game);
   }
 
   /* @SubscribeMessage("startGame")
