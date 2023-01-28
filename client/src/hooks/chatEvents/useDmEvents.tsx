@@ -4,6 +4,7 @@ import axios from "axios";
 import { conversationType } from "../../types/directMessageType";
 import userEvent from "@testing-library/user-event";
 import User from "../User";
+import { getSavedItem, saveItem } from "../../utils/storage";
 
 type Props = {
   setConvs: (convs: any) => void;
@@ -21,7 +22,24 @@ export default function useDmEvents({ setConvs }: Props) {
       .then((response) => {
         if (response.data) {
           console.log("convs", response.data);
-          setConvs(response.data);
+          /*        let uniqueArray = [
+            ...response.data,
+            ...getSavedItem("convs").filter((item : conversationType) => !response.data.includes(item)),
+          ]; */
+          let uniqueArray = [...response.data, ...getSavedItem("convs")].filter(
+            (conversation, index, self) =>
+              index ===
+              self.findIndex(
+                (t) => t.id === conversation.id && t.to === conversation.to
+              )
+          );
+          //filter to avoid duplicate
+          setConvs(uniqueArray);
+          saveItem("convs", uniqueArray);
+          console.log(
+            "🚀 ~ file: useDmEvents.tsx:33 ~ .then ~ uniqueArray",
+            uniqueArray
+          );
         }
       });
 
@@ -32,8 +50,10 @@ export default function useDmEvents({ setConvs }: Props) {
         if (index >= 0) {
           const copy = [...prev];
           copy[index] = conv;
+          saveItem("convs", copy);
           return copy;
         }
+        saveItem("convs", [...prev, conv]);
         return [...prev, conv];
       });
     });
@@ -50,9 +70,10 @@ export default function useDmEvents({ setConvs }: Props) {
               show: true,
               messages: conv.messages,
             };
+            saveItem("convs", copy);
             return copy;
           }
-          return [
+          const tmp = [
             ...prev,
             {
               id: conv.id,
@@ -61,6 +82,8 @@ export default function useDmEvents({ setConvs }: Props) {
               show: true,
             },
           ];
+          saveItem("convs", tmp);
+          return tmp;
         }
       });
     });
@@ -68,7 +91,7 @@ export default function useDmEvents({ setConvs }: Props) {
     socket.on("updateConvs", (user) => {
       setConvs((prev: conversationType[]) => {
         if (prev) {
-          return prev.map((p) => {
+          const res = prev.map((p) => {
             if (p.to.id === user.id) {
               const newMessages = p.messages.map((m) => {
                 if (m.from.id === user.id) return { ...m, from: user };
@@ -78,6 +101,8 @@ export default function useDmEvents({ setConvs }: Props) {
             }
             return p;
           });
+
+          return res;
         }
       });
     });

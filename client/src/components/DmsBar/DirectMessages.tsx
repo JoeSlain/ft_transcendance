@@ -8,6 +8,7 @@ import { ContextMenu } from "../../styles/menus";
 import { CommonContext } from "../contextMenus/commonContext";
 import useClickListener from "../../hooks/useClickListener";
 import "../../styles/chat/dms.css";
+import { getSavedItem, saveItem } from "../../utils/storage";
 
 type Props = {
   conv: conversationType;
@@ -116,19 +117,28 @@ const MessageContent = ({ conv }: Props) => {
 };
 
 export default function DirectMessages() {
-  const [convs, setConvs] = useState<conversationType[]>([]);
-
+  const [convs, setConvs] = useState(getSavedItem("convs"));
+  if (convs === null) 
+  {
+    saveItem("convs", []);
+    setConvs([]);
+  }
+  console.log("🚀 ~ file: DirectMessages.tsx:121 ~ DirectMessages ~ convs", convs)
+  
   useDmEvents({ setConvs });
 
   const handleClick = (index: number) => {
     const copy = [...convs];
     copy[index].show = !copy[index].show;
+    saveItem("convs", copy);
     setConvs(copy);
   };
 
   const handleClose = (conv: conversationType) => {
     setConvs((prev: any) => {
-      return prev.filter((p: any) => p.id !== conv.id);
+      const res = prev.filter((p: any) => p.id !== conv.id);
+      saveItem("convs", res);
+      return res;
     });
   };
 
@@ -138,7 +148,7 @@ export default function DirectMessages() {
       style={{ position: "fixed", bottom: 0 }}
     >
       {convs &&
-        convs.map((conv, index) => {
+        convs.map((conv: any, index: any) => {
           return (
             <div className={`dmEntry flex flex-col self-end `} key={index}>
               <div
