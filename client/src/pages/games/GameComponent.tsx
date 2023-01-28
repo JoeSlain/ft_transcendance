@@ -18,11 +18,9 @@ type CdProps = {
 
 function GameComponent() {
   const canvasRef: CanvasRef = useRef<HTMLCanvasElement>(null);
-  const [game, setGame] = useState<gameData | null>(getSavedItem("game"));
   const [timer, setTimer] = useState(3);
   const socket = useContext(GameContext);
-
-  useGameEvents({ game, setGame, canvasRef });
+  const game = useGameEvents({ canvasRef });
 
   useEffect(() => {
     console.log("timer", timer);

@@ -162,6 +162,7 @@ export class GameService {
       game.player1.score++;
       game = this.resetBall(game);
     }
+    this.saveGame(game);
     return game;
   }
 
@@ -227,7 +228,7 @@ export class GameService {
           game.player2.y += 20;
       }
     }
-    this.games.set(game.gameId, game);
+    this.saveGame(game);
     return game;
     // // Envoyer les mises à jour de l'état du jeu aux clients connectés à la salle
     // client.emit("updateGameState", { game });

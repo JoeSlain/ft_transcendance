@@ -76,12 +76,13 @@ export class MessageService {
 
     const ret = [];
     while (convs.length) {
-      const conv = convs.shift();
+      let conv = convs.shift();
+      //conv = await this.updateNewMessages(conv, id);
       ret.push({
         id: conv.id,
         messages: conv.messages,
         to: conv.user1.id === id ? conv.user2 : conv.user1,
-        show: true,
+        show: false,
       });
     }
 
@@ -146,12 +147,12 @@ export class MessageService {
     if (!conv) {
       return null;
     }
-    return {
+    return conv; /*{
       id: conv.id,
       messages: conv.messages,
       to,
       show: true,
-    };
+    };*/
   }
 
   async createConversation(me: User, to: User) {
@@ -161,12 +162,12 @@ export class MessageService {
     });
 
     conv = await this.convRepo.save(conv);
-    return {
+    return conv; /*{
       id: conv.id,
       messages: [],
       to,
       show: true,
-    };
+    };*/
   }
 
   async createDm(from: User, content: string) {
@@ -180,5 +181,11 @@ export class MessageService {
     else conversation.new1 = true;
     conversation.messages.push(dm);
     return await this.convRepo.save(conversation);
+  }
+
+  async updateNewMessages(conv: Conversation, userId: number) {
+    if (userId === conv.user1.id) conv.new1 = false;
+    else if (userId === conv.user2.id) conv.new2 = false;
+    return await this.convRepo.save(conv);
   }
 }

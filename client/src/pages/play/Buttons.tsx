@@ -12,13 +12,51 @@ type IProps = {
 export default function Buttons({ room }: IProps) {
   const { user } = useContext(User);
   const socket = useContext(GameContext);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdown, setCountDown] = useState({
+    min: 0,
+    sec: 0,
+  });
   let showStart = false;
   let playersReady = false;
+  let showSearch = false;
   const showLeave = room.spectators.find((sp) => sp.id === user.id);
 
+  useEffect(() => {
+    socket.on("stopQueue", () => {
+      console.log("stop queue");
+      setCountDown({ min: 0, sec: 0 });
+      setShowCountdown(false);
+    });
+
+    return () => {
+      socket.off("stopQueue");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showCountdown) {
+      const interval = setInterval(() => {
+        console.log("countdown", countdown);
+        let min = countdown.min;
+        let sec = countdown.sec + 1;
+        if (sec === 60) {
+          min += 1;
+          sec = 0;
+        }
+        setCountDown({ min, sec });
+      }, 1000);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [showCountdown, countdown]);
+
   if (room.host && room.host.infos.id === user.id) {
-    showStart = true;
-    if (room.host.ready && room.guest && room.guest.ready) playersReady = true;
+    if (room.guest) {
+      showStart = true;
+      if (room.host.ready && room.guest.ready) playersReady = true;
+    } else showSearch = true;
   }
 
   const startGame = () => {
@@ -32,6 +70,21 @@ export default function Buttons({ room }: IProps) {
 
   const leaveRoom = () => {
     socket.emit("leaveRoom", { roomId: room.id, user });
+  };
+
+  const searchOpponent = () => {
+    socket.emit("searchOpponent", user);
+    setShowCountdown(true);
+    /*const interval = setInterval(() => {
+      setCountDown((prev) => prev + 1);
+      console.log("countdown", countdown);
+    }, 1000);*/
+  };
+
+  const stopSearch = () => {
+    socket.emit("stopQueue", user);
+    setCountDown({ min: 0, sec: 0 });
+    setShowCountdown(false);
   };
 
   return (
@@ -51,6 +104,16 @@ export default function Buttons({ room }: IProps) {
           Start{" "}
         </button>
       )}
+      {showSearch && (
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
+          style={{ width: "70px" }}
+          onClick={searchOpponent}
+        >
+          {" "}
+          Search Opponent{" "}
+        </button>
+      )}
       {showLeave && (
         <button
           className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
@@ -60,6 +123,22 @@ export default function Buttons({ room }: IProps) {
           {" "}
           Leave{" "}
         </button>
+      )}
+      {showCountdown && (
+        <button
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
+          style={{ width: "70px" }}
+          onClick={stopSearch}
+        >
+          {" "}
+          Stop search{" "}
+        </button>
+      )}
+      {showCountdown && (
+        <div>
+          {" "}
+          Time in queue : {countdown.min}m{countdown.sec}s{" "}
+        </div>
       )}
     </div>
   );

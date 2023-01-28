@@ -117,6 +117,7 @@ const MessageContent = ({ conv }: Props) => {
 };
 
 export default function DirectMessages() {
+    const socket = useContext(ChatContext);
   const [convs, setConvs] = useState(getSavedItem("convs"));
   if (convs === null) 
   {
@@ -125,12 +126,17 @@ export default function DirectMessages() {
   }
   console.log("🚀 ~ file: DirectMessages.tsx:121 ~ DirectMessages ~ convs", convs)
   
+  const { user } = useContext(User);
   useDmEvents({ setConvs });
 
   const handleClick = (index: number) => {
     const copy = [...convs];
     copy[index].show = !copy[index].show;
     saveItem("convs", copy);
+    socket.emit("updateNewMessages", {
+      convId: copy[index].id,
+      userId: user.id,
+    });
     setConvs(copy);
   };
 

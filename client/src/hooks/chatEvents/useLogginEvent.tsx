@@ -42,7 +42,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
       if (!getSavedItem("isLogged")) navigate("/home");
       saveItem("isLogged", true);
       setIsLogged(true);
-      gameSocket.emit("login", data);
+      //gameSocket.emit("login", data);
     });
 
     chatSocket.on("loggedOut", () => {

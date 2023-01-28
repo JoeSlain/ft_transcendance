@@ -2,7 +2,6 @@ import { useContext, useEffect } from "react";
 import { ChatContext } from "../../context/socketContext";
 import axios from "axios";
 import { conversationType } from "../../types/directMessageType";
-import userEvent from "@testing-library/user-event";
 import User from "../User";
 import { getSavedItem, saveItem } from "../../utils/storage";
 

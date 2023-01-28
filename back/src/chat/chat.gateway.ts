@@ -520,8 +520,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!conv) {
       conv = await this.messageService.createConversation(data.me, data.to);
       console.log("conv not found, creation new", conv);
-    } else console.log("conv found", conv);
-    this.server.to(client.id).emit("openConversation", conv);
+    } else {
+      conv = await this.messageService.updateNewMessages(conv, data.me.id);
+      console.log("conv found", conv);
+    }
+    this.server.to(client.id).emit("openConversation", {
+      id: conv.id,
+      messages: conv.messages,
+      to: data.to,
+      show: true,
+    });
   }
 
   @SubscribeMessage("directMessage")
@@ -537,8 +545,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!(await this.usersService.checkBlocked(data.user.id, data.to.id))) {
       console.log("not blocked, sending dm");
       const to = this.chatService.getUser(data.to.id);
-      if (to) this.server.to(to).emit("newDm", conv);
+      if (to) {
+        conv = await this.messageService.updateNewMessages(conv, data.to.id);
+        this.server.to(to).emit("newDm", conv);
+      }
     }
     this.server.to(client.id).emit("newDm", conv);
+  }
+
+  @SubscribeMessage("updateNewMessages")
+  async updateNewMessages(client: Socket, data: any) {
+    const conv = await this.messageService.findConvById(data.convId);
+
+    await this.messageService.updateNewMessages(conv, data.userId);
   }
 }

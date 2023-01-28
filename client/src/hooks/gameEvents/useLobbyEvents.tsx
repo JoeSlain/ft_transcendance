@@ -20,7 +20,8 @@ export default function useLobbyEvents({ setRoom, setGameStart }: IProps) {
     // new room
     gameSocket.on("newRoom", (room) => {
       console.log("newroom", room);
-      setRoom(room);
+      if (room.gameStarted) setGameStart(true);
+      else setRoom(room);
     });
 
     // join

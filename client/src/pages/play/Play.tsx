@@ -16,8 +16,6 @@ export default function Play() {
 
   useLobbyEvents({ setRoom, setGameStart });
 
-  const searchOpponent = () => {};
-
   if (gameStart) {
     return <GameComponent />;
   }
@@ -39,24 +37,5 @@ export default function Play() {
       </div>
     );
   }
-  return (
-    <div className="center">
-      <div className="play">
-        <div className="playHeader">
-          <h1> Play </h1>
-        </div>
-        <div className="playBody"></div>
-        <div className="playFooter">
-          <button
-            className="customButton"
-            id="searchOpponentButton"
-            onClick={searchOpponent}
-          >
-            {" "}
-            Search Opponent{" "}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return <></>;
 }
