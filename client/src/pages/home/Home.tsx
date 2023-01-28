@@ -40,9 +40,9 @@ function Games() {
           </tr>
         </thead>
         <tbody>
-          {arr.map((row: any, index) => (
+          {/*arr.map((row: any, index) => (
             <TableRow key={index} row={row} />
-          ))}
+          ))*/}
         </tbody>
       </table>
     </div>

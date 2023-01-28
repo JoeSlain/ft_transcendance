@@ -54,6 +54,7 @@ export class RoomService {
     this.rooms.set(roomId, room);
     this.usersRooms.set(room.host.infos.id, room);
     this.usersRooms.set(room.guest.infos.id, room);
+    return room;
   }
 
   getUserRoom(id: number) {

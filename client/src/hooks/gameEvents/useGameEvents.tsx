@@ -3,14 +3,13 @@ import { GameContext } from "../../context/socketContext";
 import { CanvasRef } from "../../pages/games/type";
 import User from "../User";
 import { gameData } from "../../types/gameType";
-import { getSavedItem, saveItem } from "../../utils/storage";
-import { preventOverflow } from "@popperjs/core";
 
 type Props = {
   canvasRef: CanvasRef;
+  setRoom: (room: any) => void;
 };
 
-export default function useGameEvents({ canvasRef }: Props) {
+export default function useGameEvents({ canvasRef, setRoom }: Props) {
   const socket = useContext(GameContext);
   const { user } = useContext(User);
   const [playerId, setPlayerId] = useState(0);
@@ -98,8 +97,11 @@ export default function useGameEvents({ canvasRef }: Props) {
       //updateCanvas();
     });
 
-    socket.on("endGame", (game) => {
-      setGame(game);
+    socket.on("endGame", () => {
+      console.log("endgame");
+      setRoom((prev: any) => {
+        return { ...prev, gameStarted: false };
+      });
     });
 
     socket.on("updateBall", (ball) => {

@@ -129,8 +129,9 @@ export class GameGateway {
     const game = this.gameService.createGame(room);
 
     console.log("game", game);
-    this.roomService.updateRoom(room.id, { ...room, gameStarted: true });
-    this.server.to(room.id).emit("gameCreated");
+    room = this.roomService.updateRoom(room.id, { ...room, gameStarted: true });
+    this.startGame(client, game);
+    this.server.to(room.id).emit("gameStarted", room);
   }
 
   @SubscribeMessage("getGame")
@@ -161,10 +162,10 @@ export class GameGateway {
       this.gameService.saveGame(game);
       this.server.to(game.gameId).emit("updateGameState", game);
       if (!game.gameRunning) {
-        this.server.to(game.gameId).emit("endGame", game);
+        this.server.to(game.gameId).emit("endGame");
         return;
       }
-    }, 1000 / 20);
+    }, 1000);
 
     console.log("out game loop");
   }

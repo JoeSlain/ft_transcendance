@@ -6,10 +6,9 @@ import { gameData } from "../../types/gameType";
 
 type IProps = {
   setRoom: (props: roomType | null) => void;
-  setGameStart: (props: boolean) => void;
 };
 
-export default function useLobbyEvents({ setRoom, setGameStart }: IProps) {
+export default function useLobbyEvents({ setRoom }: IProps) {
   const gameSocket = useContext(GameContext);
   const { user } = useContext(User);
 
@@ -20,8 +19,7 @@ export default function useLobbyEvents({ setRoom, setGameStart }: IProps) {
     // new room
     gameSocket.on("newRoom", (room) => {
       console.log("newroom", room);
-      if (room.gameStarted) setGameStart(true);
-      else setRoom(room);
+      setRoom(room);
     });
 
     // join
@@ -43,9 +41,9 @@ export default function useLobbyEvents({ setRoom, setGameStart }: IProps) {
       setRoom(room);
     });
 
-    gameSocket.on("gameCreated", () => {
+    gameSocket.on("gameStarted", (room) => {
       console.log("game created");
-      setGameStart(true);
+      setRoom(room);
     });
 
     return () => {
@@ -55,7 +53,7 @@ export default function useLobbyEvents({ setRoom, setGameStart }: IProps) {
       gameSocket.off("leftRoom");
       gameSocket.off("clearRoom");
       gameSocket.off("ready");
-      gameSocket.off("gameCreated");
+      gameSocket.off("gameStarted");
     };
   }, []);
 }

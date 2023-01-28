@@ -183,6 +183,8 @@ export class UsersService {
           user1: {
             id: userId,
           },
+        },
+        {
           user2: {
             id: userId,
           },

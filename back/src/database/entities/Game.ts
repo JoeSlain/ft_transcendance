@@ -16,7 +16,7 @@ export class Game {
   score2: number;
 
   @Column()
-  date: Date;
+  date: string;
 
   @ManyToOne(() => User)
   user1: User;

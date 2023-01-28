@@ -30,15 +30,6 @@ import { getGames } from "../../services/User/GetGames";
 ];*/
 
 export default function History(props: { userId: number }) {
-  /* let { isLoading, data, error } = useQuery({
-    queryKey: ["userData", props.userId],
-    queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
-  });
-  if (isLoading) return <Loading />;
-  if (error) {
-    return <Error err="Error fetching user" />;
-  }*/
-
   const [games, setGames] = useState<gameType[] | null>(null);
 
   useEffect(() => {
@@ -51,29 +42,39 @@ export default function History(props: { userId: number }) {
       });
   }, []);
 
-  //if (data) {
-  //console.log("games: ", data);
+  let { isLoading, data, error } = useQuery({
+    queryKey: ["userData", props.userId],
+    queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
+  });
+  if (isLoading) return <Loading />;
+  if (error) {
+    return <Error err="Error fetching user" />;
+  }
 
-  return (
-    <div className="overflow-x-auto">
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th>Game Id</th>
-            <th>Opponents</th>
-            <th>Winner</th>
-            <th>Score</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {games &&
-            games.map((row: any, index) => <TableRow row={row} key={index} />)}
-        </tbody>
-      </table>
-    </div>
-  );
-  /*}
-  return <></>;*/
+  if (data) {
+    console.log("games: ", games);
+    console.log("data: ", data);
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="table w-full">
+          <thead>
+            <tr>
+              <th>Opponents</th>
+              <th>Result</th>
+              <th>Score</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {games &&
+              games.map((row: any, index) => (
+                <TableRow row={row} key={index} user={data} />
+              ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+  return <></>;
 }

@@ -205,7 +205,7 @@ export class UsersController {
   @Get("games/:id")
   @UseGuards(TwoFactorGuard)
   async getGames(@Param() params) {
-    console.log("get games");
+    console.log(`get games ${params.id}`);
     const games = await this.usersService.getGames(params.id);
     console.log("returned games", games);
 

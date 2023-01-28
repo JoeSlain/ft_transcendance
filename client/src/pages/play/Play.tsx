@@ -1,23 +1,19 @@
-import { useContext, useEffect, useState } from "react";
-import { ChatContext, GameContext } from "../../context/socketContext";
-import User from "../../hooks/User";
+import { useState } from "react";
 import { roomType } from "../../types/roomType";
 import PlayerEntry from "./playerEntry";
 import Spectators from "./spectators";
 import useLobbyEvents from "../../hooks/gameEvents/useLobbyEvents";
 import "../../styles/play.css";
 import Buttons from "./Buttons";
-import { gameData } from "../../types/gameType";
 import GameComponent from "../games/GameComponent";
 
 export default function Play() {
   const [room, setRoom] = useState<roomType | null>(null);
-  const [gameStart, setGameStart] = useState(false);
 
-  useLobbyEvents({ setRoom, setGameStart });
+  useLobbyEvents({ setRoom });
 
-  if (gameStart) {
-    return <GameComponent />;
+  if (room && room.gameStarted) {
+    return <GameComponent setRoom={setRoom} />;
   }
 
   if (room) {

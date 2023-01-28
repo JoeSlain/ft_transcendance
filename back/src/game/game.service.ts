@@ -66,7 +66,7 @@ export class GameService {
       player1,
       player2,
       ball,
-      gameRunning: false,
+      gameRunning: true,
       gameId,
     };
 
@@ -75,9 +75,14 @@ export class GameService {
   }
 
   resetGame(game: GameType) {
+    const id1 = game.player1.id;
+    const id2 = game.player2.id;
+
     game.ball = this.newBall(game.width, game.height, 1);
     game.player1 = this.newPlayer(game.width, game.height, 1);
+    game.player1.id = id1;
     game.player2 = this.newPlayer(game.width, game.height, 2);
+    game.player1.id = id2;
     game.gameRunning = true;
     this.saveGame(game);
 
@@ -188,7 +193,7 @@ export class GameService {
       date: new Date().toISOString().slice(0, 10),
     });
 
-    //this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
+    this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
 
     return await this.gameRepo.save(newGame);
   }
