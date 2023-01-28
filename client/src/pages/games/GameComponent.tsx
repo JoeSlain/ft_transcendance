@@ -1,9 +1,8 @@
-import "../../styles/games.css";
+import "../../styles/gameComponent.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { CanvasRef } from "./type";
 import { gameData } from "../../types/gameType";
 import useGameEvents from "../../hooks/gameEvents/useGameEvents";
-import { getSavedItem } from "../../utils/storage";
 import { GameContext } from "../../context/socketContext";
 
 type Props = {
@@ -31,15 +30,29 @@ function GameComponent() {
     } else socket.emit("startGame", game);
   }, [timer]);
 
+  const rematch = () => {
+    socket.emit("rematch", game);
+  };
+
   return (
-    <div className="game-canvas-container">
-      <canvas
-        width={game ? game.width : 800}
-        height={game ? game.height : 500}
-        id="game-canvas"
-        ref={canvasRef}
-      ></canvas>
-      {timer && <div className="timer"> {timer} </div>}
+    <div className="gameContainer">
+      <div className="gameButtons">
+        {game && !game.gameRunning && (
+          <button className="btn btn-primary" onClick={rematch}>
+            Rematch
+          </button>
+        )}
+      </div>
+
+      <div className="gameCanvas">
+        <canvas
+          width={game ? game.width : 800}
+          height={game ? game.height : 500}
+          id="game-canvas"
+          ref={canvasRef}
+        ></canvas>
+        {timer && <div className="timer"> {timer} </div>}
+      </div>
     </div>
   );
 }

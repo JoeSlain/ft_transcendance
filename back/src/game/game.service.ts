@@ -52,12 +52,9 @@ export class GameService {
     // console.log('updateGame');
   }*/
 
-  createGame(room: Room): GameType {
-    const width = 800; // largeur de la zone de jeu
-    const height = 600; // hauteur de la zone de jeu
-    const gameId = room.id;
-    const player1 = {
-      x: 30,
+  newPlayer(width: number, height: number, id: number) {
+    const player = {
+      x: id === 1 ? 30 : width - 50,
       y: height / 2 - 30,
       width: 20,
       height: 60,
@@ -71,33 +68,33 @@ export class GameService {
         xVel: 0,
         yVel: 0,
       },
-      id: room.host.infos.id,
+      id: -1,
     };
-    const player2 = {
-      x: width - 50,
-      y: height / 2 - 30,
-      width: 20,
-      height: 60,
-      score: 0,
-      win: false,
-      paddle: {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        xVel: 0,
-        yVel: 0,
-      },
-      id: room.guest.infos.id,
-    };
+    return player;
+  }
+
+  newBall(width: number, height: number, vel: number) {
     const ball = {
       x: width / 2 - 5,
       y: height / 2 - 5,
       speedX: 10,
       speedY: 5,
-      xVel: 1,
+      xVel: vel,
     };
+    return ball;
+  }
 
+  createGame(room: Room): GameType {
+    const width = 800; // largeur de la zone de jeu
+    const height = 600; // hauteur de la zone de jeu
+    const gameId = room.id;
+
+    const player1 = this.newPlayer(width, height, 1);
+    player1.id = room.host.infos.id;
+    const player2 = this.newPlayer(width, height, 2);
+    player2.id = room.guest.infos.id;
+
+    const ball = this.newBall(width, height, 1);
     const game = {
       width,
       height,
@@ -109,6 +106,16 @@ export class GameService {
     };
 
     this.saveGame(game);
+    return game;
+  }
+
+  resetGame(game: GameType) {
+    game.ball = this.newBall(game.width, game.height, 1);
+    game.player1 = this.newPlayer(game.width, game.height, 1);
+    game.player2 = this.newPlayer(game.width, game.height, 2);
+    game.gameRunning = true;
+    this.saveGame(game);
+
     return game;
   }
 
@@ -157,16 +164,16 @@ export class GameService {
     }
     if (game.ball.x <= 0) {
       game.player2.score++;
-      game = this.resetBall(game);
+      game.ball = this.newBall(game.width, game.height, -1);
     } else if (game.ball.x >= game.width) {
       game.player1.score++;
-      game = this.resetBall(game);
+      game.ball = this.newBall(game.width, game.height, 1);
     }
     this.saveGame(game);
     return game;
   }
 
-  resetBall(game: GameType): GameType {
+  /*resetBall(game: GameType): GameType {
     // Réinitialisation de la position de la balle au centre du canvas
     game.ball.x = game.width / 2 - 5;
     game.ball.y = game.height / 2 - 5;
@@ -182,7 +189,7 @@ export class GameService {
       game.ball.xVel = -1;
     }
     return game;
-  }
+  }*/
 
   startGame(game: GameType) {
     game.gameRunning = true;
