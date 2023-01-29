@@ -1,17 +1,17 @@
 import { useContext, useEffect, useState } from "react";
-import { GameContext } from "../../context/socketContext";
+import { ChatContext, GameContext } from "../../context/socketContext";
 import { CanvasRef } from "../../pages/games/type";
 import User from "../User";
 import { gameData } from "../../types/gameType";
-import { getSavedItem, saveItem } from "../../utils/storage";
-import { preventOverflow } from "@popperjs/core";
 
 type Props = {
   canvasRef: CanvasRef;
+  setRoom: (room: any) => void;
 };
 
-export default function useGameEvents({ canvasRef }: Props) {
-  const socket = useContext(GameContext);
+export default function useGameEvents({ canvasRef, setRoom }: Props) {
+  const gameSocket = useContext(GameContext);
+  const chatSocket = useContext(ChatContext);
   const { user } = useContext(User);
   const [playerId, setPlayerId] = useState(0);
   const [key, setKey] = useState<string | null>(null);
@@ -70,30 +70,71 @@ export default function useGameEvents({ canvasRef }: Props) {
 
   // first render
   useEffect(() => {
-    socket.emit("getGame", user.id);
+    gameSocket.emit("getGame", user.id);
 
-    socket.on("newGame", (data) => {
+    gameSocket.on("newGame", (data) => {
       console.log("game", data);
       setGame(data);
-      setPlayerId(data.player1.id === user.id ? 1 : 2);
+      if (data.player1.infos.id === user.id) {
+        setPlayerId(1);
+        chatSocket.emit("updateUserStatus", { user, status: "ingame" });
+      } else if (data.player2.infos.id === user.id) {
+        setPlayerId(2);
+        chatSocket.emit("updateUserStatus", { user, status: "ingame" });
+      }
       //updateCanvas();
     });
 
-    socket.on("gameReset", (game: gameData) => {
+    gameSocket.on("gameReset", (game: gameData) => {
       setGame(game);
     });
 
-    socket.on("updateGameState", (game: gameData) => {
-      setGame(game);
+    gameSocket.on("updateGameState", (game: gameData) => {
+      setGame((prev: any) => {
+        if (prev) {
+          return {
+            ...prev,
+            ball: game.ball,
+            player1: { ...prev.player1, score: game.player1.score },
+            player2: { ...prev.player2, score: game.player2.score },
+          };
+        }
+        return game;
+      });
       //updateCanvas();
-      console.log("Game state updated: ", game);
     });
 
-    socket.on("updatePaddle", (game) => {
-      setGame(game);
+    gameSocket.on("endGame", (game) => {
+      console.log("endgame");
+      setRoom((prev: any) => {
+        return { ...prev, gameStarted: false };
+      });
+      if (
+        game.player1.infos.id === user.id ||
+        game.player2.infos.id === user.id
+      )
+        chatSocket.emit("updateUserStatus", { user, status: "online" });
     });
 
-    socket.on("win", (data) => {
+    gameSocket.on("updateBall", (ball) => {
+      setGame((prev: any) => {
+        return { ...prev, ball };
+      });
+    });
+
+    gameSocket.on("updatePaddle", (game) => {
+      setGame((prev: any) => {
+        if (prev) {
+          return {
+            ...prev,
+            player1: { ...prev.player1, y: game.player1.y },
+            player2: { ...prev.player2, y: game.player2.y },
+          };
+        }
+      });
+    });
+
+    gameSocket.on("win", (data) => {
       const { game } = data;
 
       if (game.player1.win) {
@@ -114,11 +155,12 @@ export default function useGameEvents({ canvasRef }: Props) {
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      socket.off("newGame");
-      socket.off("resetGame");
-      socket.off("updateGameState");
-      socket.off("win");
-      socket.off("updatePaddle");
+      gameSocket.off("newGame");
+      gameSocket.off("resetGame");
+      gameSocket.off("updateBall");
+      gameSocket.off("updateGameState");
+      gameSocket.off("win");
+      gameSocket.off("updatePaddle");
     };
   }, []);
 
@@ -131,7 +173,7 @@ export default function useGameEvents({ canvasRef }: Props) {
     if (key === "ArrowUp" || key === "ArrowDown") {
       console.log("key pressed", key);
       console.log("game", game);
-      socket.emit("movePaddle", { game, playerId, direction: key });
+      gameSocket.emit("movePaddle", { game, playerId, direction: key });
       setKey(null);
     }
   }, [key, game]);

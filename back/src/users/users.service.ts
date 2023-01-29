@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "src/database";
+import { Game, User } from "src/database";
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Game) private gameRepo: Repository<Game>
   ) {}
 
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
@@ -169,5 +170,28 @@ export class UsersService {
       return true;
     }
     return false;
+  }
+
+  async getGames(userId: number) {
+    const games = await this.gameRepo.find({
+      relations: {
+        user1: true,
+        user2: true,
+      },
+      where: [
+        {
+          user1: {
+            id: userId,
+          },
+        },
+        {
+          user2: {
+            id: userId,
+          },
+        },
+      ],
+    });
+
+    return games;
   }
 }

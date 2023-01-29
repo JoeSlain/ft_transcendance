@@ -14,17 +14,29 @@ export class ChatService {
   constructor(private readonly authService: AuthService) {}
 
   users: Map<number, string> = new Map();
+  statuses: Map<number, string> = new Map();
 
-  addUser(id: number, socketId: string) {
+  addUser(id: number, socketId: string, status: string) {
     this.users.set(id, socketId);
+    this.statuses.set(id, status);
   }
 
   removeUser(id: number) {
+    this.statuses.delete(id);
     return this.users.delete(id);
   }
 
   getUser(id: number) {
     return this.users.get(id);
+  }
+
+  getUserStatus(id: number) {
+    if (!this.statuses.has(id)) return "offline";
+    return this.statuses.get(id);
+  }
+
+  updateUserStatus(id: number, status: string) {
+    if (this.statuses.has(id)) this.statuses.set(id, status);
   }
 
   async getUserFromSocket(socket: Socket) {

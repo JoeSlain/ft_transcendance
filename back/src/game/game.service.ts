@@ -1,56 +1,22 @@
 import { Injectable } from "@nestjs/common";
-import { Room } from "src/utils/types";
-import { RoomService } from "./room.service";
-import { Socket, Namespace } from "socket.io";
+import { GameInfos, Room } from "src/utils/types";
 import { GameType } from "../utils/types";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Game } from "src/database";
-import { v4 as uuidv4 } from "uuid";
+import { Repository } from "typeorm";
+import { date } from "joi";
+import { RoomService } from "./room.service";
 
 @Injectable()
 export class GameService {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    @InjectRepository(Game) private gameRepo: Repository<Game>,
+    private readonly roomService: RoomService
+  ) {}
 
   users: Map<number, GameType> = new Map();
   games = new Map<string, GameType>();
-
-  // addUsersFromRoom(room: Room) {
-  //   console.log('addUsersFromRoom', room);
-  //   this.users.set(room.host.infos.id, room.host.infos.username);
-  //   if (room.guest) this.users.set(room.guest.infos.id, room.guest.infos.username);
-  // }
-
-  // removeUserFromRoom(userId: number) {
-  //   this.users.delete(userId);
-  // }
-
-  /*  startGameLoop(game: GameType) {
-    game.gameRunning = true;
-    // Création d'une boucle de jeu
-    const gameLoop = setInterval(() => {
-      // Mise à jour de l'état du jeu
-      this.updateBall(game);
-
-      // Vérification de la fin de la partie
-      if (game.player1.score >= 10) {
-        clearInterval(gameLoop);
-        game.player1.win = true;
-        game.gameRunning = false;
-        return game;
-      }
-      if (game.player2.score >= 10) {
-        clearInterval(gameLoop);
-        game.player2.win = true;
-        game.gameRunning = false;
-        return game;
-      }
-      console.log("gameLoop", game);
-    }, 1000 / 60);
-  }
-
-  private updateGame(game: GameType) {
-    this.updateBall(game);
-    // console.log('updateGame');
-  }*/
+  //gameInfos = new Array<GameInfos>();
 
   newPlayer(width: number, height: number, id: number) {
     const player = {
@@ -68,7 +34,7 @@ export class GameService {
         xVel: 0,
         yVel: 0,
       },
-      id: -1,
+      infos: null,
     };
     return player;
   }
@@ -90,9 +56,9 @@ export class GameService {
     const gameId = room.id;
 
     const player1 = this.newPlayer(width, height, 1);
-    player1.id = room.host.infos.id;
+    player1.infos = room.host.infos;
     const player2 = this.newPlayer(width, height, 2);
-    player2.id = room.guest.infos.id;
+    player2.infos = room.guest.infos;
 
     const ball = this.newBall(width, height, 1);
     const game = {
@@ -101,44 +67,29 @@ export class GameService {
       player1,
       player2,
       ball,
-      gameRunning: false,
+      gameRunning: true,
+      scoreUpdate: false,
       gameId,
     };
 
     this.saveGame(game);
+    //this.pushGameInfos(game, room);
     return game;
   }
 
   resetGame(game: GameType) {
+    const user1 = game.player1.infos;
+    const user2 = game.player2.infos;
+
     game.ball = this.newBall(game.width, game.height, 1);
     game.player1 = this.newPlayer(game.width, game.height, 1);
+    game.player1.infos = user1;
     game.player2 = this.newPlayer(game.width, game.height, 2);
+    game.player1.infos = user2;
     game.gameRunning = true;
     this.saveGame(game);
 
     return game;
-  }
-
-  generateRandomId() {
-    return uuidv4();
-  }
-  // Fonction pour mettre à jour la position d'un paddle
-  private updatePaddle(game: GameType, clients: Socket) {
-    // clients.on("movePaddle", (data) => {
-    //   const { direction} = data;
-    //     if (direction === "ArrowUp") {
-    //       if (game.player1.y > 0) game.player1.y -= 10;
-    //     } else if (direction === "ArrowDown") {
-    //       if (game.player1.y + game.player1.height < game.height) game.player1.y += 10;
-    //    }
-    //  else if () {
-    //   if (direction === "ArrowUp") {
-    //     if (game.player2.y > 0) game.player2.y -= 10;
-    //   } else if (direction === "ArrowDown") {
-    //     if (game.player2.y + game.player2.height < game.height) game.player2.y += 10;
-    //   }
-    // }
-    // });
   }
 
   // Fonction pour mettre à jour la position d'une balle
@@ -165,9 +116,11 @@ export class GameService {
     if (game.ball.x <= 0) {
       game.player2.score++;
       game.ball = this.newBall(game.width, game.height, -1);
+      game.scoreUpdate = true;
     } else if (game.ball.x >= game.width) {
       game.player1.score++;
       game.ball = this.newBall(game.width, game.height, 1);
+      game.scoreUpdate = true;
     }
     this.saveGame(game);
     return game;
@@ -203,23 +156,49 @@ export class GameService {
     return this.users.get(id);
   }
 
+  getCurrentGames() {
+    const games = [];
+    const iter = this.games.values();
+
+    while (iter) {
+      console.log("iter", iter);
+      const current = iter.next().value;
+      if (!current) return games;
+      console.log("current", current);
+      games.push({
+        id: current.gameId,
+        player1: current.player1.infos.username,
+        player2: current.player2.infos.username,
+        score: `${current.player1.score}/${current.player2.score}`,
+      });
+    }
+
+    console.log("games", games);
+    return games;
+  }
+
   saveGame(game: GameType) {
     this.games.set(game.gameId, game);
-    this.users.set(game.player1.id, game);
-    this.users.set(game.player2.id, game);
+    this.users.set(game.player1.infos.id, game);
+    this.users.set(game.player2.infos.id, game);
   }
 
-  deleteGame(gameId: string): void {
-    this.games.delete(gameId);
+  deleteGame(game: GameType): void {
+    this.games.delete(game.gameId);
+    this.users.delete(game.player1.infos.id);
+    this.users.delete(game.player2.infos.id);
   }
+
+  /*pushGameInfos(game: GameType, room: Room) {
+    this.gameInfos.push({
+      id: game.gameId,
+      player1: room.host.infos.username,
+      player2: room.guest.infos.username,
+      score: '0/0',
+    })
+  }*/
 
   movePaddle(game: GameType, playerId: number, direction: string) {
-    // const { direction, player} = data;
-    // const game = this.games.get(..);
-    // if (!game) {
-    //   console.error("Unable to find game for client");
-    //   return;
-    // }
     if (playerId === 1) {
       if (direction === "ArrowUp") {
         if (game.player1.y > 0) game.player1.y -= 20;
@@ -237,7 +216,24 @@ export class GameService {
     }
     this.saveGame(game);
     return game;
-    // // Envoyer les mises à jour de l'état du jeu aux clients connectés à la salle
-    // client.emit("updateGameState", { game });
+  }
+
+  async register(game: GameType) {
+    console.log("registering game", game);
+    const room = this.roomService.findRoom(game.gameId);
+    const newGame = this.gameRepo.create({
+      user1: game.player1.infos,
+      user2: game.player2.infos,
+      winnerId: game.player1.win
+        ? game.player1.infos.id
+        : game.player2.infos.id,
+      score1: game.player1.score,
+      score2: game.player2.score,
+      date: new Date().toISOString().slice(0, 10),
+    });
+
+    this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
+
+    return await this.gameRepo.save(newGame);
   }
 }

@@ -59,6 +59,13 @@ export type Room = {
 
 // 2. GAME
 // pong game
+export type GameInfos = {
+  id: string;
+  player1: string;
+  player2: string;
+  score: string;
+};
+
 export type GameType = {
   width: number;
   height: number;
@@ -66,6 +73,7 @@ export type GameType = {
   player2: PlayerType;
   ball: BallType;
   gameRunning: boolean;
+  scoreUpdate: boolean;
   gameId: any;
 };
 
@@ -78,7 +86,7 @@ export type PlayerType = {
   score: number;
   win: boolean;
   paddle: PaddleType;
-  id: number;
+  infos: User;
 };
 
 // pong ball

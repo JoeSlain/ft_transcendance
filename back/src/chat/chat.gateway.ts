@@ -18,6 +18,7 @@ import { ChannelService } from "./channel.service";
 import * as bcrypt from "bcrypt";
 import { MessageService } from "./message.service";
 import { RestrictionService } from "./restrictions.service";
+import { GameService } from "src/game/game.service";
 
 @WebSocketGateway(3002, {
   cors: {
@@ -30,10 +31,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly usersService: UsersService,
     private readonly chatService: ChatService,
     private readonly notifService: NotifService,
-    private readonly roomService: RoomService,
     private readonly channelService: ChannelService,
     private readonly messageService: MessageService,
-    private readonly restrictionService: RestrictionService
+    private readonly restrictionService: RestrictionService,
+    private readonly gameService: GameService
   ) {}
 
   @WebSocketServer() server: Namespace;
@@ -56,8 +57,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       status: "online",
     };
     console.log("chat ws login");
-
-    this.chatService.addUser(user.id, client.id);
+    if (this.gameService.getGameForUser(user.id)) data.status = "ingame";
+    this.chatService.addUser(user.id, client.id, data.status);
     client.broadcast.emit("updateStatus", data);
     this.server.to(client.id).emit("loggedIn", user);
   }
@@ -85,9 +86,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage("updateUser")
   async updateUser(client: Socket, user: User) {
     console.log("update user", user);
-    client.broadcast.emit("updateStatus", { user, status: "online" });
+    const status = this.chatService.getUserStatus(user.id);
+    client.broadcast.emit("updateStatus", { user, status });
     client.broadcast.emit("updateConvs", user);
     client.broadcast.emit("updateSelectedChan", user);
+  }
+
+  @SubscribeMessage("updateUserStatus")
+  async updateUserStatus(client: Socket, data: any) {
+    this.chatService.updateUserStatus(data.user.id, data.status);
+    client.broadcast.emit("updateStatus", {
+      user: data.user,
+      status: data.status,
+    });
   }
 
   /* GET FRIENDS
@@ -108,8 +119,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const map = new Map();
 
     friends.forEach((friend) => {
-      if (this.chatService.getUser(friend.id)) map.set(friend.id, "online");
-      else map.set(friend.id, "offline");
+      const status = this.chatService.getUserStatus(friend.id);
+      map.set(friend.id, status);
     });
     const ret = {
       friends: friends,
@@ -175,9 +186,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const newFriend = await this.usersService.addFriend(notif.from, notif.to);
     if (newFriend) {
+      const toStatus = this.chatService.getUserStatus(notif.to.id);
+      const fromStatus = this.chatService.getUserStatus(notif.from.id);
+
       const from = this.chatService.getUser(notif.from.id);
-      if (from) this.server.to(from).emit("newFriend", notif.to);
-      this.server.to(client.id).emit("newFriend", notif.from);
+      if (from) {
+        this.server
+          .to(from)
+          .emit("newFriend", { friend: notif.to, status: toStatus });
+      }
+      this.server
+        .to(client.id)
+        .emit("newFriend", { friend: notif.from, status: fromStatus });
     } else console.log("error adding friend");
     await this.notifService.deleteNotif(notif);
   }

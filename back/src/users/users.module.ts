@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Notif, User } from "src/database";
+import { Game, Notif, User } from "src/database";
 import { TwoFactorStrategy } from "src/auth/2fa/2fa.strategy";
 import { FortyTwoStrategy } from "src/auth/42auth/42.strategy";
 import { AuthModule } from "src/auth/auth.module";
@@ -14,7 +14,7 @@ import { NotifService } from "./notifs.service";
   controllers: [UsersController],
   providers: [UsersService, AuthService, NotifService],
   imports: [
-    TypeOrmModule.forFeature([User, Notif]),
+    TypeOrmModule.forFeature([User, Notif, Game]),
     AuthModule,
     JwtModule.register({
       secret: process.env.FT_SECRET,

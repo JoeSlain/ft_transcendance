@@ -9,6 +9,7 @@ import {
   Restriction,
   DirectMessage,
   Conversation,
+  Game,
 } from "src/database";
 import { GameModule } from "src/game/game.module";
 import { RoomService } from "src/game/room.service";
@@ -20,6 +21,7 @@ import { ChannelService } from "./channel.service";
 import { ChatController } from "./chat.controller";
 import { MessageService } from "./message.service";
 import { RestrictionService } from "./restrictions.service";
+import { GameService } from "src/game/game.service";
 
 @Module({
   controllers: [ChatController],
@@ -35,6 +37,7 @@ import { RestrictionService } from "./restrictions.service";
       Restriction,
       DirectMessage,
       Conversation,
+      Game,
     ]),
   ],
   providers: [
@@ -45,6 +48,7 @@ import { RestrictionService } from "./restrictions.service";
     ChannelService,
     MessageService,
     RestrictionService,
+    GameService,
   ],
 })
 export class ChatModule {}

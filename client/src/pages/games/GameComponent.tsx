@@ -1,34 +1,18 @@
 import "../../styles/gameComponent.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef } from "react";
 import { CanvasRef } from "./type";
-import { gameData } from "../../types/gameType";
 import useGameEvents from "../../hooks/gameEvents/useGameEvents";
 import { GameContext } from "../../context/socketContext";
+import { roomType } from "../../types/roomType";
 
 type Props = {
-  game: gameData;
-  setGame: (game: gameData) => void;
+  setRoom: (room: roomType) => void;
 };
 
-type CdProps = {
-  timer: number;
-  setTimer: (timer: number) => void;
-};
-
-function GameComponent() {
+function GameComponent({ setRoom }: Props) {
   const canvasRef: CanvasRef = useRef<HTMLCanvasElement>(null);
-  const [timer, setTimer] = useState(3);
   const socket = useContext(GameContext);
-  const game = useGameEvents({ canvasRef });
-
-  useEffect(() => {
-    console.log("timer", timer);
-    if (timer) {
-      setTimeout(() => {
-        setTimer(timer - 1);
-      }, 1000);
-    } else socket.emit("startGame", game);
-  }, [timer]);
+  const game = useGameEvents({ canvasRef, setRoom });
 
   const rematch = () => {
     socket.emit("rematch", game);
@@ -51,7 +35,6 @@ function GameComponent() {
           id="game-canvas"
           ref={canvasRef}
         ></canvas>
-        {timer && <div className="timer"> {timer} </div>}
       </div>
     </div>
   );

@@ -36,7 +36,7 @@ export class GameGateway {
   logout(client: Socket, user: User) {
     let room = this.roomService.getUserRoom(user.id);
 
-    if (room) {
+    if (room && !room.gameStarted) {
       const roomLeft = this.roomService.leaveRoom(room.id, user.id);
       client.to(room.id).emit("leftRoom", roomLeft);
       client.leave(room.id);
@@ -129,11 +129,15 @@ export class GameGateway {
     const game = this.gameService.createGame(room);
 
     console.log("game", game);
-    const newRoom = { ...room, gameStarted: true };
-    this.roomService.rooms.set(room.id, newRoom);
-    this.roomService.usersRooms.set(room.host.infos.id, newRoom);
-    this.roomService.usersRooms.set(room.guest.infos.id, newRoom);
-    this.server.to(room.id).emit("gameCreated");
+    room = this.roomService.updateRoom(room.id, { ...room, gameStarted: true });
+    this.startGame(client, game);
+    this.server.emit("addGame", {
+      id: game.gameId,
+      player1: game.player1.infos.username,
+      player2: game.player2.infos.username,
+      score: "0/0",
+    });
+    this.server.to(room.id).emit("gameStarted", room);
   }
 
   @SubscribeMessage("getGame")
@@ -143,27 +147,45 @@ export class GameGateway {
     if (game) this.server.to(client.id).emit("newGame", game);
   }
 
+  @SubscribeMessage("getCurrentGames")
+  getCurrentGames(client: Socket, data: any) {
+    const games = this.gameService.getCurrentGames();
+
+    if (games) this.server.to(client.id).emit("newGames", games);
+  }
+
   @SubscribeMessage("startGame")
   startGame(client: Socket, game: GameType) {
     const gameLoop = setInterval(() => {
       game = this.gameService.games.get(game.gameId);
-      game = this.gameService.updateBall(game);
-
       // Vérification de la fin de la partie
       if (game.player1.score >= 10) {
         clearInterval(gameLoop);
         game.player1.win = true;
         game.gameRunning = false;
-      }
-      if (game.player2.score >= 10) {
+        console.log("score1");
+        this.gameService.register(game);
+      } else if (game.player2.score >= 10) {
         clearInterval(gameLoop);
         game.player2.win = true;
         game.gameRunning = false;
+        console.log("score2");
+        this.gameService.register(game);
+      } else game = this.gameService.updateBall(game);
+      if (game.scoreUpdate) {
+        game.scoreUpdate = false;
+        this.server.emit("updateGames", game);
       }
-      console.log("gameLoop", game);
       this.gameService.saveGame(game);
       this.server.to(game.gameId).emit("updateGameState", game);
-    }, 1000 / 20);
+      if (!game.gameRunning) {
+        this.server.to(game.gameId).emit("endGame", game);
+        this.gameService.deleteGame(game);
+        return;
+      }
+    }, 1000 / 30);
+
+    console.log("out game loop");
   }
 
   @SubscribeMessage("rematch")
@@ -173,19 +195,6 @@ export class GameGateway {
     this.server.to(game.gameId).emit("gameReset", game);
     this.startGame(client, game);
   }
-
-  /* @SubscribeMessage("startGame")
-  startGame(client: Socket, room: Room) {
-    console.log("start game event");
-    const game = this.gameService.createGame();
-    // this.gameService.addUsersFromRoom(room)
-    this.gameService.startGame(game);
-    this.server.to(room.id).emit("updateGameState", game);
-    /*client.to(room.id).emit("gameStarted", game);
-    console.log("start startGameLoop");
-    this.gameService.startGameLoop(game, room);
-    return game;
-  }*/
 
   @SubscribeMessage("movePaddle")
   movePaddle(client: Socket, data: any) {

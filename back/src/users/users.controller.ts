@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { User } from "src/database";
+import { Game, User } from "src/database";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AuthenticatedGuard } from "src/auth/42auth/42.guard";
@@ -200,5 +200,15 @@ export class UsersController {
     const user = await this.usersService.block(req.user.id, userId);
 
     return user;
+  }
+
+  @Get("games/:id")
+  @UseGuards(TwoFactorGuard)
+  async getGames(@Param() params) {
+    console.log(`get games ${params.id}`);
+    const games = await this.usersService.getGames(params.id);
+    console.log("returned games", games);
+
+    return games;
   }
 }
