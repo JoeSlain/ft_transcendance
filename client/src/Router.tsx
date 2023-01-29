@@ -27,6 +27,8 @@ import Modal from "./components/modal";
 import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
 import DirectMessages from "./components/DmsBar/DirectMessages";
 import GameComponent from "./pages/games/GameComponent";
+import { CountdownContext, CountdownType } from "./context/countDownContext";
+import useQueueEvents from "./hooks/gameEvents/useQueueEvents";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -35,45 +37,52 @@ export default function Router() {
   const [user, setUser] = useState<userType>(getSavedItem("user"));
   const [notifs, setNotifs] = useState<notifType[]>([]);
   const [modal, setModal] = useState<ModalType | null>(null);
+  const [countdown, setCountdown] = useState<CountdownType | null>(null);
 
   useLogginEvent({ user, setUser, setIsLogged, isLogged });
+  useQueueEvents({ countdown, setCountdown });
   useErrorEvent();
 
   return (
     <Auth.Provider value={isLogged}>
       <User.Provider value={{ user, setUser }}>
         <ModalContext.Provider value={{ setModal }}>
-          <Navbar setIsLogged={setIsLogged} />
-          {modal && <Modal header={modal.header} body={modal.body} />}
-          <div className="main">
-            <div className="w-[80%] ">
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/login/redirect"
-                  element={
-                    <Redirect setIsLogged={setIsLogged} setUser={setUser} />
-                  }
-                />
-                <Route element={<AuthRoute />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/play" element={<Play />} />
-                  <Route path="/games" element={<Games />} />
-                  <Route path="/chat" element={<Chat />} />
-                  <Route path="/profile">
-                    <Route index element={<MyProfile />} />
-                    <Route path=":id" element={<Profile />} />
-                    <Route path="stats" element={<Stats userId={user?.id} />} />
+          <CountdownContext.Provider value={{ countdown, setCountdown }}>
+            <Navbar setIsLogged={setIsLogged} />
+            {modal && <Modal header={modal.header} body={modal.body} />}
+            <div className="main">
+              <div className="w-[80%] ">
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/login/redirect"
+                    element={
+                      <Redirect setIsLogged={setIsLogged} setUser={setUser} />
+                    }
+                  />
+                  <Route element={<AuthRoute />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/play" element={<Play />} />
+                    <Route path="/games" element={<Games />} />
+                    <Route path="/chat" element={<Chat />} />
+                    <Route path="/profile">
+                      <Route index element={<MyProfile />} />
+                      <Route path=":id" element={<Profile />} />
+                      <Route
+                        path="stats"
+                        element={<Stats userId={user?.id} />}
+                      />
+                      <Route path="*" element={<PageNotFound />} />
+                    </Route>
                     <Route path="*" element={<PageNotFound />} />
                   </Route>
-                  <Route path="*" element={<PageNotFound />} />
-                </Route>
-              </Routes>
+                </Routes>
+              </div>
+              <div className="w-[20%]">{isLogged === true && <Contact />}</div>
             </div>
-            <div className="w-[20%]">{isLogged === true && <Contact />}</div>
-          </div>
-          {isLogged && <DirectMessages />}
+            {isLogged && <DirectMessages />}
+          </CountdownContext.Provider>
         </ModalContext.Provider>
       </User.Provider>
     </Auth.Provider>

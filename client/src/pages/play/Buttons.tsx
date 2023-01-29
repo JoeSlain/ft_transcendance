@@ -4,6 +4,7 @@ import User from "../../hooks/User";
 import { GameContext } from "../../context/socketContext";
 import GameComponent from "../games/GameComponent";
 import { useNavigate } from "react-router-dom";
+import { CountdownContext } from "../../context/countDownContext";
 
 type IProps = {
   room: roomType;
@@ -12,21 +13,22 @@ type IProps = {
 export default function Buttons({ room }: IProps) {
   const { user } = useContext(User);
   const socket = useContext(GameContext);
-  const [showCountdown, setShowCountdown] = useState(false);
+  /*const [showCountdown, setShowCountdown] = useState(false);
   const [countdown, setCountDown] = useState({
     min: 0,
     sec: 0,
-  });
+  });*/
+  const { countdown, setCountdown } = useContext(CountdownContext);
   let showStart = false;
   let playersReady = false;
   let showSearch = false;
   const showLeave = room.spectators.find((sp) => sp.id === user.id);
 
-  useEffect(() => {
+  /*useEffect(() => {
     socket.on("stopQueue", () => {
       console.log("stop queue");
-      setCountDown({ min: 0, sec: 0 });
-      setShowCountdown(false);
+      setCountdown(null);
+      //setShowCountdown(false);
     });
 
     return () => {
@@ -35,7 +37,7 @@ export default function Buttons({ room }: IProps) {
   }, []);
 
   useEffect(() => {
-    if (showCountdown) {
+    if (countdown) {
       const interval = setInterval(() => {
         console.log("countdown", countdown);
         let min = countdown.min;
@@ -44,13 +46,13 @@ export default function Buttons({ room }: IProps) {
           min += 1;
           sec = 0;
         }
-        setCountDown({ min, sec });
+        setCountdown({ min, sec });
       }, 1000);
       return () => {
         clearInterval(interval);
       };
     }
-  }, [showCountdown, countdown]);
+  }, [countdown]);*/
 
   if (room.host && room.host.infos.id === user.id) {
     if (room.guest) {
@@ -74,7 +76,7 @@ export default function Buttons({ room }: IProps) {
 
   const searchOpponent = () => {
     socket.emit("searchOpponent", user);
-    setShowCountdown(true);
+    setCountdown({ min: 0, sec: 0 });
     /*const interval = setInterval(() => {
       setCountDown((prev) => prev + 1);
       console.log("countdown", countdown);
@@ -83,8 +85,8 @@ export default function Buttons({ room }: IProps) {
 
   const stopSearch = () => {
     socket.emit("stopQueue", user);
-    setCountDown({ min: 0, sec: 0 });
-    setShowCountdown(false);
+    setCountdown(null);
+    //setShowCountdown(false);
   };
 
   return (
@@ -124,7 +126,7 @@ export default function Buttons({ room }: IProps) {
           Leave{" "}
         </button>
       )}
-      {showCountdown && (
+      {countdown && (
         <button
           className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
           style={{ width: "70px" }}
@@ -134,7 +136,7 @@ export default function Buttons({ room }: IProps) {
           Stop search{" "}
         </button>
       )}
-      {showCountdown && (
+      {countdown && (
         <div>
           {" "}
           Time in queue : {countdown.min}m{countdown.sec}s{" "}
