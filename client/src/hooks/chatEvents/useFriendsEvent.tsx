@@ -23,10 +23,11 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
 
     // new friend
     socket.on("newFriend", (data) => {
-      console.log("new Friend Event");
-      setFriends((prev: userType[]) => [...prev, data]);
+      console.log("new Friend Event", data);
+      setFriends((prev: userType[]) => [...prev, data.friend]);
       setStatuses(
-        (prev: Map<number, string>) => new Map(prev.set(data.id, "online"))
+        (prev: Map<number, string>) =>
+          new Map(prev.set(data.friend.id, data.status))
       );
     });
 

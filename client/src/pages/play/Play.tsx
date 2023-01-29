@@ -12,6 +12,8 @@ export default function Play() {
 
   useLobbyEvents({ setRoom });
 
+  console.log("room", room);
+
   if (room && room.gameStarted) {
     return <GameComponent setRoom={setRoom} />;
   }

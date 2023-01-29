@@ -18,7 +18,7 @@ export default function useLobbyEvents({ setRoom }: IProps) {
 
     // new room
     gameSocket.on("newRoom", (room) => {
-      console.log("newroom", room);
+      //console.log("newroom", room);
       setRoom(room);
     });
 

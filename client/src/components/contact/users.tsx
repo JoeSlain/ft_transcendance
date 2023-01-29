@@ -15,7 +15,7 @@ const getColor = (status?: string) => {
     case "online":
       return "green";
     case "ingame":
-      return "yellow";
+      return "red";
     default:
       return "grey";
   }

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Room } from "src/utils/types";
+import { GameInfos, Room } from "src/utils/types";
 import { GameType } from "../utils/types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Game } from "src/database";
@@ -16,6 +16,7 @@ export class GameService {
 
   users: Map<number, GameType> = new Map();
   games = new Map<string, GameType>();
+  //gameInfos = new Array<GameInfos>();
 
   newPlayer(width: number, height: number, id: number) {
     const player = {
@@ -33,7 +34,7 @@ export class GameService {
         xVel: 0,
         yVel: 0,
       },
-      id: -1,
+      infos: null,
     };
     return player;
   }
@@ -55,9 +56,9 @@ export class GameService {
     const gameId = room.id;
 
     const player1 = this.newPlayer(width, height, 1);
-    player1.id = room.host.infos.id;
+    player1.infos = room.host.infos;
     const player2 = this.newPlayer(width, height, 2);
-    player2.id = room.guest.infos.id;
+    player2.infos = room.guest.infos;
 
     const ball = this.newBall(width, height, 1);
     const game = {
@@ -67,22 +68,24 @@ export class GameService {
       player2,
       ball,
       gameRunning: true,
+      scoreUpdate: false,
       gameId,
     };
 
     this.saveGame(game);
+    //this.pushGameInfos(game, room);
     return game;
   }
 
   resetGame(game: GameType) {
-    const id1 = game.player1.id;
-    const id2 = game.player2.id;
+    const user1 = game.player1.infos;
+    const user2 = game.player2.infos;
 
     game.ball = this.newBall(game.width, game.height, 1);
     game.player1 = this.newPlayer(game.width, game.height, 1);
-    game.player1.id = id1;
+    game.player1.infos = user1;
     game.player2 = this.newPlayer(game.width, game.height, 2);
-    game.player1.id = id2;
+    game.player1.infos = user2;
     game.gameRunning = true;
     this.saveGame(game);
 
@@ -113,9 +116,11 @@ export class GameService {
     if (game.ball.x <= 0) {
       game.player2.score++;
       game.ball = this.newBall(game.width, game.height, -1);
+      game.scoreUpdate = true;
     } else if (game.ball.x >= game.width) {
       game.player1.score++;
       game.ball = this.newBall(game.width, game.height, 1);
+      game.scoreUpdate = true;
     }
     this.saveGame(game);
     return game;
@@ -151,15 +156,47 @@ export class GameService {
     return this.users.get(id);
   }
 
-  saveGame(game: GameType) {
-    this.games.set(game.gameId, game);
-    this.users.set(game.player1.id, game);
-    this.users.set(game.player2.id, game);
+  getCurrentGames() {
+    const games = [];
+    const iter = this.games.values();
+
+    while (iter) {
+      console.log("iter", iter);
+      const current = iter.next().value;
+      if (!current) return games;
+      console.log("current", current);
+      games.push({
+        id: current.gameId,
+        player1: current.player1.infos.username,
+        player2: current.player2.infos.username,
+        score: `${current.player1.score}/${current.player2.score}`,
+      });
+    }
+
+    console.log("games", games);
+    return games;
   }
 
-  deleteGame(gameId: string): void {
-    this.games.delete(gameId);
+  saveGame(game: GameType) {
+    this.games.set(game.gameId, game);
+    this.users.set(game.player1.infos.id, game);
+    this.users.set(game.player2.infos.id, game);
   }
+
+  deleteGame(game: GameType): void {
+    this.games.delete(game.gameId);
+    this.users.delete(game.player1.infos.id);
+    this.users.delete(game.player2.infos.id);
+  }
+
+  /*pushGameInfos(game: GameType, room: Room) {
+    this.gameInfos.push({
+      id: game.gameId,
+      player1: room.host.infos.username,
+      player2: room.guest.infos.username,
+      score: '0/0',
+    })
+  }*/
 
   movePaddle(game: GameType, playerId: number, direction: string) {
     if (playerId === 1) {
@@ -185,9 +222,11 @@ export class GameService {
     console.log("registering game", game);
     const room = this.roomService.findRoom(game.gameId);
     const newGame = this.gameRepo.create({
-      user1: room.host.infos,
-      user2: room.guest.infos,
-      winnerId: game.player1.win ? game.player1.id : game.player2.id,
+      user1: game.player1.infos,
+      user2: game.player2.infos,
+      winnerId: game.player1.win
+        ? game.player1.infos.id
+        : game.player2.infos.id,
       score1: game.player1.score,
       score2: game.player2.score,
       date: new Date().toISOString().slice(0, 10),
