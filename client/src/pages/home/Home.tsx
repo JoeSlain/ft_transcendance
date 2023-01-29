@@ -2,8 +2,6 @@ import "../../styles/Home.css";
 import "../../styles/global.css";
 import "../../styles/contact.css";
 import React, { useContext, useEffect, useState } from "react";
-import Auth from "../../hooks/Auth";
-import TableRow from "../../components/tableRow";
 import { GameContext } from "../../context/socketContext";
 import { GameInfos } from "../../types/gameType";
 import TableGamesRow from "../../components/tableGamesRow";
