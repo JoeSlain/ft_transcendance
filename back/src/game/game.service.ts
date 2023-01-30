@@ -44,7 +44,7 @@ export class GameService {
       x: width / 2 - 5,
       y: height / 2 - 5,
       speedX: 10,
-      speedY: 5,
+      speedY: (Math.random() * 2 - 1) * 10,
       xVel: vel,
     };
     return ball;
@@ -102,17 +102,6 @@ export class GameService {
     if (game.ball.y < 0 || game.ball.y + 10 > game.height)
       game.ball.speedY *= -1;
 
-    // Vérifier la collision avec les paddles
-    if (
-      (game.ball.x < game.player1.x + game.player1.width &&
-        game.ball.y > game.player1.y &&
-        game.ball.y < game.player1.y + game.player1.height) ||
-      (game.ball.x + 10 > game.player2.x &&
-        game.ball.y > game.player2.y &&
-        game.ball.y < game.player2.y + game.player2.height)
-    ) {
-      game.ball.speedX *= -1;
-    }
     if (game.ball.x <= 0) {
       game.player2.score++;
       game.ball = this.newBall(game.width, game.height, -1);
@@ -121,6 +110,15 @@ export class GameService {
       game.player1.score++;
       game.ball = this.newBall(game.width, game.height, 1);
       game.scoreUpdate = true;
+    } else if (
+      (game.ball.x < game.player1.x + game.player1.width &&
+        game.ball.y > game.player1.y &&
+        game.ball.y < game.player1.y + game.player1.height) ||
+      (game.ball.x + 10 > game.player2.x &&
+        game.ball.y > game.player2.y &&
+        game.ball.y < game.player2.y + game.player2.height)
+    ) {
+      game.ball.speedX *= -1;
     }
     this.saveGame(game);
     return game;
