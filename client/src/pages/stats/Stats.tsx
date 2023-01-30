@@ -57,12 +57,12 @@ export default function Stats() {
     );
   }
   if (data) {
-    //data.n_win = 7;
-    //data.n_lose = 3;
     let win_percentage, loss_percentage;
     if (data.n_win || data.n_lose) {
       win_percentage = (data.n_win / (data.n_lose + data.n_win)) * 100;
+      win_percentage = Math.ceil(win_percentage);
       loss_percentage = (data.n_lose / (data.n_lose + data.n_win)) * 100;
+      loss_percentage = Math.ceil(loss_percentage);
     } else {
       win_percentage = 0;
       loss_percentage = 0;

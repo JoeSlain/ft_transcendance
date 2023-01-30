@@ -14,9 +14,13 @@
 }
 */
 
+import { useNavigate } from "react-router-dom";
+import { userType } from "../types/userType";
+
 export default function TableRow(props: { row: any; user: any }) {
-  let me, opponent, winner;
+  let me, winner, opponent: userType;
   let myScore, opponentScore, result;
+  const navigate = useNavigate();
 
   if (props.user.id === props.row.user1.id) {
     me = props.row.user1;
@@ -36,10 +40,15 @@ export default function TableRow(props: { row: any; user: any }) {
     winner = opponent;
     result = "loss";
   }
+
   const score =
     me.id === winner.id
       ? `${myScore}/${opponentScore}`
       : `${opponentScore}/${myScore}`;
+
+  const getProfile = () => {
+    navigate(`/profile/${opponent.id}`);
+  };
 
   return (
     <>
@@ -48,6 +57,9 @@ export default function TableRow(props: { row: any; user: any }) {
         <td>{result}</td>
         <td>{score}</td>
         <td>{props.row.date}</td>
+        <td onClick={getProfile} className="btn btn-primary">
+          Get profile
+        </td>
       </tr>
     </>
   );

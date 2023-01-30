@@ -190,7 +190,9 @@ export class GameGateway {
     room = await this.gameService.updateRoom(room, gameInfos);
     this.server.to(room.id).emit("endGame", room);
     this.server.to(room.id).emit("updateStatus", "online");
-    //this.server.to(room.id).emit("updateElo", gameInfos);
+    this.server
+      .to(room.id)
+      .emit("updateElo", { host: room.host.infos, guest: room.guest.infos });
     this.server.emit("deleteGame", game);
     this.gameService.deleteGame(game);
   }
