@@ -161,10 +161,8 @@ export class GameService {
     const iter = this.games.values();
 
     while (iter) {
-      console.log("iter", iter);
       const current = iter.next().value;
       if (!current) return games;
-      console.log("current", current);
       games.push({
         id: current.gameId,
         player1: current.player1.infos,
@@ -173,7 +171,6 @@ export class GameService {
       });
     }
 
-    console.log("games", games);
     return games;
   }
 
@@ -237,6 +234,7 @@ export class GameService {
   async updateUsersElo(gameInfos: Game) {
     let winner, loser;
 
+    // set winner/loser
     if (gameInfos.user1.id === gameInfos.winnerId) {
       winner = gameInfos.user1;
       loser = gameInfos.user2;
@@ -244,7 +242,7 @@ export class GameService {
       winner = gameInfos.user2;
       loser = gameInfos.user1;
     }
-
+    // update stats
     if (winner.elo > loser.elo) {
       winner.elo += 1;
       loser.elo -= 1;
@@ -255,7 +253,9 @@ export class GameService {
       winner.elo += 20;
       loser.elo -= 20;
     }
-
+    winner.n_win++;
+    loser.n_lose++;
+    // save stats
     winner = await this.userRepo.save(winner);
     loser = await this.userRepo.save(loser);
     return { winner, loser };

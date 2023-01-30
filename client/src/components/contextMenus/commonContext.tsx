@@ -27,6 +27,7 @@ export const CommonContext = ({ selected }: UserProps) => {
 
   const handleSpectate = () => {
     gameSocket.emit("spectate", { user: selected, me: user });
+    navigate("/play");
     console.log("spectate", selected);
   };
 
