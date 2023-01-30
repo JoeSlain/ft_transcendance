@@ -221,7 +221,7 @@ export class GameGateway {
         this.endGame(game);
         return;
       }
-    }, 1000 / 30);
+    }, 10000);
 
     console.log("out game loop");
   }

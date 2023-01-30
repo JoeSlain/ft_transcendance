@@ -13,7 +13,7 @@ export default function Play() {
   useLobbyEvents({ setRoom });
 
   if (room && room.gameStarted) {
-    return <GameComponent setRoom={setRoom} />;
+    return <GameComponent room={room} setRoom={setRoom} />;
   }
 
   if (room) {
