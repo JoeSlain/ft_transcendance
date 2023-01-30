@@ -66,6 +66,14 @@ export default function Home() {
       setGames((prev: any) => [...prev, game]);
     });
 
+    socket.on("deleteGame", (game) => {
+      console.log("deleting game", game);
+      setGames((prev: any) => {
+        console.log("prev", prev);
+        return prev.filter((g: GameInfos) => g.id !== game.gameId);
+      });
+    });
+
     socket.on("updateGames", (data) => {
       console.log("updating", data);
       setGames((prev: any) => {

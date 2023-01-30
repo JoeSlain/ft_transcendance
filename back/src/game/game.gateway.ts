@@ -60,16 +60,19 @@ export class GameGateway {
     console.log("join event");
     let room = this.roomService.getUserRoom(data.id);
 
+    // check room
     if (!room) {
       this.server.to(client.id).emit("error", "game room not found");
       return null;
     }
+    // leave previous room
     const prevRoom = this.roomService.getUserRoom(data.user.id);
     if (prevRoom) {
       if (prevRoom.id !== room.id && !prevRoom.gameStarted)
         this.leaveRoom(client, { roomId: prevRoom.id, user: data.user });
       else return;
     }
+    // add user to room
     room = this.roomService.joinRoom(data.user, room);
     this.roomService.usersRooms.set(data.user.id, room);
     client.join(room.id);
@@ -97,18 +100,21 @@ export class GameGateway {
     console.log("spectatate event");
     let room = this.roomService.usersRooms.get(data.user.id);
 
+    // check room
     if (!room) {
       this.server
         .to(client.id)
         .emit("error", ` ${data.user.username} is not currently in a game`);
       return;
     }
+    // leave previous room
     const prevRoom = this.roomService.getUserRoom(data.me.id);
     if (prevRoom) {
       if (prevRoom.id !== room.id && !prevRoom.gameStarted)
         this.leaveRoom(client, { roomId: prevRoom.id, user: data.me });
       else return;
     }
+    // add spectator to room
     room = this.roomService.addSpectator(data.me, room);
     this.roomService.rooms.set(room.id, room);
     this.roomService.usersRooms.set(data.me.id, room);
@@ -129,14 +135,18 @@ export class GameGateway {
     const game = this.gameService.createGame(room);
 
     console.log("game", game);
+    // room.gameStarted to true
     room = this.roomService.updateRoom(room.id, { ...room, gameStarted: true });
+    // start mainloop
     this.startGame(client, game);
+    // send new game to ongoing games
     this.server.emit("addGame", {
       id: game.gameId,
-      player1: game.player1.infos.username,
-      player2: game.player2.infos.username,
+      player1: game.player1.infos,
+      player2: game.player2.infos,
       score: "0/0",
     });
+    // signal clients that game started
     this.server.to(room.id).emit("gameStarted", room);
   }
 
@@ -154,6 +164,22 @@ export class GameGateway {
     if (games) this.server.to(client.id).emit("newGames", games);
   }
 
+  endGame(game: GameType) {
+    const room = this.roomService.findRoom(game.gameId);
+
+    // room game started to false
+    this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
+    // save game in db
+    this.gameService.register(game);
+
+    // delete game
+    this.server.to(game.gameId).emit("endGame", game);
+    this.server.emit("deleteGame", game);
+    this.gameService.deleteGame(game);
+
+    // update player elos
+  }
+
   @SubscribeMessage("startGame")
   startGame(client: Socket, game: GameType) {
     const gameLoop = setInterval(() => {
@@ -163,15 +189,13 @@ export class GameGateway {
         clearInterval(gameLoop);
         game.player1.win = true;
         game.gameRunning = false;
-        console.log("score1");
-        this.gameService.register(game);
       } else if (game.player2.score >= 10) {
         clearInterval(gameLoop);
         game.player2.win = true;
         game.gameRunning = false;
-        console.log("score2");
-        this.gameService.register(game);
       } else game = this.gameService.updateBall(game);
+
+      // update game
       if (game.scoreUpdate) {
         game.scoreUpdate = false;
         this.server.emit("updateGames", game);
@@ -179,8 +203,7 @@ export class GameGateway {
       this.gameService.saveGame(game);
       this.server.to(game.gameId).emit("updateGameState", game);
       if (!game.gameRunning) {
-        this.server.to(game.gameId).emit("endGame", game);
-        this.gameService.deleteGame(game);
+        this.endGame(game);
         return;
       }
     }, 1000 / 30);
@@ -210,12 +233,14 @@ export class GameGateway {
   emitOpponent(client: Socket, user: User, opponent: User) {
     console.log("emit stop queue");
     const room = this.roomService.getUserRoom(opponent.id);
+    // stop queue
     this.server.to(room.id).emit("stopQueue");
     this.server.to(client.id).emit("stopQueue");
     if (!opponent) {
       console.log("opponent null, returning");
       return;
     }
+    // join room
     console.log(`user ${user.username} joining room ${room.id}`);
     this.joinRoom(client, { user, id: opponent.id });
   }
@@ -227,11 +252,13 @@ export class GameGateway {
     let n = 0;
     let opponent = this.queueService.findOpponent(user.id, user.elo, eloRange);
 
+    // find opponent
     if (opponent) {
       console.log(`opponent found ${opponent.username}`);
       this.emitOpponent(client, user, opponent);
       return;
     }
+    // queue up
     console.log(`opponent not found, queueing user ${user.username}`);
     const index = this.queueService.queueUp(user);
     const interval = setInterval(() => {

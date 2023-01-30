@@ -1,9 +1,9 @@
 import { userType } from "./userType";
 
 export type GameInfos = {
-  id: number;
-  user1: string;
-  user2: string;
+  id: string;
+  user1: userType;
+  user2: userType;
   score: string;
 };
 

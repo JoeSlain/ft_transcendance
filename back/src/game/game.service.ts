@@ -167,8 +167,8 @@ export class GameService {
       console.log("current", current);
       games.push({
         id: current.gameId,
-        player1: current.player1.infos.username,
-        player2: current.player2.infos.username,
+        player1: current.player1.infos,
+        player2: current.player2.infos,
         score: `${current.player1.score}/${current.player2.score}`,
       });
     }
@@ -220,7 +220,6 @@ export class GameService {
 
   async register(game: GameType) {
     console.log("registering game", game);
-    const room = this.roomService.findRoom(game.gameId);
     const newGame = this.gameRepo.create({
       user1: game.player1.infos,
       user2: game.player2.infos,
@@ -231,8 +230,6 @@ export class GameService {
       score2: game.player2.score,
       date: new Date().toISOString().slice(0, 10),
     });
-
-    this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
 
     return await this.gameRepo.save(newGame);
   }

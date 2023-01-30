@@ -156,11 +156,12 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       gameSocket.off("newGame");
-      gameSocket.off("resetGame");
-      gameSocket.off("updateBall");
+      gameSocket.off("gameReset");
       gameSocket.off("updateGameState");
-      gameSocket.off("win");
+      gameSocket.off("endGame");
+      gameSocket.off("updateBall");
       gameSocket.off("updatePaddle");
+      gameSocket.off("win");
     };
   }, []);
 
