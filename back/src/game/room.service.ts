@@ -52,6 +52,9 @@ export class RoomService {
     this.rooms.set(roomId, room);
     this.usersRooms.set(room.host.infos.id, room);
     this.usersRooms.set(room.guest.infos.id, room);
+    room.spectators.forEach((spectator) => {
+      this.usersRooms.set(spectator.id, room);
+    });
     return room;
   }
 

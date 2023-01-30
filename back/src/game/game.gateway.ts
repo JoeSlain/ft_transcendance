@@ -111,9 +111,12 @@ export class GameGateway {
     // leave previous room
     const prevRoom = this.roomService.getUserRoom(data.me.id);
     if (prevRoom) {
-      if (prevRoom.id !== room.id && !prevRoom.gameStarted)
-        this.leaveRoom(client, { roomId: prevRoom.id, user: data.me });
-      else return;
+      if (
+        this.gameService.getGameForUser(data.me.id) ||
+        prevRoom.id === room.id
+      )
+        return;
+      this.leaveRoom(client, { roomId: prevRoom.id, user: data.me });
     }
     // add spectator to room
     room = this.roomService.addSpectator(data.me, room);
