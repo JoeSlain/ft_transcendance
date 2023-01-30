@@ -1,7 +1,8 @@
 import { useContext, useEffect } from "react";
-import { ChatContext } from "../../context/socketContext";
+import { ChatContext, GameContext } from "../../context/socketContext";
 import { userType } from "../../types/userType";
 import User from "../User";
+import { saveItem } from "../../utils/storage";
 
 type IProps = {
   setFriends: (props: any) => void;
@@ -9,20 +10,21 @@ type IProps = {
 };
 
 export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
-  const socket = useContext(ChatContext);
-  const { user } = useContext(User);
+  const chatSocket = useContext(ChatContext);
+  const gameSocket = useContext(GameContext);
+  const { user, setUser } = useContext(User);
 
   useEffect(() => {
-    socket.emit("getFriends", user);
+    chatSocket.emit("getFriends", user);
 
-    socket.on("friends", (data) => {
+    chatSocket.on("friends", (data) => {
       console.log("get friends event");
       setFriends(data.friends);
       setStatuses(new Map(JSON.parse(data.statuses)));
     });
 
     // new friend
-    socket.on("newFriend", (data) => {
+    chatSocket.on("newFriend", (data) => {
       console.log("new Friend Event", data);
       setFriends((prev: userType[]) => [...prev, data.friend]);
       setStatuses(
@@ -32,7 +34,7 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
     });
 
     // update friend status
-    socket.on("updateStatus", (data) => {
+    chatSocket.on("updateStatus", (data) => {
       console.log("friend update event", data);
       setFriends((prev: userType[]) => {
         return prev.map((friend) => {
@@ -51,18 +53,36 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
       });
     });
 
-    socket.on("friendDeleted", (data) => {
+    chatSocket.on("friendDeleted", (data) => {
       console.log("delete friend event");
       setFriends((prev: userType[]) =>
         prev.filter((friend) => friend.id !== data.id)
       );
     });
 
+    gameSocket.on("updateStatus", (status) => {
+      chatSocket.emit("updateUserStatus", { user, status });
+    });
+
+    /*gameSocket.on("updateElo", (gameInfos) => {
+      chatSocket.emit("updateUserElo", { user, gameInfos });
+    });
+
+    chatSocket.on("eloUpdated", (newUser) => {
+      console.log("elo updated");
+      setUser(newUser);
+      saveItem("user", newUser);
+      gameSocket.emit("eloUpdated", newUser);
+    });*/
+
     return () => {
-      socket.off("friends");
-      socket.off("newFriend");
-      socket.off("updateStatus");
-      socket.off("friendDeleted");
+      chatSocket.off("friends");
+      chatSocket.off("newFriend");
+      chatSocket.off("updateStatus");
+      chatSocket.off("friendDeleted");
+      gameSocket.off("updateStatus");
+      //gameSocket.off("updateElo");
+      //chatSocket.off("eloUpdated");
     };
   }, []);
 }

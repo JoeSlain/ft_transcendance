@@ -75,6 +75,8 @@ export default function Buttons({ room }: IProps) {
   };
 
   const searchOpponent = () => {
+    console.log(`search opponent, my elo = ${user.elo}`);
+    console.log(`my wins = ${user.n_win}, my losses = ${user.n_lose}`);
     socket.emit("searchOpponent", user);
     setCountdown({ min: 0, sec: 0 });
     /*const interval = setInterval(() => {

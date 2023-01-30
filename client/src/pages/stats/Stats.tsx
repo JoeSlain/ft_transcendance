@@ -4,6 +4,9 @@ import "../../styles/global.css";
 import CSS from "csstype";
 import History from "./History";
 import ProfileNavbar from "../profil/Navbar";
+import { useContext } from "react";
+import { useParams } from "react-router-dom";
+import User from "../../hooks/User";
 
 const win: CSS.Properties = {
   backgroundColor: "#4ade80",
@@ -12,10 +15,14 @@ const lose: CSS.Properties = {
   backgroundColor: "#f87171",
 };
 
-export default function Stats(props: { userId: number }) {
+export default function Stats() {
+  const { user } = useContext(User);
+  const param = useParams().id;
+  const userId = param ? parseInt(param) : user.id;
+
   //get user
   let { isLoading, data, error } = useQuery({
-    queryKey: ["userData", props.userId],
+    queryKey: ["userData", userId],
     queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
   });
   /*   isLoading = true;
@@ -50,20 +57,26 @@ export default function Stats(props: { userId: number }) {
     );
   }
   if (data) {
-    data.n_win = 7;
-    data.n_lose = 3;
+    //data.n_win = 7;
+    //data.n_lose = 3;
+    let win_percentage, loss_percentage;
+    if (data.n_win || data.n_lose) {
+      win_percentage = (data.n_win / (data.n_lose + data.n_win)) * 100;
+      loss_percentage = (data.n_lose / (data.n_lose + data.n_win)) * 100;
+    } else {
+      win_percentage = 0;
+      loss_percentage = 0;
+    }
     return (
       <>
-        <ProfileNavbar userId={props.userId} />
+        <ProfileNavbar userId={userId} />
 
         <div className="flex flex-col justify-center gap-10 items-center pt-5 ">
           <div className="stats shadow mb-5 justify-center">
             <div className="stat " style={win}>
               <div className="stat-title">Wins</div>
               <div className="stat-value">{data.n_win}</div>
-              <div className="stat-desc">
-                {(data.n_win / (data.n_lose + data.n_win)) * 100}% wins
-              </div>
+              <div className="stat-desc">{win_percentage}% wins</div>
             </div>
             <div className="stat ">
               <div className="stat-title">Elo</div>
@@ -72,12 +85,10 @@ export default function Stats(props: { userId: number }) {
             <div className="stat " style={lose}>
               <div className="stat-title">Losses</div>
               <div className="stat-value">{data.n_lose}</div>
-              <div className="stat-desc">
-                {(data.n_lose / (data.n_lose + data.n_win)) * 100}% losses
-              </div>
+              <div className="stat-desc">{loss_percentage}% losses</div>
             </div>
           </div>
-          <History userId={props.userId} />
+          <History userId={userId} />
         </div>
       </>
     );

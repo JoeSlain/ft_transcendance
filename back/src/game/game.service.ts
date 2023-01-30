@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { GameInfos, Room } from "src/utils/types";
+import { Room } from "src/utils/types";
 import { GameType } from "../utils/types";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Game } from "src/database";
+import { Game, User } from "src/database";
 import { Repository } from "typeorm";
-import { date } from "joi";
 import { RoomService } from "./room.service";
 
 @Injectable()
 export class GameService {
   constructor(
     @InjectRepository(Game) private gameRepo: Repository<Game>,
+    @InjectRepository(User) private userRepo: Repository<User>,
     private readonly roomService: RoomService
   ) {}
 
@@ -167,8 +167,8 @@ export class GameService {
       console.log("current", current);
       games.push({
         id: current.gameId,
-        player1: current.player1.infos.username,
-        player2: current.player2.infos.username,
+        player1: current.player1.infos,
+        player2: current.player2.infos,
         score: `${current.player1.score}/${current.player2.score}`,
       });
     }
@@ -220,7 +220,6 @@ export class GameService {
 
   async register(game: GameType) {
     console.log("registering game", game);
-    const room = this.roomService.findRoom(game.gameId);
     const newGame = this.gameRepo.create({
       user1: game.player1.infos,
       user2: game.player2.infos,
@@ -232,8 +231,49 @@ export class GameService {
       date: new Date().toISOString().slice(0, 10),
     });
 
-    this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
-
     return await this.gameRepo.save(newGame);
+  }
+
+  async updateUsersElo(gameInfos: Game) {
+    let winner, loser;
+
+    if (gameInfos.user1.id === gameInfos.winnerId) {
+      winner = gameInfos.user1;
+      loser = gameInfos.user2;
+    } else {
+      winner = gameInfos.user2;
+      loser = gameInfos.user1;
+    }
+
+    if (winner.elo > loser.elo) {
+      winner.elo += 1;
+      loser.elo -= 1;
+    } else if (winner.elo === loser.elo) {
+      winner.elo += 10;
+      loser.elo -= 10;
+    } else {
+      winner.elo += 20;
+      loser.elo -= 20;
+    }
+
+    winner = await this.userRepo.save(winner);
+    loser = await this.userRepo.save(loser);
+    return { winner, loser };
+  }
+
+  async updateRoom(room: Room, gameInfos: Game) {
+    const { winner, loser } = await this.updateUsersElo(gameInfos);
+
+    if (winner.id === room.host.infos.id) {
+      room.host.infos = winner;
+      room.guest.infos = loser;
+    } else {
+      room.host.infos = loser;
+      room.guest.infos = winner;
+    }
+    room.gameStarted = false;
+    this.roomService.updateRoom(room.id, room);
+
+    return room;
   }
 }

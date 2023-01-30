@@ -141,6 +141,32 @@ export class UsersService {
     return this.usersRepository.save(user); */
   }
 
+  /*async updateUserElo(userId: number, gameInfos: Game) {
+    const win = userId === gameInfos.winnerId;
+    let me, opponent;
+
+    if (gameInfos.user1.id === userId) {
+      me = gameInfos.user1;
+      opponent = gameInfos.user2;
+    } else {
+      me = gameInfos.user2;
+      opponent = gameInfos.user1;
+    }
+    if (win) {
+      if (me.elo > opponent.elo) me.elo += 1;
+      else if (me.elo === opponent.elo) me.elo += 10;
+      else me.elo += 20;
+      me.n_win++;
+    } else {
+      if (me.elo > opponent.elo) me.elo -= 20;
+      else if (me.elo === opponent.elo) me.elo -= 10;
+      else me.elo -= 1;
+      me.n_lose++;
+    }
+
+    return await this.usersRepository.save(me);
+  }*/
+
   async uploadAvatar(userId: number, url: string) {
     await this.usersRepository.update(userId, {
       avatar: url,

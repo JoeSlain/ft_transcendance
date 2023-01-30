@@ -61,8 +61,8 @@ export type Room = {
 // pong game
 export type GameInfos = {
   id: string;
-  player1: string;
-  player2: string;
+  player1: User;
+  player2: User;
   score: string;
 };
 

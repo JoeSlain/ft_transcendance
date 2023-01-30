@@ -12,14 +12,13 @@ import useUserQuery from "../../services/User/useUserIdQuery";
 
 export default function Profile() {
   const userId = useParams().id || "";
-  const {
-    isLoading: avatarLoading,
-    error: avatarErr,
-    data: avatar,
-  } = useQuery({
-    queryKey: ["avatar", userId],
-    queryFn: ({ queryKey }) => getAvatar(parseInt(queryKey[1])),
-  });
+  console.log("profile user id", userId);
+  const { isLoading: avatarLoading, error: avatarErr, data: avatar } = useQuery(
+    {
+      queryKey: ["avatar", userId],
+      queryFn: ({ queryKey }) => getAvatar(parseInt(queryKey[1])),
+    }
+  );
   const {
     isLoading: isCurrentLoading,
     data: user,

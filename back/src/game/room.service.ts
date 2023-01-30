@@ -1,9 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { string } from "joi";
 import { User } from "src/database";
 import { generateRandomId } from "src/utils/functions";
 import { Room, RoomUser } from "src/utils/types";
-import { UpdateResult } from "typeorm";
 
 @Injectable()
 export class RoomService {
