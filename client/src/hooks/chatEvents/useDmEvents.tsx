@@ -29,7 +29,7 @@ export default function useDmEvents({ setConvs }: Props) {
             (conversation, index, self) =>
               index ===
               self.findIndex(
-                (t) => t.id === conversation.id && t.to === conversation.to));
+                (t) => t.id === conversation.id));
           //filter to avoid duplicate
           setConvs(uniqueArray);
           saveItem("convs", uniqueArray);
