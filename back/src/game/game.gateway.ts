@@ -1,17 +1,14 @@
 import {
-  OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
-import { userInfo } from "os";
 import { Socket, Namespace } from "socket.io";
 import { User } from "src/database";
-import { GameType, NotifData, Room } from "src/utils/types";
+import { GameType, Room } from "src/utils/types";
 import { GameService } from "./game.service";
 import { RoomService } from "./room.service";
 import { QueueService } from "./queue.service";
-import { RoutesMapper } from "@nestjs/core/middleware/routes-mapper";
 
 @WebSocketGateway(3003, {
   cors: {
@@ -226,7 +223,7 @@ export class GameGateway {
         this.endGame(game);
         return;
       }
-    }, 1000 / 50);
+    }, 1000 / 30);
 
     console.log("out game loop");
   }

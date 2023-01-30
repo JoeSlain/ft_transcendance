@@ -126,24 +126,6 @@ export class GameService {
     return game;
   }
 
-  /*resetBall(game: GameType): GameType {
-    // Réinitialisation de la position de la balle au centre du canvas
-    game.ball.x = game.width / 2 - 5;
-    game.ball.y = game.height / 2 - 5;
-
-    // Réinitialisation de la vitesse de la balle
-    game.ball.speedX = 10;
-    game.ball.speedY = 5;
-
-    // Sélection aléatoire de la direction initiale de la balle
-    if (Math.random() > 0.5) {
-      game.ball.xVel = 1;
-    } else {
-      game.ball.xVel = -1;
-    }
-    return game;
-  }*/
-
   startGame(game: GameType) {
     game.gameRunning = true;
   }
@@ -185,15 +167,6 @@ export class GameService {
     this.users.delete(game.player1.infos.id);
     this.users.delete(game.player2.infos.id);
   }
-
-  /*pushGameInfos(game: GameType, room: Room) {
-    this.gameInfos.push({
-      id: game.gameId,
-      player1: room.host.infos.username,
-      player2: room.guest.infos.username,
-      score: '0/0',
-    })
-  }*/
 
   movePaddle(game: GameType, playerId: number, direction: string) {
     if (playerId === 1) {
@@ -272,6 +245,8 @@ export class GameService {
       room.guest.infos = winner;
     }
     room.gameStarted = false;
+    room.host.ready = false;
+    room.guest.ready = false;
     this.roomService.updateRoom(room.id, room);
 
     return room;
