@@ -4,6 +4,7 @@ import "../../styles/global.css";
 import CSS from "csstype";
 import History from "./History";
 import ProfileNavbar from "../profil/Navbar";
+import useUserQuery from "../../services/User/useUserIdQuery";
 
 const win: CSS.Properties = {
   backgroundColor: "#4ade80",
@@ -14,12 +15,8 @@ const lose: CSS.Properties = {
 
 export default function Stats(props: { userId: number }) {
   //get user
-  let { isLoading, data, error } = useQuery({
-    queryKey: ["userData", props.userId],
-    queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
-  });
-  /*   isLoading = true;
-  error = true; */
+  const { isLoading, data, error } = useUserQuery(props.userId.toString())
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center heightMinusNavProfile ">
@@ -50,8 +47,6 @@ export default function Stats(props: { userId: number }) {
     );
   }
   if (data) {
-    data.n_win = 7;
-    data.n_lose = 3;
     return (
       <>
         <ProfileNavbar userId={props.userId} />
