@@ -148,6 +148,7 @@ export class GameGateway {
     });
     // signal clients that game started
     this.server.to(room.id).emit("gameStarted", room);
+    this.server.to(room.id).emit("updateStatus", "ingame");
   }
 
   @SubscribeMessage("getGame")
@@ -174,6 +175,7 @@ export class GameGateway {
 
     // delete game
     this.server.to(game.gameId).emit("endGame", game);
+    this.server.to(room.id).emit("updateStatus", "online");
     this.server.emit("deleteGame", game);
     this.gameService.deleteGame(game);
 

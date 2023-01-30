@@ -18,7 +18,7 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
   const [game, setGame] = useState<gameData | null>(null);
 
   function drawBoardDetails(ctx: CanvasRenderingContext2D, game: gameData) {
-    console.log("game data", game);
+    //console.log("game data", game);
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 5;
     ctx.strokeRect(10, 10, game.width - 20, game.height - 20);
@@ -42,7 +42,7 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       console.error("Unable to find canvas element with id 'game-canvas");
       return;
     }
-    console.log("updating canvas");
+    //console.log("updating canvas");
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
@@ -75,14 +75,6 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
     gameSocket.on("newGame", (data) => {
       console.log("game", data);
       setGame(data);
-      if (data.player1.infos.id === user.id) {
-        setPlayerId(1);
-        chatSocket.emit("updateUserStatus", { user, status: "ingame" });
-      } else if (data.player2.infos.id === user.id) {
-        setPlayerId(2);
-        chatSocket.emit("updateUserStatus", { user, status: "ingame" });
-      }
-      //updateCanvas();
     });
 
     gameSocket.on("gameReset", (game: gameData) => {
@@ -109,11 +101,6 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       setRoom((prev: any) => {
         return { ...prev, gameStarted: false };
       });
-      if (
-        game.player1.infos.id === user.id ||
-        game.player2.infos.id === user.id
-      )
-        chatSocket.emit("updateUserStatus", { user, status: "online" });
     });
 
     gameSocket.on("updateBall", (ball) => {
@@ -168,12 +155,12 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
   // keydown
   useEffect(() => {
     if (!key) {
-      console.log("key null");
+      //console.log("key null");
       return;
     }
     if (key === "ArrowUp" || key === "ArrowDown") {
-      console.log("key pressed", key);
-      console.log("game", game);
+      /*console.log("key pressed", key);
+      console.log("game", game);*/
       gameSocket.emit("movePaddle", { game, playerId, direction: key });
       setKey(null);
     }
