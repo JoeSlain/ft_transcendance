@@ -89,6 +89,8 @@ export default function Home() {
   }, []);
 
   return (
+    <div className="flex flex-col justify-center">
+    <h1 className="font-retro ">Currents games</h1>
     <div className="overflow-x-auto">
       <table className="table w-full">
         <thead>
@@ -106,6 +108,7 @@ export default function Home() {
             ))}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

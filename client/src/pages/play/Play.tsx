@@ -3,9 +3,9 @@ import { roomType } from "../../types/roomType";
 import PlayerEntry from "./playerEntry";
 import Spectators from "./spectators";
 import useLobbyEvents from "../../hooks/gameEvents/useLobbyEvents";
-import "../../styles/play.css";
 import Buttons from "./Buttons";
 import GameComponent from "../games/GameComponent";
+import "../../styles/play.css";
 
 export default function Play() {
   const [room, setRoom] = useState<roomType | null>(null);
