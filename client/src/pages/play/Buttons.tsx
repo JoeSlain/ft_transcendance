@@ -106,7 +106,7 @@ export default function Buttons({ room }: IProps) {
           Start{" "}
         </button>
       )}
-      {showSearch && (
+      {!countdown && showSearch && (
         <button
           className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
           style={{ width: "70px" }}
@@ -126,9 +126,10 @@ export default function Buttons({ room }: IProps) {
           Leave{" "}
         </button>
       )}
+      <div className="flex flex-col">
       {countdown && (
         <button
-          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 self-center"
           style={{ width: "70px" }}
           onClick={stopSearch}
         >
@@ -142,6 +143,7 @@ export default function Buttons({ room }: IProps) {
           Time in queue : {countdown.min}m{countdown.sec}s{" "}
         </div>
       )}
+      </div>
     </div>
   );
 }
