@@ -11,6 +11,7 @@ import { GameType, NotifData, Room } from "src/utils/types";
 import { GameService } from "./game.service";
 import { RoomService } from "./room.service";
 import { QueueService } from "./queue.service";
+import { RoutesMapper } from "@nestjs/core/middleware/routes-mapper";
 
 @WebSocketGateway(3003, {
   cors: {
@@ -129,6 +130,18 @@ export class GameGateway {
     this.server.to(data.roomId).emit("ready", data.room);
   }
 
+  /*@SubscribeMessage("eloUpdated")
+  updateRoom(client: Socket, user: User) {
+    const room = this.roomService.getUserRoom(user.id);
+
+    if (!room) return;
+    if (room.host.infos.id === user.id) room.host.infos = user;
+    else if (room.guest.infos.id === user.id) room.guest.infos = user;
+    this.roomService.updateRoom(room.id, room);
+
+    this.server.to(room.id).emit("updateRoom", room);
+  }*/
+
   @SubscribeMessage("createGame")
   createGame(client: Socket, room: Room) {
     console.log("create game event");
@@ -165,21 +178,21 @@ export class GameGateway {
     if (games) this.server.to(client.id).emit("newGames", games);
   }
 
-  endGame(game: GameType) {
-    const room = this.roomService.findRoom(game.gameId);
+  async endGame(game: GameType) {
+    let room = this.roomService.findRoom(game.gameId);
+    // save game in db
+    const gameInfos = await this.gameService.register(game);
 
     // room game started to false
-    this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
-    // save game in db
-    this.gameService.register(game);
+    //this.roomService.updateRoom(room.id, { ...room, gameStarted: false });
 
-    // delete game
-    this.server.to(game.gameId).emit("endGame", game);
+    // delete game + update users
+    room = await this.gameService.updateRoom(room, gameInfos);
+    this.server.to(room.id).emit("endGame", room);
     this.server.to(room.id).emit("updateStatus", "online");
+    //this.server.to(room.id).emit("updateElo", gameInfos);
     this.server.emit("deleteGame", game);
     this.gameService.deleteGame(game);
-
-    // update player elos
   }
 
   @SubscribeMessage("startGame")

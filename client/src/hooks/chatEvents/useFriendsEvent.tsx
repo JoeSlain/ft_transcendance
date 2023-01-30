@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import { ChatContext, GameContext } from "../../context/socketContext";
 import { userType } from "../../types/userType";
 import User from "../User";
+import { saveItem } from "../../utils/storage";
 
 type IProps = {
   setFriends: (props: any) => void;
@@ -11,7 +12,7 @@ type IProps = {
 export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
   const chatSocket = useContext(ChatContext);
   const gameSocket = useContext(GameContext);
-  const { user } = useContext(User);
+  const { user, setUser } = useContext(User);
 
   useEffect(() => {
     chatSocket.emit("getFriends", user);
@@ -63,11 +64,25 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
       chatSocket.emit("updateUserStatus", { user, status });
     });
 
+    /*gameSocket.on("updateElo", (gameInfos) => {
+      chatSocket.emit("updateUserElo", { user, gameInfos });
+    });
+
+    chatSocket.on("eloUpdated", (newUser) => {
+      console.log("elo updated");
+      setUser(newUser);
+      saveItem("user", newUser);
+      gameSocket.emit("eloUpdated", newUser);
+    });*/
+
     return () => {
       chatSocket.off("friends");
       chatSocket.off("newFriend");
       chatSocket.off("updateStatus");
       chatSocket.off("friendDeleted");
+      gameSocket.off("updateStatus");
+      //gameSocket.off("updateElo");
+      //chatSocket.off("eloUpdated");
     };
   }, []);
 }

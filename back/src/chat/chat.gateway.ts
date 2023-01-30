@@ -101,6 +101,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  /*@SubscribeMessage("updateUserElo")
+  async updateUserElo(client: Socket, data: any) {
+    const user = await this.usersService.updateUserElo(
+      data.user.id,
+      data.gameInfos
+    );
+
+    this.server.to(client.id).emit("eloUpdated", user);
+  }*/
+
   /* GET FRIENDS
   ** description: recupere les amis de l'utilisateur user dans la db
       et renvoie les amis dans un array d'utilisateurs au client,

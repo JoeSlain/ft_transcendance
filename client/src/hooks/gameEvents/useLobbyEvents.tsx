@@ -18,7 +18,7 @@ export default function useLobbyEvents({ setRoom }: IProps) {
 
     // new room
     gameSocket.on("newRoom", (room) => {
-      //console.log("newroom", room);
+      console.log("newroom", room);
       setRoom(room);
     });
 
@@ -46,6 +46,11 @@ export default function useLobbyEvents({ setRoom }: IProps) {
       setRoom(room);
     });
 
+    /*gameSocket.on("updateRoom", (room) => {
+      console.log("room updated", room);
+      setRoom(room);
+    });*/
+
     return () => {
       gameSocket.off("getRoom");
       gameSocket.off("newRoom");
@@ -54,6 +59,7 @@ export default function useLobbyEvents({ setRoom }: IProps) {
       gameSocket.off("clearRoom");
       gameSocket.off("ready");
       gameSocket.off("gameStarted");
+      //gameSocket.off("updateRoom");
     };
   }, []);
 }

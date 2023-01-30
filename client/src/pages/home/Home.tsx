@@ -92,6 +92,7 @@ export default function Home() {
     return () => {
       socket.off("newGames");
       socket.off("addGame");
+      socket.off("deleteGame");
       socket.off("updateGames");
     };
   }, []);

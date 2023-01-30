@@ -75,6 +75,8 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
     gameSocket.on("newGame", (data) => {
       console.log("game", data);
       setGame(data);
+      if (data.player1.infos.id === user.id) setPlayerId(1);
+      else if (data.player2.infos.id === user.id) setPlayerId(2);
     });
 
     gameSocket.on("gameReset", (game: gameData) => {
@@ -96,11 +98,9 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       //updateCanvas();
     });
 
-    gameSocket.on("endGame", (game) => {
+    gameSocket.on("endGame", (room) => {
       console.log("endgame");
-      setRoom((prev: any) => {
-        return { ...prev, gameStarted: false };
-      });
+      setRoom(room);
     });
 
     gameSocket.on("updateBall", (ball) => {

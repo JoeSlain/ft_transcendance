@@ -24,7 +24,6 @@ export default function useQueueEvents({ countdown, setCountdown }: Props) {
   useEffect(() => {
     if (countdown) {
       const interval = setInterval(() => {
-        console.log("countdown", countdown);
         let min = countdown.min;
         let sec = countdown.sec + 1;
         if (sec === 60) {

@@ -57,8 +57,16 @@ export default function Stats() {
     );
   }
   if (data) {
-    data.n_win = 7;
-    data.n_lose = 3;
+    //data.n_win = 7;
+    //data.n_lose = 3;
+    let win_percentage, loss_percentage;
+    if (data.n_win || data.n_lose) {
+      win_percentage = (data.n_win / (data.n_lose + data.n_win)) * 100;
+      loss_percentage = (data.n_lose / (data.n_lose + data.n_win)) * 100;
+    } else {
+      win_percentage = 0;
+      loss_percentage = 0;
+    }
     return (
       <>
         <ProfileNavbar userId={userId} />
@@ -68,9 +76,7 @@ export default function Stats() {
             <div className="stat " style={win}>
               <div className="stat-title">Wins</div>
               <div className="stat-value">{data.n_win}</div>
-              <div className="stat-desc">
-                {(data.n_win / (data.n_lose + data.n_win)) * 100}% wins
-              </div>
+              <div className="stat-desc">{win_percentage}% wins</div>
             </div>
             <div className="stat ">
               <div className="stat-title">Elo</div>
@@ -79,9 +85,7 @@ export default function Stats() {
             <div className="stat " style={lose}>
               <div className="stat-title">Losses</div>
               <div className="stat-value">{data.n_lose}</div>
-              <div className="stat-desc">
-                {(data.n_lose / (data.n_lose + data.n_win)) * 100}% losses
-              </div>
+              <div className="stat-desc">{loss_percentage}% losses</div>
             </div>
           </div>
           <History userId={userId} />
