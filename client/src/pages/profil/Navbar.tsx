@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 export default function ProfileNavbar(props: { userId: number }) {
+  console.log("userid", props.userId);
   return (
     <>
       <nav className="navigation mt-5 ">
@@ -15,7 +16,10 @@ export default function ProfileNavbar(props: { userId: number }) {
               </NavLink>
             </li>
             <li>
-              <NavLink className="navlink  font-retro" to="/profile/stats">
+              <NavLink
+                className="navlink  font-retro"
+                to={`/profile/${props.userId}/stats`}
+              >
                 Statistics
               </NavLink>
             </li>

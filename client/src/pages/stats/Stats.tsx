@@ -4,6 +4,9 @@ import "../../styles/global.css";
 import CSS from "csstype";
 import History from "./History";
 import ProfileNavbar from "../profil/Navbar";
+import { useContext } from "react";
+import { useParams } from "react-router-dom";
+import User from "../../hooks/User";
 
 const win: CSS.Properties = {
   backgroundColor: "#4ade80",
@@ -12,10 +15,14 @@ const lose: CSS.Properties = {
   backgroundColor: "#f87171",
 };
 
-export default function Stats(props: { userId: number }) {
+export default function Stats() {
+  const { user } = useContext(User);
+  const param = useParams().id;
+  const userId = param ? parseInt(param) : user.id;
+
   //get user
   let { isLoading, data, error } = useQuery({
-    queryKey: ["userData", props.userId],
+    queryKey: ["userData", userId],
     queryFn: ({ queryKey }) => getUser(queryKey[1].toString()),
   });
   /*   isLoading = true;
@@ -54,7 +61,7 @@ export default function Stats(props: { userId: number }) {
     data.n_lose = 3;
     return (
       <>
-        <ProfileNavbar userId={props.userId} />
+        <ProfileNavbar userId={userId} />
 
         <div className="flex flex-col justify-center gap-10 items-center pt-5 ">
           <div className="stats shadow mb-5 justify-center">
@@ -77,7 +84,7 @@ export default function Stats(props: { userId: number }) {
               </div>
             </div>
           </div>
-          <History userId={props.userId} />
+          <History userId={userId} />
         </div>
       </>
     );

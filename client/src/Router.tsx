@@ -69,10 +69,7 @@ export default function Router() {
                     <Route path="/profile">
                       <Route index element={<MyProfile />} />
                       <Route path=":id" element={<Profile />} />
-                      <Route
-                        path="stats"
-                        element={<Stats userId={user?.id} />}
-                      />
+                      <Route path=":id/stats" element={<Stats />} />
                       <Route path="*" element={<PageNotFound />} />
                     </Route>
                     <Route path="*" element={<PageNotFound />} />
