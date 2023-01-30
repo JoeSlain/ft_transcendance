@@ -117,16 +117,18 @@ const MessageContent = ({ conv }: Props) => {
 };
 
 export default function DirectMessages() {
-    const socket = useContext(ChatContext);
+  const socket = useContext(ChatContext);
   const [convs, setConvs] = useState(getSavedItem("convs"));
-  if (convs === null) 
-  {
+  const { user } = useContext(User);
+  if (convs === null) {
     saveItem("convs", []);
     setConvs([]);
   }
-  console.log("🚀 ~ file: DirectMessages.tsx:121 ~ DirectMessages ~ convs", convs)
-  
-  const { user } = useContext(User);
+  console.log(
+    "🚀 ~ file: DirectMessages.tsx:121 ~ DirectMessages ~ convs",
+    convs
+  );
+
   useDmEvents({ setConvs });
 
   const handleClick = (index: number) => {
