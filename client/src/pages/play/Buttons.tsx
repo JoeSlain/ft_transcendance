@@ -1,7 +1,9 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { roomType } from "../../types/roomType";
 import User from "../../hooks/User";
 import { GameContext } from "../../context/socketContext";
+import GameComponent from "../games/GameComponent";
+import { useNavigate } from "react-router-dom";
 import { CountdownContext } from "../../context/countDownContext";
 
 type IProps = {
@@ -88,7 +90,7 @@ export default function Buttons({ room }: IProps) {
   };
 
   return (
-    <div className="flex flex-col justify-center">
+    <div>
       {showStart && (
         <button
           onClick={startGame}
@@ -104,7 +106,7 @@ export default function Buttons({ room }: IProps) {
           Start{" "}
         </button>
       )}
-      {!countdown && showSearch && (
+      {showSearch && (
         <button
           className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
           style={{ width: "70px" }}
@@ -126,7 +128,7 @@ export default function Buttons({ room }: IProps) {
       )}
       {countdown && (
         <button
-          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 self-center"
+          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 "
           style={{ width: "70px" }}
           onClick={stopSearch}
         >
