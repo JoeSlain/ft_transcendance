@@ -223,7 +223,7 @@ export class GameGateway {
         this.endGame(game);
         return;
       }
-    }, 1000 / 100);
+    }, 1000 / 50);
 
     console.log("out game loop");
   }
