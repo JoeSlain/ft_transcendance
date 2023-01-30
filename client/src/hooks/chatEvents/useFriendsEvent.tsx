@@ -64,11 +64,17 @@ export default function useFriendsEvent({ setFriends, setStatuses }: IProps) {
       chatSocket.emit("updateUserStatus", { user, status });
     });
 
-    /*gameSocket.on("updateElo", (gameInfos) => {
-      chatSocket.emit("updateUserElo", { user, gameInfos });
+    gameSocket.on("updateElo", ({ host, guest }) => {
+      if (host.id === user.id) {
+        setUser(host);
+        saveItem("user", host);
+      } else if (guest.id === user.id) {
+        setUser(guest);
+        saveItem("user", guest);
+      }
     });
 
-    chatSocket.on("eloUpdated", (newUser) => {
+    /*chatSocket.on("eloUpdated", (newUser) => {
       console.log("elo updated");
       setUser(newUser);
       saveItem("user", newUser);
