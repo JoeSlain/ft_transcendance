@@ -211,14 +211,18 @@ export class GameGateway {
         clearInterval(gameLoop);
         game.player2.win = true;
         game.gameRunning = false;
-      } else game = this.gameService.updateBall(game, dt % 60);
-
-      // update game
+      } else {
+        game = this.gameService.updateBall(game);
+        game = this.gameService.spawnPowerUp(game);
+        game = this.gameService.updatePowerUp(game);
+        this.gameService.saveGame(game);
+      }
+      // score update
       if (game.scoreUpdate) {
         game.scoreUpdate = false;
         this.server.emit("updateGames", game);
       }
-      game = this.gameService.spawnPowerUp(game);
+      // signals
       this.server.to(game.gameId).emit("updateGameState", game);
       if (!game.gameRunning) {
         this.endGame(game);

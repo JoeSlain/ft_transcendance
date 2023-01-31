@@ -1,10 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { RoomService } from "./room.service";
 import { User } from "src/database";
 
 @Injectable()
 export class QueueService {
-  constructor(private readonly roomService: RoomService) {}
+  constructor() {}
 
   queue: User[] = [];
 
@@ -42,32 +41,5 @@ export class QueueService {
 
   queueUp(user: User) {
     return this.queue.push(user) - 1;
-    /*let eloRange = 50;
-    let opponent = this.findOpponent(user.id, user.elo, eloRange);
-
-    if (opponent) {
-      console.log(`opponent found ${opponent.username}`);
-      return opponent;
-    }
-    console.log(`opponent not found, queueing user ${user.username}`);
-    const index = this.queue.push(user) - 1;
-    const interval = setInterval(() => {
-      console.log("interval");
-      eloRange += 50;
-      if (!this.checkQueued(index, user.id)) {
-        console.log(`user ${user.username} not queued`);
-        clearInterval(interval);
-        return null;
-      }
-      console.log(`user ${user.username} queued`);
-      opponent = this.findOpponent(user.id, user.elo, eloRange);
-      if (opponent) {
-        console.log(`opponent found ${opponent.username}`);
-        this.stopQueue(user.id, index);
-        clearInterval(interval);
-        return opponent;
-      }
-    }, 10000);
-    console.log("out interval");*/
   }
 }

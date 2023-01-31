@@ -46,6 +46,13 @@ export type BallType = {
   radius: number;
 };
 
+export type PowerUp = {
+  x: number;
+  y: number;
+  type: number;
+  size: number;
+};
+
 export type gameData = {
   width: number;
   height: number;
@@ -53,6 +60,6 @@ export type gameData = {
   player2: PlayerType;
   ball: BallType;
   gameRunning: boolean;
-  grid: Array<Array<number>>;
+  grid: PowerUp[];
   gameId: any;
 };

@@ -34,17 +34,15 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
   }
 
   const drawPowerUps = (ctx: CanvasRenderingContext2D, game: gameData) => {
-    for (var i = 0; i < 70; i++) {
-      for (var j = 0; j < 50; j++) {
-        if (game.grid[i][j] === 0) {
-          ctx.fillStyle = "#ff0d00";
-          ctx.fillRect(i * 10 + 50, j * 10 + 50, 10, 10);
-        } else if (game.grid[i][j] === 1) {
-          ctx.fillStyle = "#002aff";
-          ctx.fillRect(i * 10 + 50, j * 10 + 50, 10, 10);
-        }
+    game.grid.forEach((pu) => {
+      if (!pu.type) {
+        ctx.fillStyle = "#ff0d00";
+        ctx.fillRect(pu.x, pu.y, pu.size, pu.size);
+      } else {
+        ctx.fillStyle = "#002aff";
+        ctx.fillRect(pu.x, pu.y, pu.size, pu.size);
       }
-    }
+    });
   };
 
   const updateCanvas = () => {
@@ -104,8 +102,16 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
           return {
             ...prev,
             ball: game.ball,
-            player1: { ...prev.player1, score: game.player1.score },
-            player2: { ...prev.player2, score: game.player2.score },
+            player1: {
+              ...prev.player1,
+              score: game.player1.score,
+              height: game.player1.height,
+            },
+            player2: {
+              ...prev.player2,
+              score: game.player2.score,
+              height: game.player2.height,
+            },
             grid: game.grid,
           };
         }

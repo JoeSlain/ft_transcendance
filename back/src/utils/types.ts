@@ -66,6 +66,13 @@ export type GameInfos = {
   score: string;
 };
 
+export type PowerUp = {
+  x: number;
+  y: number;
+  type: number;
+  size: number;
+};
+
 export type GameType = {
   width: number;
   height: number;
@@ -75,7 +82,7 @@ export type GameType = {
   gameRunning: boolean;
   scoreUpdate: boolean;
   powerUps: boolean;
-  grid: Array<Array<number>>;
+  grid: PowerUp[];
   gameId: any;
 };
 

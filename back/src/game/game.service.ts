@@ -1,13 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { PaddleType, Room } from "src/utils/types";
+import { PowerUp, Room } from "src/utils/types";
 import { GameType } from "../utils/types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Game, User } from "src/database";
 import { Repository } from "typeorm";
 import { RoomService } from "./room.service";
 import { BallType } from "src/utils/types";
-import { PlayerType } from "src/utils/types";
-import { posix } from "path";
 
 @Injectable()
 export class GameService {
@@ -19,7 +17,6 @@ export class GameService {
 
   users: Map<number, GameType> = new Map();
   games = new Map<string, GameType>();
-  //gameInfos = new Array<GameInfos>();
 
   newPlayer(width: number, height: number, id: number) {
     const player = {
@@ -50,7 +47,6 @@ export class GameService {
       speedX: dir * 5,
       speedY: (Math.random() * 2 - 1) * 5,
       radius: 10,
-      //xVel: vel,
     };
     return ball;
   }
@@ -76,20 +72,10 @@ export class GameService {
       scoreUpdate: false,
       gameId,
       powerUps: true,
-      grid: new Array(70),
+      grid: [],
     };
-    for (var i = 0; i < 70; i++) {
-      game.grid[i] = new Array(50);
-    }
-
-    for (var i = 0; i < 70; i++) {
-      for (var j = 0; j < 50; j++) {
-        game.grid[i][j] = -1;
-      }
-    }
 
     this.saveGame(game);
-    //this.pushGameInfos(game, room);
     return game;
   }
 
@@ -104,7 +90,6 @@ export class GameService {
     game.player1.infos = user2;
     game.gameRunning = true;
     this.saveGame(game);
-
     return game;
   }
 
@@ -130,25 +115,34 @@ export class GameService {
     return false;
   }
 
-  /*accelerate(x, y, dx, dy, accel, dt) {
-    var x2 = x + dt * dx + accel * dt * dt * 0.5;
-    var y2 = y + dt * dy + accel * dt * dt * 0.5;
-    var dx2 = dx + accel * dt * (dx > 0 ? 1 : -1);
-    var dy2 = dy + accel * dt * (dy > 0 ? 1 : -1);
-
-    return { x: x2, y: y2, dx: dx2, dy: dy2 };
-  }*/
-
-  setPaddleUp(paddle: PaddleType) {
-    paddle.up = true;
-    paddle.down = false;
-    return paddle;
+  powerUpCollision(ball: BallType, pu: PowerUp) {
+    if (
+      ball.x >= pu.x &&
+      ball.x <= pu.x + pu.size &&
+      ball.y >= pu.y &&
+      ball.y <= pu.y + pu.size
+    )
+      return true;
+    return false;
   }
 
-  setPaddleDown(paddle: PaddleType) {
-    paddle.up = false;
-    paddle.down = true;
-    return paddle;
+  updatePowerUp(game: GameType) {
+    const index = game.grid.findIndex((pu) =>
+      this.powerUpCollision(game.ball, pu)
+    );
+
+    if (index >= 0) {
+      const powerUp = game.grid.splice(index, 1)[0];
+      console.log(powerUp);
+      if (!powerUp.type) {
+        if (game.ball.speedX < 0) game.player2.height += 10;
+        else game.player1.height += 10;
+      } else {
+        if (game.ball.speedX < 0) game.player1.height -= 10;
+        else game.player2.height -= 10;
+      }
+    }
+    return game;
   }
 
   movePaddle(game: GameType, playerId: number, direction: string) {
@@ -156,24 +150,20 @@ export class GameService {
       if (direction === "ArrowUp") {
         if (game.player1.y > 0) {
           game.player1.y -= 10;
-          game.player1.paddle = this.setPaddleUp(game.player1.paddle);
         }
       } else if (direction === "ArrowDown") {
         if (game.player1.y + game.player1.height < game.height) {
           game.player1.y += 10;
-          game.player1.paddle = this.setPaddleDown(game.player1.paddle);
         }
       }
     } else if (playerId === 2) {
       if (direction === "ArrowUp") {
         if (game.player2.y > 0) {
           game.player2.y -= 10;
-          game.player2.paddle = this.setPaddleUp(game.player2.paddle);
         }
       } else if (direction === "ArrowDown") {
         if (game.player2.y + game.player2.height < game.height) {
           game.player2.y += 10;
-          game.player2.paddle = this.setPaddleDown(game.player2.paddle);
         }
       }
     }
@@ -182,7 +172,7 @@ export class GameService {
   }
 
   // Fonction pour mettre à jour la position d'une balle
-  updateBall(game: GameType, dt: number) {
+  updateBall(game: GameType) {
     // Mettre à jour la position de la balle en fonction de sa vitesse
     game.ball.x += game.ball.speedX;
     game.ball.y += game.ball.speedY;
@@ -227,26 +217,23 @@ export class GameService {
         game.scoreUpdate = true;
       }
     }
-
-    this.saveGame(game);
     return game;
   }
 
   spawnPowerUp(game: GameType) {
     if (game.powerUps) {
-      if (Math.random() >= 0.995) {
-        const x = Math.floor(Math.random() * 70);
-        const y = Math.floor(Math.random() * 50);
+      if (Math.random() >= 0.999) {
+        const x = Math.floor(Math.random() * 700) + 50;
+        const y = Math.floor(Math.random() * 500) + 50;
         if (
-          game.grid[x][y] >= 0 ||
+          game.grid.find((pu) => pu.x === x && pu.y === y) ||
           (x > game.width / 2 - 10 && x < game.width / 2 + 25)
         ) {
           return game;
         }
-        game.grid[x][y] = Math.floor(Math.random() * 2);
+        game.grid.push({ x, y, type: Math.floor(Math.random() * 2), size: 20 });
       }
     }
-    this.saveGame(game);
     return game;
   }
 
