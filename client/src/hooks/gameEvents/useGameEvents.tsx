@@ -29,8 +29,9 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       ctx.fillRect(game.width / 2 - 10, i + 10, 15, 20);
     }
     //draw scores
-    ctx.fillText(game.player1.score.toString(), 320, 50);
-    ctx.fillText(game.player2.score.toString(), 450, 50);
+    ctx.font = "60px serif";
+    ctx.fillText(game.player1.score.toString(), 320, 100);
+    ctx.fillText(game.player2.score.toString(), 450, 100);
   }
 
   const drawPowerUps = (ctx: CanvasRenderingContext2D, game: gameData) => {
