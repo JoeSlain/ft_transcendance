@@ -130,156 +130,25 @@ export class GameService {
     return false;
   }
 
-  intercept(x1, y1, x2, y2, x3, y3, x4, y4, d) {
-    var denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-    if (denom != 0) {
-      var ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-      if (ua >= 0 && ua <= 1) {
-        var ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
-        if (ub >= 0 && ub <= 1) {
-          var x = x1 + ua * (x2 - x1);
-          var y = y1 + ua * (y2 - y1);
-          return { x, y, d };
-        }
-      }
-    }
-    return null;
+  /*accelerate(x, y, dx, dy, accel, dt) {
+    var x2 = x + dt * dx + accel * dt * dt * 0.5;
+    var y2 = y + dt * dy + accel * dt * dt * 0.5;
+    var dx2 = dx + accel * dt * (dx > 0 ? 1 : -1);
+    var dy2 = dy + accel * dt * (dy > 0 ? 1 : -1);
+
+    return { x: x2, y: y2, dx: dx2, dy: dy2 };
+  }*/
+
+  setPaddleUp(paddle: PaddleType) {
+    paddle.up = true;
+    paddle.down = false;
+    return paddle;
   }
 
-  // check model
-  ballIntercept(ball: BallType, paddle: PaddleType, nx, ny) {
-    var pt;
-
-    if (nx < 0) {
-      pt = this.intercept(
-        ball.x,
-        ball.y,
-        ball.x + nx,
-        ball.y + ny,
-        paddle.right,
-        paddle.top,
-        paddle.right,
-        paddle.bottom + ball.radius,
-        "right"
-      );
-    } else if (nx > 0) {
-      pt = this.intercept(
-        ball.x,
-        ball.y,
-        ball.x + nx,
-        ball.y + ny,
-        paddle.left - ball.radius,
-        paddle.top,
-        paddle.left - ball.radius,
-        paddle.bottom + ball.radius,
-        "left"
-      );
-    }
-    if (!pt) {
-      if (ny < 0) {
-        pt = this.intercept(
-          ball.x,
-          ball.y,
-          ball.x + nx,
-          ball.y + ny,
-          paddle.left - ball.radius,
-          paddle.bottom + ball.radius,
-          paddle.right,
-          paddle.bottom + ball.radius,
-          "bottom"
-        );
-      } else if (ny > 0) {
-        pt = this.intercept(
-          ball.x,
-          ball.y,
-          ball.x + nx,
-          ball.y + ny,
-          paddle.left - ball.radius,
-          paddle.top,
-          paddle.right,
-          paddle.top,
-          "top"
-        );
-      }
-    }
-    return pt;
-  }
-
-  accelerate(x, y, dx, dy, radius) {
-    const x2 = x + dx;
-    const y2 = y + dy;
-    return {
-      nx: x2 - x,
-      ny: y2 - y,
-      x: x2,
-      y: y2,
-      dx,
-      dy,
-      radius,
-    };
-  }
-
-  updateBall(game: GameType) {
-    const pos = this.accelerate(
-      game.ball.x,
-      game.ball.y,
-      game.ball.speedX,
-      game.ball.speedY,
-      game.ball.radius
-    );
-    //pos.x += pos.speedX;
-    //pos.y += pos.speedY;
-
-    if (pos.dy > 0 && pos.y + pos.radius > game.height) {
-      pos.y = game.height - pos.radius;
-      pos.dy *= -1;
-    } else if (pos.dy < 0 && pos.y < 0) {
-      pos.y = 0;
-      pos.dy *= -1;
-    }
-    const paddle = pos.dx < 0 ? game.player1.paddle : game.player2.paddle;
-    const pt = this.ballIntercept(game.ball, paddle, pos.nx, pos.ny);
-    if (pt) {
-      if (pt.d === "left" || pt.d === "right") {
-        pos.x = pt.x;
-        pos.dx *= -1;
-      } else if (pt.d === "top" || pt.d === "bottom") {
-        pos.y = pt.y;
-        pos.dy *= -1;
-      }
-    }
-    if (pos.x <= 0) {
-      game.player2.score++;
-      game.ball = this.newBall(game.width, game.height, -1);
-      game.scoreUpdate = true;
-    } else if (game.ball.x + game.ball.radius >= game.width) {
-      game.player1.score++;
-      game.ball = this.newBall(game.width, game.height, 1);
-      game.scoreUpdate = true;
-    } else
-      game.ball = {
-        ...game.ball,
-        x: pos.x,
-        y: pos.y,
-        speedX: pos.dx,
-        speedY: pos.dy,
-      };
-    /*if (paddle.up) ball.speedY *= ball.speedY < 0 ? 0.5 : 1.5;
-    else if (paddle.down) ball.speedY *= ball.speedY > 0 ? 0.5 : 1.5;
-    */
-    this.saveGame(game);
-    return game;
-  }
-
-  updatePaddle(player: PlayerType) {
-    player.paddle = {
-      ...player.paddle,
-      top: player.y + player.height,
-      bottom: player.y,
-      up: false,
-      down: false,
-    };
-    return player.paddle;
+  setPaddleDown(paddle: PaddleType) {
+    paddle.up = false;
+    paddle.down = true;
+    return paddle;
   }
 
   movePaddle(game: GameType, playerId: number, direction: string) {
@@ -287,24 +156,24 @@ export class GameService {
       if (direction === "ArrowUp") {
         if (game.player1.y > 0) {
           game.player1.y -= 10;
-          game.player1.paddle = this.updatePaddle(game.player1);
+          game.player1.paddle = this.setPaddleUp(game.player1.paddle);
         }
       } else if (direction === "ArrowDown") {
         if (game.player1.y + game.player1.height < game.height) {
           game.player1.y += 10;
-          game.player1.paddle = this.updatePaddle(game.player1);
+          game.player1.paddle = this.setPaddleDown(game.player1.paddle);
         }
       }
     } else if (playerId === 2) {
       if (direction === "ArrowUp") {
         if (game.player2.y > 0) {
           game.player2.y -= 10;
-          game.player2.paddle = this.updatePaddle(game.player2);
+          game.player2.paddle = this.setPaddleUp(game.player2.paddle);
         }
       } else if (direction === "ArrowDown") {
         if (game.player2.y + game.player2.height < game.height) {
           game.player2.y += 10;
-          game.player2.paddle = this.updatePaddle(game.player2);
+          game.player2.paddle = this.setPaddleDown(game.player2.paddle);
         }
       }
     }
@@ -313,17 +182,23 @@ export class GameService {
   }
 
   // Fonction pour mettre à jour la position d'une balle
-  /*updateBall(game: GameType) {
+  updateBall(game: GameType, dt: number) {
     // Mettre à jour la position de la balle en fonction de sa vitesse
     game.ball.x += game.ball.speedX;
     game.ball.y += game.ball.speedY;
 
     // Vérifier la collision avec les limites du canvas
-    if (game.ball.y < 0 || game.ball.y + 10 > game.height)
+    if (game.ball.y < 0) {
       game.ball.speedY *= -1;
+      game.ball.y = 0;
+    } else if (game.ball.y + 10 > game.height) {
+      game.ball.speedY *= -1;
+      game.ball.y = game.height - game.ball.radius;
+    }
 
     if (this.player1Collision(game)) {
       game.ball.speedX *= -1;
+      game.ball.x += game.player1.width;
       if (
         (game.ball.speedY < 0 &&
           game.ball.y > game.player1.y + game.player1.height / 2) ||
@@ -333,6 +208,7 @@ export class GameService {
         game.ball.speedY *= -1;
     } else if (this.player2Collision(game)) {
       game.ball.speedX *= -1;
+      game.ball.x -= game.player2.width;
       if (
         (game.ball.speedY < 0 &&
           game.ball.y > game.player2.y + game.player2.height / 2) ||
@@ -351,9 +227,10 @@ export class GameService {
         game.scoreUpdate = true;
       }
     }
+
     this.saveGame(game);
     return game;
-  }*/
+  }
 
   spawnPowerUp(game: GameType) {
     if (game.powerUps) {

@@ -198,7 +198,9 @@ export class GameGateway {
 
   @SubscribeMessage("startGame")
   startGame(client: Socket, game: GameType) {
+    let dt = 0;
     const gameLoop = setInterval(() => {
+      dt++;
       game = this.gameService.games.get(game.gameId);
       // Vérification de la fin de la partie
       if (game.player1.score >= 10) {
@@ -209,7 +211,7 @@ export class GameGateway {
         clearInterval(gameLoop);
         game.player2.win = true;
         game.gameRunning = false;
-      } else game = this.gameService.updateBall(game);
+      } else game = this.gameService.updateBall(game, dt % 60);
 
       // update game
       if (game.scoreUpdate) {
