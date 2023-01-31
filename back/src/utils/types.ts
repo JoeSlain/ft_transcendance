@@ -74,6 +74,8 @@ export type GameType = {
   ball: BallType;
   gameRunning: boolean;
   scoreUpdate: boolean;
+  powerUps: boolean;
+  grid: Array<Array<number>>;
   gameId: any;
 };
 
@@ -95,7 +97,7 @@ export type BallType = {
   y: number;
   speedX: number;
   speedY: number;
-  xVel: number;
+  //xVel: number;
 };
 
 // paddle

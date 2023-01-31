@@ -39,13 +39,13 @@ export class GameService {
     return player;
   }
 
-  newBall(width: number, height: number, vel: number) {
+  newBall(width: number, height: number, dir: number) {
     const ball = {
       x: width / 2 - 5,
       y: height / 2 - 5,
-      speedX: 10,
+      speedX: 10 * dir,
       speedY: (Math.random() * 2 - 1) * 10,
-      xVel: vel,
+      //xVel: vel,
     };
     return ball;
   }
@@ -61,7 +61,7 @@ export class GameService {
     player2.infos = room.guest.infos;
 
     const ball = this.newBall(width, height, 1);
-    const game = {
+    const game: GameType = {
       width,
       height,
       player1,
@@ -70,7 +70,18 @@ export class GameService {
       gameRunning: true,
       scoreUpdate: false,
       gameId,
+      powerUps: true,
+      grid: new Array(70),
     };
+    for (var i = 0; i < 70; i++) {
+      game.grid[i] = new Array(50);
+    }
+
+    for (var i = 0; i < 70; i++) {
+      for (var j = 0; j < 50; j++) {
+        game.grid[i][j] = -1;
+      }
+    }
 
     this.saveGame(game);
     //this.pushGameInfos(game, room);
@@ -92,33 +103,84 @@ export class GameService {
     return game;
   }
 
+  player1Collision(game: GameType) {
+    if (
+      game.ball.x <= game.player1.x + game.player1.width &&
+      game.ball.x > game.player1.x &&
+      game.ball.y >= game.player1.y &&
+      game.ball.y <= game.player1.y + game.player1.height
+    )
+      return true;
+    return false;
+  }
+
+  player2Collision(game: GameType) {
+    if (
+      game.ball.x + 10 >= game.player2.x &&
+      game.ball.x < game.player2.x + game.player2.width &&
+      game.ball.y > game.player2.y &&
+      game.ball.y < game.player2.y + game.player2.height
+    )
+      return true;
+    return false;
+  }
+
   // Fonction pour mettre à jour la position d'une balle
   updateBall(game: GameType) {
     // Mettre à jour la position de la balle en fonction de sa vitesse
-    game.ball.x += game.ball.speedX * game.ball.xVel;
+    game.ball.x += game.ball.speedX;
     game.ball.y += game.ball.speedY;
 
     // Vérifier la collision avec les limites du canvas
     if (game.ball.y < 0 || game.ball.y + 10 > game.height)
       game.ball.speedY *= -1;
 
-    if (game.ball.x <= 0) {
-      game.player2.score++;
-      game.ball = this.newBall(game.width, game.height, -1);
-      game.scoreUpdate = true;
-    } else if (game.ball.x >= game.width) {
-      game.player1.score++;
-      game.ball = this.newBall(game.width, game.height, 1);
-      game.scoreUpdate = true;
-    } else if (
-      (game.ball.x < game.player1.x + game.player1.width &&
-        game.ball.y > game.player1.y &&
-        game.ball.y < game.player1.y + game.player1.height) ||
-      (game.ball.x + 10 > game.player2.x &&
-        game.ball.y > game.player2.y &&
-        game.ball.y < game.player2.y + game.player2.height)
-    ) {
+    if (this.player1Collision(game)) {
       game.ball.speedX *= -1;
+      if (
+        (game.ball.speedY < 0 &&
+          game.ball.y > game.player1.y + game.player1.height / 2) ||
+        (game.ball.speedY > 0 &&
+          game.ball.y < game.player1.y + game.player1.height / 2)
+      )
+        game.ball.speedY *= -1;
+    } else if (this.player2Collision(game)) {
+      game.ball.speedX *= -1;
+      if (
+        (game.ball.speedY < 0 &&
+          game.ball.y > game.player2.y + game.player2.height / 2) ||
+        (game.ball.speedY > 0 &&
+          game.ball.y < game.player2.y + game.player2.height / 2)
+      )
+        game.ball.speedY *= -1;
+    } else {
+      if (game.ball.x <= 0) {
+        game.player2.score++;
+        game.ball = this.newBall(game.width, game.height, -1);
+        game.scoreUpdate = true;
+      } else if (game.ball.x >= game.width) {
+        game.player1.score++;
+        game.ball = this.newBall(game.width, game.height, 1);
+        game.scoreUpdate = true;
+      }
+    }
+    this.saveGame(game);
+    return game;
+  }
+
+  spawnPowerUp(game: GameType) {
+    if (game.powerUps) {
+      if (Math.random() >= 0.995) {
+        const x = Math.floor(Math.random() * 70);
+        const y = Math.floor(Math.random() * 50);
+        if (
+          game.grid[x][y] >= 0 ||
+          (x > game.width / 2 - 10 && x < game.width / 2 + 25)
+        ) {
+          return game;
+        }
+        game.grid[x][y] = Math.floor(Math.random() * 2);
+      }
     }
     this.saveGame(game);
     return game;
@@ -187,7 +249,6 @@ export class GameService {
   }
 
   async register(game: GameType) {
-    console.log("registering game", game);
     const newGame = this.gameRepo.create({
       user1: game.player1.infos,
       user2: game.player2.infos,

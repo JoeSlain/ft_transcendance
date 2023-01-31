@@ -33,6 +33,20 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
     ctx.fillText(game.player2.score.toString(), 450, 50);
   }
 
+  const drawPowerUps = (ctx: CanvasRenderingContext2D, game: gameData) => {
+    for (var i = 0; i < 70; i++) {
+      for (var j = 0; j < 50; j++) {
+        if (game.grid[i][j] === 0) {
+          ctx.fillStyle = "#ff0d00";
+          ctx.fillRect(i * 10 + 50, j * 10 + 50, 10, 10);
+        } else if (game.grid[i][j] === 1) {
+          ctx.fillStyle = "#002aff";
+          ctx.fillRect(i * 10 + 50, j * 10 + 50, 10, 10);
+        }
+      }
+    }
+  };
+
   const updateCanvas = () => {
     if (!game) {
       console.log("game null");
@@ -50,6 +64,7 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       return;
     }
     ctx.clearRect(0, 0, game.width, game.height);
+    drawPowerUps(ctx, game);
     drawBoardDetails(ctx, game);
     // Dessiner sur le canvas en utilisant les données du jeu
     //console.log("DrawGame", game);
@@ -91,6 +106,7 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
             ball: game.ball,
             player1: { ...prev.player1, score: game.player1.score },
             player2: { ...prev.player2, score: game.player2.score },
+            grid: game.grid,
           };
         }
         return game;
@@ -112,6 +128,7 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
     gameSocket.on("updatePaddle", (game) => {
       setGame((prev: any) => {
         if (prev) {
+          //if (playerId === 1)
           return {
             ...prev,
             player1: { ...prev.player1, y: game.player1.y },
@@ -138,7 +155,12 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       setKey(event.key);
     };
 
+    /*const handleKeyUp = (event: KeyboardEvent) => {
+
+    }*/
+
     window.addEventListener("keydown", handleKeyDown);
+    //window.addEventListener('keyup', handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);

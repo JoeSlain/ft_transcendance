@@ -53,5 +53,6 @@ export type gameData = {
   player2: PlayerType;
   ball: BallType;
   gameRunning: boolean;
+  grid: Array<Array<number>>;
   gameId: any;
 };
