@@ -17,12 +17,12 @@ export type gameType = {
 };
 
 export type PaddleType = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  xVel: number;
-  yVel: number;
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  up: boolean;
+  down: boolean;
 };
 
 // pong player
@@ -43,7 +43,7 @@ export type BallType = {
   y: number;
   speedX: number;
   speedY: number;
-  xVel: number;
+  radius: number;
 };
 
 export type gameData = {

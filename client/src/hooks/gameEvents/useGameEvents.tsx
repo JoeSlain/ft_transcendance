@@ -155,15 +155,17 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       setKey(event.key);
     };
 
-    /*const handleKeyUp = (event: KeyboardEvent) => {
-
-    }*/
+    const handleKeyUp = (event: KeyboardEvent) => {
+      event.preventDefault();
+      setKey(null);
+    };
 
     window.addEventListener("keydown", handleKeyDown);
-    //window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
       gameSocket.off("newGame");
       gameSocket.off("gameReset");
       gameSocket.off("updateGameState");
@@ -176,16 +178,18 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
 
   // keydown
   useEffect(() => {
+    //const update = () => {
     if (!key) {
       //console.log("key null");
+      //gameSocket.emit("stopPaddle", { game, playerId });
       return;
     }
     if (key === "ArrowUp" || key === "ArrowDown") {
-      /*console.log("key pressed", key);
-      console.log("game", game);*/
+      console.log("key pressed", key);
+      //console.log("game", game);
       gameSocket.emit("movePaddle", { game, playerId, direction: key });
-      setKey(null);
     }
+    //};
   }, [key, game]);
 
   // draw

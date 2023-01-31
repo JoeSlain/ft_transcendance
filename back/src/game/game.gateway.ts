@@ -222,7 +222,7 @@ export class GameGateway {
         this.endGame(game);
         return;
       }
-    }, 1000 / 30);
+    }, 1000 / 60);
 
     console.log("out game loop");
   }
@@ -244,6 +244,18 @@ export class GameGateway {
     );
 
     this.server.to(game.gameId).emit("updatePaddle", game);
+  }
+
+  @SubscribeMessage("stopPaddle")
+  stopPaddle(client: Socket, data: any) {
+    /*if (data.playerId === 1) {
+      data.game.player1.paddle.up = false;
+      data.game.player1.paddle.down = false;
+    } else if (data.playerId === 2) {
+      data.game.player2.paddle.up = false;
+      data.game.player2.paddle.down = false;
+    }
+    this.gameService.saveGame(data.game);*/
   }
 
   emitOpponent(client: Socket, user: User, opponent: User) {

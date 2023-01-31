@@ -1,10 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { Room } from "src/utils/types";
+import { PaddleType, Room } from "src/utils/types";
 import { GameType } from "../utils/types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Game, User } from "src/database";
 import { Repository } from "typeorm";
 import { RoomService } from "./room.service";
+import { BallType } from "src/utils/types";
+import { PlayerType } from "src/utils/types";
+import { posix } from "path";
 
 @Injectable()
 export class GameService {
@@ -26,15 +29,16 @@ export class GameService {
       height: 60,
       score: 0,
       win: false,
-      paddle: {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        xVel: 0,
-        yVel: 0,
-      },
+      paddle: null,
       infos: null,
+    };
+    player.paddle = {
+      left: player.x,
+      right: player.x + player.width,
+      top: player.y + player.height,
+      bottom: player.y,
+      up: false,
+      down: false,
     };
     return player;
   }
@@ -43,8 +47,9 @@ export class GameService {
     const ball = {
       x: width / 2 - 5,
       y: height / 2 - 5,
-      speedX: 10 * dir,
-      speedY: (Math.random() * 2 - 1) * 10,
+      speedX: dir * 5,
+      speedY: (Math.random() * 2 - 1) * 5,
+      radius: 10,
       //xVel: vel,
     };
     return ball;
@@ -125,8 +130,190 @@ export class GameService {
     return false;
   }
 
-  // Fonction pour mettre à jour la position d'une balle
+  intercept(x1, y1, x2, y2, x3, y3, x4, y4, d) {
+    var denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+    if (denom != 0) {
+      var ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+      if (ua >= 0 && ua <= 1) {
+        var ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+        if (ub >= 0 && ub <= 1) {
+          var x = x1 + ua * (x2 - x1);
+          var y = y1 + ua * (y2 - y1);
+          return { x, y, d };
+        }
+      }
+    }
+    return null;
+  }
+
+  // check model
+  ballIntercept(ball: BallType, paddle: PaddleType, nx, ny) {
+    var pt;
+
+    if (nx < 0) {
+      pt = this.intercept(
+        ball.x,
+        ball.y,
+        ball.x + nx,
+        ball.y + ny,
+        paddle.right,
+        paddle.top,
+        paddle.right,
+        paddle.bottom + ball.radius,
+        "right"
+      );
+    } else if (nx > 0) {
+      pt = this.intercept(
+        ball.x,
+        ball.y,
+        ball.x + nx,
+        ball.y + ny,
+        paddle.left - ball.radius,
+        paddle.top,
+        paddle.left - ball.radius,
+        paddle.bottom + ball.radius,
+        "left"
+      );
+    }
+    if (!pt) {
+      if (ny < 0) {
+        pt = this.intercept(
+          ball.x,
+          ball.y,
+          ball.x + nx,
+          ball.y + ny,
+          paddle.left - ball.radius,
+          paddle.bottom + ball.radius,
+          paddle.right,
+          paddle.bottom + ball.radius,
+          "bottom"
+        );
+      } else if (ny > 0) {
+        pt = this.intercept(
+          ball.x,
+          ball.y,
+          ball.x + nx,
+          ball.y + ny,
+          paddle.left - ball.radius,
+          paddle.top,
+          paddle.right,
+          paddle.top,
+          "top"
+        );
+      }
+    }
+    return pt;
+  }
+
+  accelerate(x, y, dx, dy, radius) {
+    const x2 = x + dx;
+    const y2 = y + dy;
+    return {
+      nx: x2 - x,
+      ny: y2 - y,
+      x: x2,
+      y: y2,
+      dx,
+      dy,
+      radius,
+    };
+  }
+
   updateBall(game: GameType) {
+    const pos = this.accelerate(
+      game.ball.x,
+      game.ball.y,
+      game.ball.speedX,
+      game.ball.speedY,
+      game.ball.radius
+    );
+    //pos.x += pos.speedX;
+    //pos.y += pos.speedY;
+
+    if (pos.dy > 0 && pos.y + pos.radius > game.height) {
+      pos.y = game.height - pos.radius;
+      pos.dy *= -1;
+    } else if (pos.dy < 0 && pos.y < 0) {
+      pos.y = 0;
+      pos.dy *= -1;
+    }
+    const paddle = pos.dx < 0 ? game.player1.paddle : game.player2.paddle;
+    const pt = this.ballIntercept(game.ball, paddle, pos.nx, pos.ny);
+    if (pt) {
+      if (pt.d === "left" || pt.d === "right") {
+        pos.x = pt.x;
+        pos.dx *= -1;
+      } else if (pt.d === "top" || pt.d === "bottom") {
+        pos.y = pt.y;
+        pos.dy *= -1;
+      }
+    }
+    if (pos.x <= 0) {
+      game.player2.score++;
+      game.ball = this.newBall(game.width, game.height, -1);
+      game.scoreUpdate = true;
+    } else if (game.ball.x + game.ball.radius >= game.width) {
+      game.player1.score++;
+      game.ball = this.newBall(game.width, game.height, 1);
+      game.scoreUpdate = true;
+    } else
+      game.ball = {
+        ...game.ball,
+        x: pos.x,
+        y: pos.y,
+        speedX: pos.dx,
+        speedY: pos.dy,
+      };
+    /*if (paddle.up) ball.speedY *= ball.speedY < 0 ? 0.5 : 1.5;
+    else if (paddle.down) ball.speedY *= ball.speedY > 0 ? 0.5 : 1.5;
+    */
+    this.saveGame(game);
+    return game;
+  }
+
+  updatePaddle(player: PlayerType) {
+    player.paddle = {
+      ...player.paddle,
+      top: player.y + player.height,
+      bottom: player.y,
+      up: false,
+      down: false,
+    };
+    return player.paddle;
+  }
+
+  movePaddle(game: GameType, playerId: number, direction: string) {
+    if (playerId === 1) {
+      if (direction === "ArrowUp") {
+        if (game.player1.y > 0) {
+          game.player1.y -= 10;
+          game.player1.paddle = this.updatePaddle(game.player1);
+        }
+      } else if (direction === "ArrowDown") {
+        if (game.player1.y + game.player1.height < game.height) {
+          game.player1.y += 10;
+          game.player1.paddle = this.updatePaddle(game.player1);
+        }
+      }
+    } else if (playerId === 2) {
+      if (direction === "ArrowUp") {
+        if (game.player2.y > 0) {
+          game.player2.y -= 10;
+          game.player2.paddle = this.updatePaddle(game.player2);
+        }
+      } else if (direction === "ArrowDown") {
+        if (game.player2.y + game.player2.height < game.height) {
+          game.player2.y += 10;
+          game.player2.paddle = this.updatePaddle(game.player2);
+        }
+      }
+    }
+    this.saveGame(game);
+    return game;
+  }
+
+  // Fonction pour mettre à jour la position d'une balle
+  /*updateBall(game: GameType) {
     // Mettre à jour la position de la balle en fonction de sa vitesse
     game.ball.x += game.ball.speedX;
     game.ball.y += game.ball.speedY;
@@ -166,7 +353,7 @@ export class GameService {
     }
     this.saveGame(game);
     return game;
-  }
+  }*/
 
   spawnPowerUp(game: GameType) {
     if (game.powerUps) {
@@ -226,26 +413,6 @@ export class GameService {
     this.games.delete(game.gameId);
     this.users.delete(game.player1.infos.id);
     this.users.delete(game.player2.infos.id);
-  }
-
-  movePaddle(game: GameType, playerId: number, direction: string) {
-    if (playerId === 1) {
-      if (direction === "ArrowUp") {
-        if (game.player1.y > 0) game.player1.y -= 20;
-      } else if (direction === "ArrowDown") {
-        if (game.player1.y + game.player1.height < game.height)
-          game.player1.y += 20;
-      }
-    } else if (playerId === 2) {
-      if (direction === "ArrowUp") {
-        if (game.player2.y > 0) game.player2.y -= 20;
-      } else if (direction === "ArrowDown") {
-        if (game.player2.y + game.player2.height < game.height)
-          game.player2.y += 20;
-      }
-    }
-    this.saveGame(game);
-    return game;
   }
 
   async register(game: GameType) {

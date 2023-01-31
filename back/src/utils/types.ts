@@ -97,15 +97,16 @@ export type BallType = {
   y: number;
   speedX: number;
   speedY: number;
+  radius: number;
   //xVel: number;
 };
 
 // paddle
 export type PaddleType = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  xVel: number;
-  yVel: number;
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  up: boolean;
+  down: boolean;
 };
