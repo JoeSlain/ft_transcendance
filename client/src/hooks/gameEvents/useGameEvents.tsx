@@ -126,6 +126,20 @@ export default function useGameEvents({ canvasRef, setRoom }: Props) {
       setRoom(room);
     });
 
+    /*gameSocket.on("forfeit", (data) => {
+      if (canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        if (ctx) {
+          //ctx.clearRect(0, 0, data.game.width, data.game.height);
+          const player =
+            data.user.id === data.game.player1.id ? "player1" : "player2";
+          ctx.fillText(`${player} abandonned`, 320, 100);
+        }
+      }
+    });*/
+
     gameSocket.on("updateBall", (ball) => {
       setGame((prev: any) => {
         return { ...prev, ball };

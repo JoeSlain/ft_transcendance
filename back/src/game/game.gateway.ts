@@ -201,9 +201,7 @@ export class GameGateway {
 
   @SubscribeMessage("startGame")
   startGame(client: Socket, game: GameType) {
-    let dt = 0;
     const gameLoop = setInterval(() => {
-      dt++;
       game = this.gameService.games.get(game.gameId);
       // Vérification de la fin de la partie
       if (game.player1.score >= 10) {
@@ -230,6 +228,7 @@ export class GameGateway {
       // signals
       this.server.to(game.gameId).emit("updateGameState", game);
       if (!game.gameRunning) {
+        //clearInterval(gameLoop);
         this.endGame(game);
         return;
       }
@@ -237,6 +236,14 @@ export class GameGateway {
 
     console.log("out game loop");
   }
+
+  /*@SubscribeMessage("giveUp")
+  giveUp(client: Socket, data: any) {
+    console.log("giveUp");
+    data.game.gameRunning = false;
+    this.gameService.saveGame(data.game);
+    this.server.to(data.game.gameId).emit("forfeit", data);
+  }*/
 
   @SubscribeMessage("rematch")
   rematch(client: Socket, game: GameType) {

@@ -21,6 +21,10 @@ function GameComponent({ room, setRoom }: Props) {
     socket.emit("leaveRoom", { roomId: room.id, user });
   };
 
+  /*const giveUp = () => {
+    socket.emit("giveUp", { game, user });
+  };*/
+
   return (
     <div className="gameContainer">
       <div className="gameButtons">
@@ -30,6 +34,13 @@ function GameComponent({ room, setRoom }: Props) {
             Leave{" "}
           </button>
         )}
+        {/*(user.id === room.host.infos.id ||
+          user.id === room.guest.infos.id) && (
+          <button className="btn btn-primary" onClick={giveUp}>
+            {" "}
+            Give Up{" "}
+          </button>
+          )*/}
       </div>
 
       <div className="gameCanvas">

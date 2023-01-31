@@ -18,6 +18,7 @@ export class GameService {
   users: Map<number, GameType> = new Map();
   games = new Map<string, GameType>();
 
+  // I. MAP
   newPlayer(width: number, height: number, id: number) {
     const player = {
       x: id === 1 ? 30 : width - 50,
@@ -79,6 +80,22 @@ export class GameService {
     return game;
   }
 
+  getGameForUser(id: number) {
+    return this.users.get(id);
+  }
+
+  saveGame(game: GameType) {
+    this.games.set(game.gameId, game);
+    this.users.set(game.player1.infos.id, game);
+    this.users.set(game.player2.infos.id, game);
+  }
+
+  deleteGame(game: GameType): void {
+    this.games.delete(game.gameId);
+    this.users.delete(game.player1.infos.id);
+    this.users.delete(game.player2.infos.id);
+  }
+
   resetGame(game: GameType) {
     const user1 = game.player1.infos;
     const user2 = game.player2.infos;
@@ -93,159 +110,7 @@ export class GameService {
     return game;
   }
 
-  player1Collision(game: GameType) {
-    if (
-      game.ball.x <= game.player1.x + game.player1.width &&
-      game.ball.x > game.player1.x &&
-      game.ball.y >= game.player1.y &&
-      game.ball.y <= game.player1.y + game.player1.height
-    )
-      return true;
-    return false;
-  }
-
-  player2Collision(game: GameType) {
-    if (
-      game.ball.x + 10 >= game.player2.x &&
-      game.ball.x < game.player2.x + game.player2.width &&
-      game.ball.y > game.player2.y &&
-      game.ball.y < game.player2.y + game.player2.height
-    )
-      return true;
-    return false;
-  }
-
-  powerUpCollision(ball: BallType, pu: PowerUp) {
-    if (
-      ball.x >= pu.x &&
-      ball.x <= pu.x + pu.size &&
-      ball.y >= pu.y &&
-      ball.y <= pu.y + pu.size
-    )
-      return true;
-    return false;
-  }
-
-  updatePowerUp(game: GameType) {
-    const index = game.grid.findIndex((pu) =>
-      this.powerUpCollision(game.ball, pu)
-    );
-
-    if (index >= 0) {
-      const powerUp = game.grid.splice(index, 1)[0];
-      console.log(powerUp);
-      if (!powerUp.type) {
-        if (game.ball.speedX < 0) game.player2.height += 10;
-        else game.player1.height += 10;
-      } else {
-        if (game.ball.speedX < 0) game.player1.height -= 10;
-        else game.player2.height -= 10;
-      }
-    }
-    return game;
-  }
-
-  movePaddle(game: GameType, playerId: number, direction: string) {
-    if (playerId === 1) {
-      if (direction === "ArrowUp") {
-        if (game.player1.y > 0) {
-          game.player1.y -= 10;
-        }
-      } else if (direction === "ArrowDown") {
-        if (game.player1.y + game.player1.height < game.height) {
-          game.player1.y += 10;
-        }
-      }
-    } else if (playerId === 2) {
-      if (direction === "ArrowUp") {
-        if (game.player2.y > 0) {
-          game.player2.y -= 10;
-        }
-      } else if (direction === "ArrowDown") {
-        if (game.player2.y + game.player2.height < game.height) {
-          game.player2.y += 10;
-        }
-      }
-    }
-    this.saveGame(game);
-    return game;
-  }
-
-  // Fonction pour mettre à jour la position d'une balle
-  updateBall(game: GameType) {
-    // Mettre à jour la position de la balle en fonction de sa vitesse
-    game.ball.x += game.ball.speedX;
-    game.ball.y += game.ball.speedY;
-
-    // Vérifier la collision avec les limites du canvas
-    if (game.ball.y < 0) {
-      game.ball.speedY *= -1;
-      game.ball.y = 0;
-    } else if (game.ball.y + 10 > game.height) {
-      game.ball.speedY *= -1;
-      game.ball.y = game.height - game.ball.radius;
-    }
-
-    if (this.player1Collision(game)) {
-      game.ball.speedX *= -1;
-      game.ball.x += game.player1.width;
-      if (
-        (game.ball.speedY < 0 &&
-          game.ball.y > game.player1.y + game.player1.height / 2) ||
-        (game.ball.speedY > 0 &&
-          game.ball.y < game.player1.y + game.player1.height / 2)
-      )
-        game.ball.speedY *= -1;
-    } else if (this.player2Collision(game)) {
-      game.ball.speedX *= -1;
-      game.ball.x -= game.player2.width;
-      if (
-        (game.ball.speedY < 0 &&
-          game.ball.y > game.player2.y + game.player2.height / 2) ||
-        (game.ball.speedY > 0 &&
-          game.ball.y < game.player2.y + game.player2.height / 2)
-      )
-        game.ball.speedY *= -1;
-    } else {
-      if (game.ball.x <= 0) {
-        game.player2.score++;
-        game.ball = this.newBall(game.width, game.height, -1);
-        game.scoreUpdate = true;
-      } else if (game.ball.x >= game.width) {
-        game.player1.score++;
-        game.ball = this.newBall(game.width, game.height, 1);
-        game.scoreUpdate = true;
-      }
-    }
-    return game;
-  }
-
-  spawnPowerUp(game: GameType) {
-    if (Math.random() >= 0.999) {
-      const x = Math.floor(Math.random() * 700) + 50;
-      const y = Math.floor(Math.random() * 500) + 50;
-      if (
-        game.grid.find((pu) => pu.x === x && pu.y === y) ||
-        (x > game.width / 2 - 10 && x < game.width / 2 + 25)
-      ) {
-        return game;
-      }
-      game.grid.push({ x, y, type: Math.floor(Math.random() * 2), size: 20 });
-    }
-    return game;
-  }
-
-  startGame(game: GameType) {
-    game.gameRunning = true;
-  }
-
-  stopGame(game: GameType) {
-    game.gameRunning = false;
-  }
-
-  getGameForUser(id: number) {
-    return this.users.get(id);
-  }
+  // II. GAME UTILS
 
   getCurrentGames() {
     const games = [];
@@ -263,18 +128,6 @@ export class GameService {
     }
 
     return games;
-  }
-
-  saveGame(game: GameType) {
-    this.games.set(game.gameId, game);
-    this.users.set(game.player1.infos.id, game);
-    this.users.set(game.player2.infos.id, game);
-  }
-
-  deleteGame(game: GameType): void {
-    this.games.delete(game.gameId);
-    this.users.delete(game.player1.infos.id);
-    this.users.delete(game.player2.infos.id);
   }
 
   async register(game: GameType) {
@@ -338,5 +191,157 @@ export class GameService {
     this.roomService.updateRoom(room.id, room);
 
     return room;
+  }
+
+  // III. GAME MECHANICS
+  startGame(game: GameType) {
+    game.gameRunning = true;
+  }
+
+  stopGame(game: GameType) {
+    game.gameRunning = false;
+  }
+
+  player1Collision(game: GameType) {
+    if (
+      game.ball.x <= game.player1.x + game.player1.width &&
+      game.ball.x > game.player1.x &&
+      game.ball.y >= game.player1.y &&
+      game.ball.y <= game.player1.y + game.player1.height
+    )
+      return true;
+    return false;
+  }
+
+  player2Collision(game: GameType) {
+    if (
+      game.ball.x + 10 >= game.player2.x &&
+      game.ball.x < game.player2.x + game.player2.width &&
+      game.ball.y > game.player2.y &&
+      game.ball.y < game.player2.y + game.player2.height
+    )
+      return true;
+    return false;
+  }
+
+  powerUpCollision(ball: BallType, pu: PowerUp) {
+    if (
+      ball.x >= pu.x &&
+      ball.x <= pu.x + pu.size &&
+      ball.y >= pu.y &&
+      ball.y <= pu.y + pu.size
+    )
+      return true;
+    return false;
+  }
+
+  movePaddle(game: GameType, playerId: number, direction: string) {
+    if (playerId === 1) {
+      if (direction === "ArrowUp") {
+        if (game.player1.y > 0) {
+          game.player1.y -= 5;
+        }
+      } else if (direction === "ArrowDown") {
+        if (game.player1.y + game.player1.height < game.height) {
+          game.player1.y += 5;
+        }
+      }
+    } else if (playerId === 2) {
+      if (direction === "ArrowUp") {
+        if (game.player2.y > 0) {
+          game.player2.y -= 5;
+        }
+      } else if (direction === "ArrowDown") {
+        if (game.player2.y + game.player2.height < game.height) {
+          game.player2.y += 5;
+        }
+      }
+    }
+    this.saveGame(game);
+    return game;
+  }
+
+  // Fonction pour mettre à jour la position d'une balle
+  updateBall(game: GameType) {
+    // Mettre à jour la position de la balle en fonction de sa vitesse
+    game.ball.x += game.ball.speedX;
+    game.ball.y += game.ball.speedY;
+
+    // Vérifier la collision avec les limites du canvas
+    if (game.ball.y < 0) {
+      game.ball.speedY *= -1;
+      game.ball.y = 0;
+    } else if (game.ball.y + 10 > game.height) {
+      game.ball.speedY *= -1;
+      game.ball.y = game.height - game.ball.radius;
+    }
+
+    // paddle collision + update score
+    if (this.player1Collision(game)) {
+      game.ball.speedX *= -1;
+      game.ball.x += game.player1.width;
+      if (
+        (game.ball.speedY < 0 &&
+          game.ball.y > game.player1.y + game.player1.height / 2) ||
+        (game.ball.speedY > 0 &&
+          game.ball.y < game.player1.y + game.player1.height / 2)
+      )
+        game.ball.speedY *= -1;
+    } else if (this.player2Collision(game)) {
+      game.ball.speedX *= -1;
+      game.ball.x -= game.player2.width;
+      if (
+        (game.ball.speedY < 0 &&
+          game.ball.y > game.player2.y + game.player2.height / 2) ||
+        (game.ball.speedY > 0 &&
+          game.ball.y < game.player2.y + game.player2.height / 2)
+      )
+        game.ball.speedY *= -1;
+    } else {
+      if (game.ball.x <= 0) {
+        game.player2.score++;
+        game.ball = this.newBall(game.width, game.height, -1);
+        game.scoreUpdate = true;
+      } else if (game.ball.x >= game.width) {
+        game.player1.score++;
+        game.ball = this.newBall(game.width, game.height, 1);
+        game.scoreUpdate = true;
+      }
+    }
+    return game;
+  }
+
+  updatePowerUp(game: GameType) {
+    const index = game.grid.findIndex((pu) =>
+      this.powerUpCollision(game.ball, pu)
+    );
+
+    if (index >= 0) {
+      const powerUp = game.grid.splice(index, 1)[0];
+      console.log(powerUp);
+      if (!powerUp.type) {
+        if (game.ball.speedX < 0) game.player2.height += 10;
+        else game.player1.height += 10;
+      } else {
+        if (game.ball.speedX < 0) game.player1.height -= 10;
+        else game.player2.height -= 10;
+      }
+    }
+    return game;
+  }
+
+  spawnPowerUp(game: GameType) {
+    if (Math.random() >= 0.999) {
+      const x = Math.floor(Math.random() * 700) + 50;
+      const y = Math.floor(Math.random() * 500) + 50;
+      if (
+        game.grid.find((pu) => pu.x === x && pu.y === y) ||
+        (x > game.width / 2 - 10 && x < game.width / 2 + 25)
+      ) {
+        return game;
+      }
+      game.grid.push({ x, y, type: Math.floor(Math.random() * 2), size: 20 });
+    }
+    return game;
   }
 }
