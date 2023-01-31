@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import "../../styles/notifs.css";
 import User from "../../hooks/User";
 import { ReadyStyle } from "../../styles/readyStyle";
@@ -6,26 +6,20 @@ import useClickListener from "../../hooks/useClickListener";
 import { notifType } from "../../types/notifType";
 import useNotifsEvent from "../../hooks/chatEvents/useNotifsEvent";
 import { ChatContext } from "../../context/socketContext";
-
-type notif = {
-  id: number;
-  type: string;
-  from: string;
-  to: string;
-  acceptEvent: string;
-};
+import { useNavigate } from "react-router-dom";
 
 export default function Notifs() {
-  const { user } = useContext(User);
   const [selected, setSelected] = useState<boolean | null>(null);
   const [notifs, setNotifs] = useState<notifType[]>([]);
   const socket = useContext(ChatContext);
+  const navigate = useNavigate();
 
   useClickListener({ selected, setSelected });
   useNotifsEvent(setNotifs);
 
   const handleAccept = (notif: notifType) => {
     socket.emit(notif.acceptEvent, notif);
+    if (notif.type === "Game Invite") navigate("/play");
     setNotifs(notifs.filter((n) => n.id !== notif.id));
   };
 

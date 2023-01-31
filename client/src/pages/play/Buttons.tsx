@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { roomType } from "../../types/roomType";
 import User from "../../hooks/User";
 import { GameContext } from "../../context/socketContext";
-import GameComponent from "../games/GameComponent";
-import { useNavigate } from "react-router-dom";
 import { CountdownContext } from "../../context/countDownContext";
 
 type IProps = {
@@ -13,46 +11,12 @@ type IProps = {
 export default function Buttons({ room }: IProps) {
   const { user } = useContext(User);
   const socket = useContext(GameContext);
-  /*const [showCountdown, setShowCountdown] = useState(false);
-  const [countdown, setCountDown] = useState({
-    min: 0,
-    sec: 0,
-  });*/
   const { countdown, setCountdown } = useContext(CountdownContext);
+  const [powerUps, setPowerUps] = useState(false);
   let showStart = false;
   let playersReady = false;
   let showSearch = false;
   const showLeave = room.spectators.find((sp) => sp.id === user.id);
-
-  /*useEffect(() => {
-    socket.on("stopQueue", () => {
-      console.log("stop queue");
-      setCountdown(null);
-      //setShowCountdown(false);
-    });
-
-    return () => {
-      socket.off("stopQueue");
-    };
-  }, []);
-
-  useEffect(() => {
-    if (countdown) {
-      const interval = setInterval(() => {
-        console.log("countdown", countdown);
-        let min = countdown.min;
-        let sec = countdown.sec + 1;
-        if (sec === 60) {
-          min += 1;
-          sec = 0;
-        }
-        setCountdown({ min, sec });
-      }, 1000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [countdown]);*/
 
   if (room.host && room.host.infos.id === user.id) {
     if (room.guest) {
@@ -65,7 +29,7 @@ export default function Buttons({ room }: IProps) {
     if (playersReady) {
       if (playersReady) {
         console.log("start game", room);
-        socket.emit("createGame", room);
+        socket.emit("createGame", { room, powerUps });
       }
     }
   };
@@ -79,34 +43,39 @@ export default function Buttons({ room }: IProps) {
     console.log(`my wins = ${user.n_win}, my losses = ${user.n_lose}`);
     socket.emit("searchOpponent", user);
     setCountdown({ min: 0, sec: 0 });
-    /*const interval = setInterval(() => {
-      setCountDown((prev) => prev + 1);
-      console.log("countdown", countdown);
-    }, 1000);*/
   };
 
   const stopSearch = () => {
     socket.emit("stopQueue", user);
     setCountdown(null);
-    //setShowCountdown(false);
   };
 
   return (
     <div>
       {showStart && (
-        <button
-          onClick={startGame}
-          className={`btn ${
-            playersReady ? "" : "btn-disabled"
-          } btn-sm md:btn-md gap-2 normal-case lg:gap-3 `}
-          style={{
-            width: "70px",
-            color: playersReady ? "white" : "grey",
-          }}
-        >
-          {" "}
-          Start{" "}
-        </button>
+        <div className="flex flex-col">
+          <button
+            onClick={startGame}
+            className={`btn ${
+              playersReady ? "" : "btn-disabled"
+            } btn-sm md:btn-md gap-2 normal-case lg:gap-3 `}
+            style={{
+              width: "70px",
+              color: playersReady ? "white" : "grey",
+            }}
+          >
+            {" "}
+            Start{" "}
+          </button>
+          <div className="flex flex-row">
+            <div>PowerUps</div>
+            <input
+              className="channelCheckBox"
+              type="checkbox"
+              onChange={() => setPowerUps(!powerUps)}
+            />
+          </div>
+        </div>
       )}
       {!countdown && showSearch && (
         <button
@@ -129,22 +98,22 @@ export default function Buttons({ room }: IProps) {
         </button>
       )}
       <div className="flex flex-col">
-      {countdown && (
-        <button
-          className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 self-center"
-          style={{ width: "70px" }}
-          onClick={stopSearch}
-        >
-          {" "}
-          Stop search{" "}
-        </button>
-      )}
-      {countdown && (
-        <div>
-          {" "}
-          Time in queue : {countdown.min}m{countdown.sec}s{" "}
-        </div>
-      )}
+        {countdown && (
+          <button
+            className="btn btn-sm md:btn-md gap-2 normal-case lg:gap-3 self-center"
+            style={{ width: "70px" }}
+            onClick={stopSearch}
+          >
+            {" "}
+            Stop search{" "}
+          </button>
+        )}
+        {countdown && (
+          <div>
+            {" "}
+            Time in queue : {countdown.min}m{countdown.sec}s{" "}
+          </div>
+        )}
       </div>
     </div>
   );

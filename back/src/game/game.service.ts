@@ -51,7 +51,7 @@ export class GameService {
     return ball;
   }
 
-  createGame(room: Room): GameType {
+  createGame(room: Room, powerUps: boolean): GameType {
     const width = 800; // largeur de la zone de jeu
     const height = 600; // hauteur de la zone de jeu
     const gameId = room.id;
@@ -71,7 +71,7 @@ export class GameService {
       gameRunning: true,
       scoreUpdate: false,
       gameId,
-      powerUps: true,
+      powerUps,
       grid: [],
     };
 
@@ -221,18 +221,16 @@ export class GameService {
   }
 
   spawnPowerUp(game: GameType) {
-    if (game.powerUps) {
-      if (Math.random() >= 0.999) {
-        const x = Math.floor(Math.random() * 700) + 50;
-        const y = Math.floor(Math.random() * 500) + 50;
-        if (
-          game.grid.find((pu) => pu.x === x && pu.y === y) ||
-          (x > game.width / 2 - 10 && x < game.width / 2 + 25)
-        ) {
-          return game;
-        }
-        game.grid.push({ x, y, type: Math.floor(Math.random() * 2), size: 20 });
+    if (Math.random() >= 0.999) {
+      const x = Math.floor(Math.random() * 700) + 50;
+      const y = Math.floor(Math.random() * 500) + 50;
+      if (
+        game.grid.find((pu) => pu.x === x && pu.y === y) ||
+        (x > game.width / 2 - 10 && x < game.width / 2 + 25)
+      ) {
+        return game;
       }
+      game.grid.push({ x, y, type: Math.floor(Math.random() * 2), size: 20 });
     }
     return game;
   }

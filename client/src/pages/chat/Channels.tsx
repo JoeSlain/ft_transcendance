@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ChatContext } from "../../context/socketContext";
 import { channelType } from "../../types/channelType";
 import User from "../../hooks/User";
@@ -7,7 +7,6 @@ import "../../styles/chat/channelBar.css";
 import { ChanContextMenu } from "./channelUtils/ChanContextMenu";
 import useClickListener from "../../hooks/useClickListener";
 import PasswordDialog from "./channelUtils/PasswordDialog";
-import SetPassword from "./channelUtils/SetPassword";
 import { ModalContext } from "../../context/modalContext";
 import ChanEntry from "./channelUtils/ChanEntry";
 

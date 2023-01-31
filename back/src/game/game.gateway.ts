@@ -143,12 +143,15 @@ export class GameGateway {
   }*/
 
   @SubscribeMessage("createGame")
-  createGame(client: Socket, room: Room) {
+  createGame(client: Socket, data: any) {
     console.log("create game event");
-    const game = this.gameService.createGame(room);
+    const game = this.gameService.createGame(data.room, data.powerUps);
 
     // room.gameStarted to true
-    room = this.roomService.updateRoom(room.id, { ...room, gameStarted: true });
+    data.room = this.roomService.updateRoom(data.room.id, {
+      ...data.room,
+      gameStarted: true,
+    });
     // send new game to ongoing games
     this.server.emit("addGame", {
       id: game.gameId,
@@ -157,8 +160,8 @@ export class GameGateway {
       score: "0/0",
     });
     // signal clients that game started
-    this.server.to(room.id).emit("gameStarted", room);
-    this.server.to(room.id).emit("updateStatus", "ingame");
+    this.server.to(data.room.id).emit("gameStarted", data.room);
+    this.server.to(data.room.id).emit("updateStatus", "ingame");
     // start mainloop
     this.startGame(client, game);
   }
@@ -213,8 +216,10 @@ export class GameGateway {
         game.gameRunning = false;
       } else {
         game = this.gameService.updateBall(game);
-        game = this.gameService.spawnPowerUp(game);
-        game = this.gameService.updatePowerUp(game);
+        if (game.powerUps) {
+          game = this.gameService.spawnPowerUp(game);
+          game = this.gameService.updatePowerUp(game);
+        }
         this.gameService.saveGame(game);
       }
       // score update
