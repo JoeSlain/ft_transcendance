@@ -41,6 +41,8 @@ export class GameGateway {
     }
   }
 
+  // ROOM
+
   @SubscribeMessage("getRoom")
   getRoom(client: Socket, user: User) {
     let room = this.roomService.getUserRoom(user.id);
@@ -141,6 +143,8 @@ export class GameGateway {
 
     this.server.to(room.id).emit("updateRoom", room);
   }*/
+
+  // GAME
 
   @SubscribeMessage("createGame")
   createGame(client: Socket, data: any) {
@@ -275,6 +279,8 @@ export class GameGateway {
     }
     this.gameService.saveGame(data.game);*/
   }
+
+  // QUEUE
 
   emitOpponent(client: Socket, user: User, opponent: User) {
     console.log("emit stop queue");

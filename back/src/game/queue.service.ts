@@ -6,6 +6,7 @@ export class QueueService {
   constructor() {}
 
   queue: User[] = [];
+  intervals = new Map<number, number>();
 
   findOpponent(userId: number, elo: number, eloRange: number) {
     const maxElo = elo + eloRange;
@@ -41,5 +42,9 @@ export class QueueService {
 
   queueUp(user: User) {
     return this.queue.push(user) - 1;
+  }
+
+  addInterval(userId: number, intervalId: number) {
+    this.intervals[userId].set(intervalId);
   }
 }

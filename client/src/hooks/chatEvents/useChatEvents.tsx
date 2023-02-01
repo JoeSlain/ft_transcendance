@@ -145,6 +145,18 @@ export default function useChatEvents({
       });
     });
 
+    socket.on('wrongPassword', () => {
+      console.log('wrong pass');
+      setSelected((prev: any) => {
+        if (!prev)
+          alert('wrong password');
+        else {
+          saveItem('selected', null);
+          return null;
+        }
+      });
+    })
+
     socket.on("removeChannel", (channel) => {
       console.log("removeChan", channel);
       setPrivateChans((prev: any) =>
@@ -226,6 +238,7 @@ export default function useChatEvents({
       socket.off("banned");
       socket.off("muted");
       socket.off("setAsAdmin");
+      socket.off('wrongPassword')
     };
   }, []);
 }

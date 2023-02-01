@@ -38,8 +38,8 @@ services:
       POSTGRES_DB: test
     ports:
       - "31415:5432"
-    volumes:
-      - ./database-data:/var/lib/postgresql/data
+    #volumes:
+    #  - ./database-data:/var/lib/postgresql/data
     networks:
       - database
     restart: always
