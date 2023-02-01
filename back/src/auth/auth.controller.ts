@@ -76,8 +76,10 @@ export class AuthController {
   }
 
   @Post("2fa/generate")
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(TwoFactorGuard)
   async register(@Res() res, @Req() req) {
+    console.log("2fa");
+    console.log("req user", req.user);
     const { otpauthUrl } =
       await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
         req.user
@@ -90,7 +92,7 @@ export class AuthController {
   }
 
   @Post("2fa/turn-on")
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(TwoFactorGuard)
   async turnOnTwoFactorAuthentication(
     @Req() req,
     @Body() { twoFactorAuthenticationCode }
@@ -122,7 +124,7 @@ export class AuthController {
   }
 
   @Post("2fa/authenticate")
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(TwoFactorGuard)
   async authenticate(@Req() req, @Body() { twoFactorAuthenticationCode }) {
     const isCodeValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
