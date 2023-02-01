@@ -308,7 +308,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         );
       }
       if (!check) {
-        this.server.to(client.id).emit("error", "wrong password");
+        this.server.to(client.id).emit("wrongPassword");
         return false;
       }
     }

@@ -166,7 +166,7 @@ export class ChannelService {
       password: await bcrypt.hash(pass, 10),
       type: "protected",
     });
-    let chan = await this.getChannelWithUsers(channel.id);
+    let chan = await this.findChannelById(channel.id);
     return chan;
   }
 

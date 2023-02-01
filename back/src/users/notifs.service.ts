@@ -15,7 +15,7 @@ export class NotifService {
   async createNotif(data: NotifData) {
     const notifs = await this.findNotif(data);
 
-    if (!notifs.length) {
+    if (!notifs) {
       console.log("notif not found, creating new");
       const newNotif = this.notifRepository.create(data);
       console.log("newNotif", newNotif);
@@ -26,7 +26,7 @@ export class NotifService {
   }
 
   async findChanInvite(data: NotifData) {
-    const notif = await this.notifRepository.find({
+    const notif = await this.notifRepository.findOne({
       relations: {
         to: true,
         from: true,
@@ -54,7 +54,7 @@ export class NotifService {
     console.log("find one notif");
 
     if (data.channel) return await this.findChanInvite(data);
-    const notif = await this.notifRepository.find({
+    const notif = await this.notifRepository.findOne({
       relations: {
         to: true,
         from: true,
@@ -69,7 +69,7 @@ export class NotifService {
         type: data.type,
       },
     });
-    console.log("friendNotif", notif);
+    console.log("friendNotif");
     return notif;
   }
 
