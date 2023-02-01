@@ -33,7 +33,7 @@ export default function MessageForm({ selected }: Props) {
     return (
       <div className="messageForm">
         <textarea
-          className="textarea max-h-24 "
+          className="textarea max-h-24 text-black messageForm"
           value={message}
           onKeyDown={handleKeyDown}
           onChange={(e) => {

@@ -20,28 +20,18 @@ export default function useDmEvents({ setConvs }: Props) {
       })
       .then((response) => {
         if (response.data) {
-          console.log("convs", response.data);
-          /*        let uniqueArray = [
-            ...response.data,
-            ...getSavedItem("convs").filter((item : conversationType) => !response.data.includes(item)),
-          ]; */
           let uniqueArray = [...response.data, ...getSavedItem("convs")].filter(
             (conversation, index, self) =>
               index ===
               self.findIndex(
                 (t) => t.id === conversation.id));
-          //filter to avoid duplicate
           setConvs(uniqueArray);
           saveItem("convs", uniqueArray);
-          console.log(
-            "🚀 ~ file: useDmEvents.tsx:33 ~ .then ~ uniqueArray",
-            uniqueArray
-          );
+
         }
       });
 
     socket.on("openConversation", (conv) => {
-      console.log("open conv", conv);
       setConvs((prev: conversationType[]) => {
         const index = prev.findIndex((p) => p.id === conv.id);
         if (index >= 0) {
@@ -56,7 +46,6 @@ export default function useDmEvents({ setConvs }: Props) {
     });
 
     socket.on("newDm", (conv) => {
-      console.log("new dm", conv);
       setConvs((prev: conversationType[]) => {
         if (prev) {
           const index = prev.findIndex((p) => p.id === conv.id);

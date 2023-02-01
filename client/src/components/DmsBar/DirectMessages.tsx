@@ -124,10 +124,6 @@ export default function DirectMessages() {
     saveItem("convs", []);
     setConvs([]);
   }
-  console.log(
-    "🚀 ~ file: DirectMessages.tsx:121 ~ DirectMessages ~ convs",
-    convs
-  );
 
   useDmEvents({ setConvs });
 

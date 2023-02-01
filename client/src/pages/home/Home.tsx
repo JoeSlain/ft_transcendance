@@ -56,7 +56,6 @@ export default function Home() {
 
   useEffect(() => {
     socket.emit("getCurrentGames");
-
     socket.on("newGames", (data) => {
       console.log(data);
       setGames(data);

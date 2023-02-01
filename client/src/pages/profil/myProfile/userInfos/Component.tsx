@@ -25,6 +25,7 @@ export default function UserInfos() {
     url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
+  console.log("is2fa: ", user.twoFactorAuthenticationSecret);
   useEffect(() => {
     if (user.avatar != null) {
       console.log("effect");
@@ -47,7 +48,6 @@ export default function UserInfos() {
       else {
         formData.append("file", avatar.file, `${user.username}.avatar.jpg`);
       }
-      console.log("🚀 ~ file: Component.tsx:35 ~ onSave ~ formData", formData);
       await axios
         .post(`${BACK_ROUTE}users/uploadAvatar`, formData, {
           withCredentials: true,
