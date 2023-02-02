@@ -1,9 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import React, { useContext, useState } from "react";
-import ReactCodeInput from "react-code-input";
 import User from "../../../../hooks/User";
 import {
-  generate2fa,
   turnOn2FA,
   useGenerate2FA,
 } from "../../../../services/2FA/Generate2FA";
@@ -50,10 +47,6 @@ export default function TwoFa() {
     });
   }
 
-  console.log("user", user);
-  console.log("qrCode", qrCode);
-  console.log("code", code);
-
   return (
     <>
       <button className="bg-white" onClick={() => refetchGenerate()}>
@@ -86,31 +79,4 @@ export default function TwoFa() {
       </form>
     </>
   );
-  //} else if (!user.isTwoFactorAuthenticationEnabled) {
-  /*return (
-    <>
-      <button className="bg-white" onClick={() => localTurnOn2FA()}>
-        {" "}
-        enable 2fa{" "}
-      </button>
-    </>
-  );
-  //}
-  return (
-    <>
-      {/* <div>
-        <p> Enter code from GoogleAuthenticator app </p>
-         <form onSubmit={send2faCode}>
-            <ReactCodeInput
-              type="text"
-              fields={6}
-              onChange={getCode}
-              name={""}
-              inputMode={"email"}
-            />
-            <button type="submit"> confirm </button>
-          </form> *
-      </div> }
-    </>
-  );*/
 }

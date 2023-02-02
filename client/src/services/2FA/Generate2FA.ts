@@ -1,6 +1,4 @@
-import { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import User from "../../hooks/User";
 import axios from "axios";
 
 export function useGenerate2FA() {

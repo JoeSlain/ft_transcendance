@@ -128,17 +128,16 @@ export class AuthController {
   }
 
   @Post("2fa/authenticate")
-  @UseGuards(TwoFactorGuard)
-  async authenticate(@Req() req, @Body() { twoFactorAuthenticationCode }) {
+  @UseGuards(AuthenticatedGuard)
+  async authenticate(@Req() req, @Body() { code }) {
+    console.log("2fa auth");
     const isCodeValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
+        code,
         req.user
       );
 
-    if (!isCodeValid) {
-      throw new UnauthorizedException("Wrong authentication code");
-    }
+    if (!isCodeValid) return null;
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
       req.user.id,
       true

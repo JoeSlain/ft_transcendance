@@ -23,6 +23,7 @@ const Redirect: React.FC<IRedirectProps> = ({ setIsLogged, setUser }) => {
         saveItem("user", res.data);
         saveItem("isLogged", true);
         navigate("/home");*/
+        console.log("res", res.data);
         socket.emit("login", res.data);
       })
       .catch((e) => {

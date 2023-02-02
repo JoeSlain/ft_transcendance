@@ -10,16 +10,14 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { Game, User } from "src/database";
+import { User } from "src/database";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AuthenticatedGuard } from "src/auth/42auth/42.guard";
 import { TwoFactorGuard } from "src/auth/2fa/2fa.guard";
 import { UsersService } from "./users.service";
 import { NotifService } from "./notifs.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import { extname } from "path";
 
 class PostDTO {
   content: string;

@@ -31,13 +31,11 @@ export class TwoFactorStrategy extends PassportStrategy(Strategy, "2fa") {
         console.log(payload.userId);
         console.log(user);*/
     if (!user.isTwoFactorAuthenticationEnabled) {
-      /*console.log('validate 2fa if1');
-            console.log(user);*/
+      console.log("validate 2fa if1");
       return user;
     }
     if (payload.isSecondFactorAuthenticated) {
-      /*console.log('validate 2fa if2');
-            console.log(user);*/
+      console.log("validate 2fa if2");
       return user;
     }
   }

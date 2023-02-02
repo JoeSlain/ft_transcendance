@@ -7,7 +7,7 @@ export class FortyTwoAuthGuard extends AuthGuard("42") {
     const activate = (await super.canActivate(context)) as boolean;
     const request = context.switchToHttp().getRequest();
     console.log("42 auth guard ");
-   // console.log(request);
+    // console.log(request);
 
     await super.logIn(request);
     return activate;
@@ -16,7 +16,7 @@ export class FortyTwoAuthGuard extends AuthGuard("42") {
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
     /*console.log('authenticated');
         console.log(req.isAuthenticated());*/
