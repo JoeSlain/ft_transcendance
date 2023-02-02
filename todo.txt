@@ -1,7 +1,6 @@
 - 2fa
-- envTemplate
-- queueInterval
-- devlog
-- chan passwords
-- 
+
+- delete devlog
+- delete .env
+- npm start not in dev ?
 
