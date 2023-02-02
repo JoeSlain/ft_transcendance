@@ -97,6 +97,7 @@ export class AuthController {
     @Req() req,
     @Body() { twoFactorAuthenticationCode }
   ) {
+    console.log("turn on");
     const isCodeValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
