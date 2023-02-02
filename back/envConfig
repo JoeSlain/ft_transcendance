@@ -1,16 +1,16 @@
 # postgre database
-DB_HOST=
-DB_PORT=
+DB_HOST=db_app
+DB_PORT=5432
 DB_USER=
 DB_PASS=
 DB_NAME=
 
 # 42auth
-FRONT_URL=
+FRONT_URL=http://localhost:3000
 PORT=3001
 FT_ID=
 FT_SECRET=
-FT_CALLBACK_URL=
+FT_CALLBACK_URL=http://localhost:3001/api/auth/redirect
 
 #utils
-COOKIE_EXPIRATION_TIME=
+COOKIE_EXPIRATION_TIME=8640000

@@ -23,11 +23,18 @@ const ChanInput = ({ title, chanEntry, setChanEntry }: ChanInputProps) => {
   return (
     <div className="addChanInput">
       <div className="inputTitle"> {title} </div>
-      <input
+      {title === 'Password' ? <input
+        className="inputEntry"
+        type='password'
+        value={chanEntry}
+        onChange={(e) => setChanEntry(e.target.value)}
+      /> : <input
         className="inputEntry"
         value={chanEntry}
         onChange={(e) => setChanEntry(e.target.value)}
       />
+      }
+
     </div>
   );
 };

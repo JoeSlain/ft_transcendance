@@ -1,7 +1,7 @@
 /node_modules
 */node_modules/
 /back/dist/
-back/.env
-back/uploads/*
+/back/.env
+/back/uploads/*
 /database-data/
 .env

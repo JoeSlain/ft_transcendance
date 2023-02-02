@@ -27,7 +27,8 @@ const PasswordDialog = ({ channel }: Props) => {
     <form className="modalForm" onSubmit={handleAccept}>
       <div className="modalBody">
         <div> Password : </div>
-        <input onChange={(e) => setPass(e.target.value)} />
+        <input type='password'
+        onChange={(e) => setPass(e.target.value)} />
       </div>
       <div className="modalButtons">
         <button className="modalButton" type="submit">
