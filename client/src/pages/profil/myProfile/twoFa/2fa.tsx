@@ -10,7 +10,7 @@ import {
 import Error from "../../../../components/error";
 
 export default function TwoFa() {
-  const { user } = useContext(User);
+  const { user, setUser } = useContext(User);
   const {
     data: qrCode,
     error: error2FA,
@@ -21,7 +21,11 @@ export default function TwoFa() {
       .then((res) => (user.isTwoFactorAuthenticationEnabled = true))
       .catch((err) => console.log("Error enablie 2fa: ", err));
   }
-  if (!user.twoFactorAuthenticationSecret) {
+
+  console.log('user', user)
+  console.log('qrCode', qrCode)
+
+  if (!user.isTwoFactorAuthenticationEnabled) {
     return (
       <>
         <button className="bg-white" onClick={() => refetchGenerate()}>
@@ -29,9 +33,11 @@ export default function TwoFa() {
           generate 2fa{" "}
         </button>
         {error2FA && <Error err="2FA code generation failed" />}
+        {qrCode && <img src={qrCode} alt="qrcode"></img> }
       </>
     );
-  } else if (!user.isTwoFactorAuthenticationEnabled) {
+  }
+  //} else if (!user.isTwoFactorAuthenticationEnabled) {
     return (
       <>
         <button className="bg-white" onClick={() => localTurnOn2FA()}>
@@ -40,9 +46,7 @@ export default function TwoFa() {
         </button>
       </>
     );
-  } else if (user.isTwoFactorAuthenticationEnabled) {
-    return <img src={qrCode ? qrCode : ""} alt="qrcode"></img>;
-  }
+  //}
   return (
     <>
       {/* <div>

@@ -1,4 +1,5 @@
 - 2fa
+- check 2fa secret encryption
 
 - delete devlog
 - delete .env

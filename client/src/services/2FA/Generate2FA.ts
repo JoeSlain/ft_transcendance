@@ -24,6 +24,7 @@ export async function generate2fa() {
     credentials: "include",
     body: "",
   });
+  console.log('res', res);
   const blob = await res.blob();
   return URL.createObjectURL(blob);
 }

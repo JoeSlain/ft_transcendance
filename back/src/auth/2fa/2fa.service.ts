@@ -6,7 +6,7 @@ import { toFileStream } from "qrcode";
 
 @Injectable()
 export class TwoFactorAuthenticationService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   async generateTwoFactorAuthenticationSecret(user: User) {
     const secret = authenticator.generateSecret();
@@ -29,8 +29,8 @@ export class TwoFactorAuthenticationService {
     user: User
   ) {
     /*console.log('verify 2fa')
-        console.log(twoFactorAuthenticationCode)
-        console.log(user.twoFactorAuthenticationSecret)*/
+    console.log(twoFactorAuthenticationCode)
+    console.log(user.twoFactorAuthenticationSecret)*/
 
     return authenticator.verify({
       token: twoFactorAuthenticationCode,

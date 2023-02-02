@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import MyProfile from "./myProfile/Component";
 import "../../styles/global.css";
-import { getUser } from "../../services/User/GetUser";
 import { useQuery } from "@tanstack/react-query";
 import ProfileNavbar from "./Navbar";
 import Loading from "../../components/loading";
