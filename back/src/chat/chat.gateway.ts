@@ -56,7 +56,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user,
       status: "online",
     };
-    console.log("chat ws login");
+    console.log("chat ws login", user);
     if (this.gameService.getGameForUser(user.id)) data.status = "ingame";
     this.chatService.addUser(user.id, client.id, data.status);
     client.broadcast.emit("updateStatus", data);

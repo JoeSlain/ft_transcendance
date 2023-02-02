@@ -7,6 +7,7 @@ import { Game } from "./entities/Game";
 import { Restriction } from "./entities/Restriction";
 import { DirectMessage } from "./entities/DirectMessages";
 import { Conversation } from "./entities/Conversation";
+import { Secret } from "./entities/Secret";
 
 export const entities = [
   User,
@@ -18,6 +19,7 @@ export const entities = [
   Restriction,
   DirectMessage,
   Conversation,
+  Secret,
 ];
 
 export {
@@ -30,4 +32,5 @@ export {
   Restriction,
   DirectMessage,
   Conversation,
+  Secret,
 };

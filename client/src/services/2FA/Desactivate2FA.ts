@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const deactivate2fa = () => {
-  axios
+  return axios
     .post(
       "http://localhost:3001/api/auth/2fa/turn-off",
       {},

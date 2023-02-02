@@ -11,7 +11,7 @@ export default React.createContext<IUserContext>({
     id: 0,
     username: "",
     email: "",
-    twoFactorAuthenticationSecret: "",
+    //twoFactorAuthenticationSecret: "",
     isTwoFactorAuthenticationEnabled: false,
     id42: 0,
     winratio: "",

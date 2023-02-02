@@ -93,14 +93,11 @@ export class AuthController {
 
   @Post("2fa/turn-on")
   @UseGuards(TwoFactorGuard)
-  async turnOnTwoFactorAuthentication(
-    @Req() req,
-    @Body() { twoFactorAuthenticationCode }
-  ) {
-    console.log("turn on");
+  async turnOnTwoFactorAuthentication(@Req() req, @Body() { code }) {
+    console.log("turn on", code);
     const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
+      await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+        code,
         req.user
       );
 
@@ -108,7 +105,7 @@ export class AuthController {
         console.log(isCodeValid)*/
 
     if (!isCodeValid) {
-      throw new UnauthorizedException("Wrong authentication code");
+      return false;
     }
     await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
@@ -116,12 +113,18 @@ export class AuthController {
       true
     );
     req.res.setHeader("Set-Cookie", [accessTokenCookie]);
+    console.log("true");
+    return true;
   }
 
   @Post("2fa/turn-off")
   @UseGuards(TwoFactorGuard)
   async turnOffTwoFactorAuthentication(@Req() req) {
-    await this.usersService.turnOffTwoFactorAuthentication(req.user.id);
+    const ret = await this.usersService.turnOffTwoFactorAuthentication(
+      req.user.id
+    );
+
+    return ret;
   }
 
   @Post("2fa/authenticate")

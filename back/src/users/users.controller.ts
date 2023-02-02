@@ -105,7 +105,7 @@ export class UsersController {
   async getNotifs(@Req() req) {
     const notifs = await this.notifService.getNotifs(req.user.id);
 
-    console.log('notifs', notifs);
+    console.log("notifs", notifs);
     return notifs;
   }
   /**

@@ -12,11 +12,11 @@ import { UsersService } from "src/users/users.service";
 import { JwtModule } from "@nestjs/jwt";
 import { TwoFactorStrategy } from "./2fa/2fa.strategy";
 import { LocalStrategy } from "./local.strategy";
-import { Game } from "src/database";
+import { Game, Secret } from "src/database";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Game]),
+    TypeOrmModule.forFeature([User, Game, Secret]),
     PassportModule,
     JwtModule.register({
       secret: process.env.FT_SECRET,

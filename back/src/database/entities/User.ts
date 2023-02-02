@@ -4,12 +4,11 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
-  OneToMany,
-  ManyToOne,
+  JoinColumn,
+  OneToOne,
 } from "typeorm";
 
-import { Game } from "./Game";
-import { Conversation } from "./Conversation";
+import { Secret } from "./Secret";
 
 @Entity({ name: "users" })
 export class User {
@@ -22,8 +21,8 @@ export class User {
   @Column()
   email: string;
 
-  @Column({ nullable: true })
-  twoFactorAuthenticationSecret?: string;
+  /*@Column({ nullable: true })
+  twoFactorAuthenticationSecret?: string;*/
 
   @Column({ default: false })
   isTwoFactorAuthenticationEnabled: boolean;
@@ -59,4 +58,8 @@ export class User {
   @ManyToMany((type) => User, (user) => user.friends)
   @JoinTable()
   friends: User[];
+
+  @OneToOne(() => Secret)
+  @JoinColumn()
+  secret: Secret;
 }

@@ -4,7 +4,7 @@ export type userType = {
   id: number;
   username: string;
   email: string;
-  twoFactorAuthenticationSecret: string;
+  //twoFactorAuthenticationSecret?: string;
   isTwoFactorAuthenticationEnabled: boolean;
   id42: number;
   winratio: string;

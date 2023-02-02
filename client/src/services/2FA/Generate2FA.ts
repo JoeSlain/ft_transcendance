@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import User from "../../hooks/User";
+import axios from "axios";
 
 export function useGenerate2FA() {
   return useQuery({
@@ -10,13 +11,13 @@ export function useGenerate2FA() {
   });
 }
 
-export function useTurnOn2FA() {
+/*export function useTurnOn2FA() {
   return useQuery({
     queryKey: ["turnOn2FA"],
     queryFn: turnOn2FA,
     enabled: false,
   });
-}
+}*/
 
 export async function generate2fa() {
   const res = await fetch("http://localhost:3001/api/auth/2fa/generate", {
@@ -24,15 +25,19 @@ export async function generate2fa() {
     credentials: "include",
     body: "",
   });
-  console.log('res', res);
+  console.log("res", res);
   const blob = await res.blob();
   return URL.createObjectURL(blob);
 }
 
-export async function turnOn2FA() {
-  const res = await fetch("http://localhost:3001/api/auth/2fa/turn-on", {
-    method: "POST",
-    credentials: "include",
-  });
-  return res;
+export async function turnOn2FA(code: string) {
+  return axios
+    .post(
+      "http://localhost:3001/api/auth/2fa/turn-on",
+      { code },
+      {
+        withCredentials: true,
+      }
+    )
+    .then((res) => res.data);
 }

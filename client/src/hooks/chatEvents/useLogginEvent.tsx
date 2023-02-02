@@ -38,6 +38,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
     });
 
     chatSocket.on("loggedIn", (data) => {
+      console.log("data", data);
       setUser(data);
       saveItem("user", data);
       if (!getSavedItem("isLogged")) navigate("/home");

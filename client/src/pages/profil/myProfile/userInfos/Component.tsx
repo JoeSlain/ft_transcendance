@@ -25,7 +25,7 @@ export default function UserInfos() {
     url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
-  console.log("is2fa: ", user.twoFactorAuthenticationSecret);
+
   useEffect(() => {
     if (user.avatar != null) {
       console.log("effect");
