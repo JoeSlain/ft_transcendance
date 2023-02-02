@@ -4,3 +4,4 @@
 /back/.env
 /back/uploads/*
 /database-data/
+.env

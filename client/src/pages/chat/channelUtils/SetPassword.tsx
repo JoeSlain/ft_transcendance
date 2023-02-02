@@ -37,12 +37,13 @@ export default function SetPassword({ channel }: Props) {
             <div>Old Password :</div>
             <input
               value={oldPass}
+              type='password'
               onChange={(e) => setOldPass(e.target.value)}
             />
           </>
         )}
         <div>New Password :</div>
-        <input value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+        <input value={newPass} type='password' onChange={(e) => setNewPass(e.target.value)} />
       </div>
       <div className="modalButtons">
         <button className="modalButton" onClick={handleAccept}>
