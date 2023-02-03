@@ -572,7 +572,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     const msg = await this.messageService.createDm(data.user, data.content);
     conv = await this.messageService.pushDm(conv, msg);
-    if (!(await this.usersService.checkBlocked(data.user.id, data.to.id))) {
+    if (!(await this.usersService.checkBlocked(data.to.id, data.user.id))) {
       console.log("not blocked, sending dm");
       const to = this.chatService.getUser(data.to.id);
       if (to) {

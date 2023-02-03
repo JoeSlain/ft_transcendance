@@ -203,9 +203,20 @@ export class UsersService {
     const user = await this.getById(userId);
 
     if (me && user) {
-      if (me.blocked && me.blocked.includes(userId)) return;
-      if (!me.blocked) me.blocked = [userId];
-      else me.blocked.push(userId);
+      if (me.blocked && me.blocked.includes(userId)) {
+        console.log('already blocked')
+        return;
+      } 
+      if (!me.blocked) {
+        console.log('blocked null, adding new', me.blocked)
+        me.blocked = [userId];
+        console.log('new blocked added', me.blocked);
+      } 
+      else {
+        console.log('blocking new')
+        me.blocked.push(userId);
+        console.log('new blocked added', me.blocked);
+      } 
       return await this.usersRepository.save(me);
     }
     console.log("me", me);
