@@ -13,6 +13,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { TwoFactorStrategy } from "./2fa/2fa.strategy";
 import { LocalStrategy } from "./local.strategy";
 import { Game, Secret } from "src/database";
+import { JwtStrategy } from "./2fa/jwt.strategy";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { Game, Secret } from "src/database";
     FortyTwoStrategy,
     TwoFactorStrategy,
     LocalStrategy,
+    JwtStrategy,
     SessionSerializer,
     TwoFactorAuthenticationService,
     UsersService,

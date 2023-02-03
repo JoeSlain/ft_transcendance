@@ -11,12 +11,7 @@ export class UsersService {
     @InjectRepository(Game) private gameRepo: Repository<Game>
   ) {}
 
-  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-    let newSecret = this.secretRepo.create({
-      key: secret,
-    });
-
-    newSecret = await this.secretRepo.save(newSecret);
+  async getUserWithSecret(userId: number) {
     const userWithSecret = await this.usersRepository.findOne({
       relations: {
         secret: true,
@@ -25,6 +20,17 @@ export class UsersService {
         id: userId,
       },
     });
+
+    return userWithSecret;
+  }
+
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    let newSecret = this.secretRepo.create({
+      key: secret,
+    });
+
+    newSecret = await this.secretRepo.save(newSecret);
+    const userWithSecret = await this.getUserWithSecret(userId);
     userWithSecret.secret = newSecret;
     return await this.usersRepository.save(userWithSecret);
   }

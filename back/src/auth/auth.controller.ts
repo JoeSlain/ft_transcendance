@@ -14,6 +14,7 @@ import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { TwoFactorGuard } from "./2fa/2fa.guard";
 import { LocalAuthenticationGuard } from "./local.guard";
+import { JwtGuard } from "./2fa/jwt.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -128,11 +129,11 @@ export class AuthController {
   }
 
   @Post("2fa/authenticate")
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(JwtGuard)
   async authenticate(@Req() req, @Body() { code }) {
     console.log("2fa auth");
     const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+      await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         code,
         req.user
       );

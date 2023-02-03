@@ -33,17 +33,12 @@ export class TwoFactorAuthenticationService {
     twoFactorAuthenticationCode: string,
     user: User
   ) {
-    const userWithSecret = await this.userRepo.findOne({
-      relations: {
-        secret: true,
-      },
-      where: {
-        id: user.id,
-      },
-    });
+    const userWithSecret = await this.usersService.getUserWithSecret(user.id);
+    console.log("user", user);
+    console.log("userWithSecret", userWithSecret);
 
     console.log("code valid code", twoFactorAuthenticationCode);
-    console.log("user2fa secret", userWithSecret.secret.key);
+    console.log("user2fa secret", userWithSecret.secret);
 
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
