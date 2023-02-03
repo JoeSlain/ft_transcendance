@@ -56,8 +56,7 @@ export default function TwoFa() {
     return (
       <div>
         <button
-          className="btn mt-2 normal-case text-slate-200 center"
-          style={{ width: 150 }}
+          className="btn btn-sm md:btn-md gap-2 normal-case text-slate lg:gap-3 ml-2 mt-2  min-w-[10rem]"
           onClick={localTurnOff2FA}
         >
           Deactivate2fa
@@ -67,9 +66,10 @@ export default function TwoFa() {
   } else {
     return (
       <>
+        
         <button
-          className="btn mt-2 normal-case text-slate-200 center"
-          style={{ width: 220 }}
+          className="btn btn-sm md:btn-md gap-2 normal-case text-slate lg:gap-3 ml-2 mt-2  min-w-[10rem] mt-6 mb-3"
+          
           onClick={() => refetchGenerate()}
         >
           {" "}
@@ -82,7 +82,7 @@ export default function TwoFa() {
             localTurnOn2FA(e);
           }}
         >
-          <div className="twoFa">
+          <div className=" flex flex-col items-center">
             <input
               placeholder="Enter 2fa code"
               type="password"
@@ -92,10 +92,11 @@ export default function TwoFa() {
               onChange={(e) => setCode(e.target.value)}
               name={""}
               inputMode={"numeric"}
+              className="mt-2"
             />
             <button
-              className="btn mt-2 normal-case text-slate-200 center"
-              style={{ width: 150 }}
+              className="btn btn-sm md:btn-md gap-2 normal-case text-slate lg:gap-3 ml-2 mt-2  min-w-[10rem]"
+
               type="submit"
             >
               {!user.isTwoFactorAuthenticationEnabled

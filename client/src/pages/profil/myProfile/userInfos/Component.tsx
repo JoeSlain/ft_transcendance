@@ -134,7 +134,7 @@ export default function UserInfos() {
             />
           </div>
           <button
-            className="btn mt-2 normal-case text-slate-200 center"
+            className="btn btn-sm md:btn-md gap-2 normal-case text-slate lg:gap-3 ml-2 mt-2  min-w-[10rem]"
             type="submit"
           >
             Submit
