@@ -17,6 +17,12 @@ export default function TwoFa() {
   } = useGenerate2FA();
   const [code, setCode] = useState("");
 
+  async function localGenerate() {
+    /* deactivate2fa().then(res => {
+      if (!res) alert('error generating qrCode');
+    }*/
+  }
+
   async function localTurnOn2FA(e: React.SyntheticEvent) {
     e.preventDefault();
     turnOn2FA(code).then((res) => {
@@ -32,8 +38,7 @@ export default function TwoFa() {
     });
   }
 
-  async function localTurnOff2FA(e: React.SyntheticEvent) {
-    e.preventDefault();
+  async function localTurnOff2FA() {
     deactivate2fa().then((res) => {
       console.log("res", res);
       if (!res) alert("error deactivating 2fa");
@@ -47,47 +52,59 @@ export default function TwoFa() {
     });
   }
 
-  return (
-    <>
-      <button
-        className="btn mt-2 normal-case text-slate-200 center"
-        style={{ width: 220 }}
-        onClick={() => refetchGenerate()}
-      >
-        {" "}
-        generate 2fa{" "}
-      </button>
-      {error2FA && <Error err="2FA code generation failed" />}
-      {qrCode && <img src={qrCode} alt="qrcode"></img>}
-      <form
-        onSubmit={(e) => {
-          user.isTwoFactorAuthenticationEnabled
-            ? localTurnOff2FA(e)
-            : localTurnOn2FA(e);
-        }}
-      >
-        <div className="twoFa">
-          <input
-            placeholder="Enter 2fa code"
-            type="password"
-            value={code}
-            minLength={6}
-            maxLength={6}
-            onChange={(e) => setCode(e.target.value)}
-            name={""}
-            inputMode={"numeric"}
-          />
-          <button
-            className="btn mt-2 normal-case text-slate-200 center"
-            style={{ width: 150 }}
-            type="submit"
-          >
-            {!user.isTwoFactorAuthenticationEnabled
-              ? "Activate2fa"
-              : "Deactivate2fa"}
-          </button>
-        </div>
-      </form>
-    </>
-  );
+  if (user.isTwoFactorAuthenticationEnabled) {
+    return (
+      <div>
+        <button
+          className="btn mt-2 normal-case text-slate-200 center"
+          style={{ width: 150 }}
+          onClick={localTurnOff2FA}
+        >
+          Deactivate2fa
+        </button>
+      </div>
+    );
+  } else {
+    return (
+      <>
+        <button
+          className="btn mt-2 normal-case text-slate-200 center"
+          style={{ width: 220 }}
+          onClick={() => refetchGenerate()}
+        >
+          {" "}
+          generate 2fa{" "}
+        </button>
+        {error2FA && <Error err="2FA code generation failed" />}
+        {qrCode && <img src={qrCode} alt="qrcode"></img>}
+        <form
+          onSubmit={(e) => {
+            localTurnOn2FA(e);
+          }}
+        >
+          <div className="twoFa">
+            <input
+              placeholder="Enter 2fa code"
+              type="password"
+              value={code}
+              minLength={6}
+              maxLength={6}
+              onChange={(e) => setCode(e.target.value)}
+              name={""}
+              inputMode={"numeric"}
+            />
+            <button
+              className="btn mt-2 normal-case text-slate-200 center"
+              style={{ width: 150 }}
+              type="submit"
+            >
+              {!user.isTwoFactorAuthenticationEnabled
+                ? "Activate2fa"
+                : "Deactivate2fa"}
+            </button>
+          </div>
+        </form>
+      </>
+    );
+  }
 }
