@@ -205,7 +205,7 @@ export class UsersService {
     if (me && user) {
       if (me.blocked && me.blocked.includes(userId)) {
         console.log('already blocked')
-        return;
+        return null;
       } 
       if (!me.blocked) {
         console.log('blocked null, adding new', me.blocked)
@@ -220,7 +220,7 @@ export class UsersService {
       return await this.usersRepository.save(me);
     }
     console.log("me", me);
-    return me;
+    return null;
   }
 
   async checkBlocked(myId: number, userId: number) {

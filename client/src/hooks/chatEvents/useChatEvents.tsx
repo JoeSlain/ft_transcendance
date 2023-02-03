@@ -182,6 +182,7 @@ export default function useChatEvents({
       console.log("newmessage", message);
 
       if (user.blocked && user.blocked.includes(message.from.id)) return;
+      else console.log('user', user);
       setSelected((prev: any) => {
         if (prev && prev.id === message.channel.id) {
           const newSelected = {

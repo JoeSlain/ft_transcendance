@@ -4,6 +4,7 @@ import { userType } from "../../types/userType";
 import User from "../../hooks/User";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { saveItem } from "../../utils/storage";
 
 export type UserProps = {
   selected: userType;
@@ -12,7 +13,7 @@ export type UserProps = {
 export const CommonContext = ({ selected }: UserProps) => {
   const chatSocket = useContext(ChatContext);
   const gameSocket = useContext(GameContext);
-  const { user } = useContext(User);
+  const { user, setUser } = useContext(User);
   const navigate = useNavigate();
 
   const handleInvite = () => {
@@ -50,7 +51,13 @@ export const CommonContext = ({ selected }: UserProps) => {
         }
       )
       .then((response) => {
-        console.log("blocked", response.data);
+        if (!response.data)
+          alert('error blocking user');
+        else {
+          setUser(response.data);
+          saveItem('user', response.data);
+          console.log("blocked", response.data);
+        }
       });
   };
 
