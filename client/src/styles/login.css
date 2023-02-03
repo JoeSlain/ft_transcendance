@@ -1,3 +1,17 @@
+.twoFaContainer {
+  display: flex;
+  height: 600px;
+  justify-content: center;
+  align-items: center;
+}
+
+.twoFaLogin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .back {
   position: absolute;
   top: 0;
