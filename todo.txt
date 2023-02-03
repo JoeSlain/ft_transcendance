@@ -1,7 +1,4 @@
-- 2fa
-- check 2fa secret encryption
-
 - delete devlog
 - delete .env
 - npm start not in dev ?
-
+- push to 42repo
