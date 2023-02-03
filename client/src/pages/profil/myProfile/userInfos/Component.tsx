@@ -60,6 +60,7 @@ export default function UserInfos() {
         });
       user.avatar = await getAvatar(user.id);
       setAvatar({ ...avatar, url: user.avatar });
+      saveItem('user', user);
     }
     if (formValue.username !== user.username) {
       const isValidUsername = validateUserInput(formValue.username);
