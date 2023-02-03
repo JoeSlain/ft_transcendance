@@ -6,11 +6,11 @@ DB_PASS=
 DB_NAME=
 
 # 42auth
-FRONT_URL=http://localhost:3000
+FRONT_URL=http://10.11.7.11:3000
 PORT=3001
 FT_ID=
 FT_SECRET=
-FT_CALLBACK_URL=http://localhost:3001/api/auth/redirect
+FT_CALLBACK_URL=http://10.11.7.11:3001/api/auth/redirect
 
 #utils
 COOKIE_EXPIRATION_TIME=8640000

@@ -18,7 +18,7 @@ export function useGenerate2FA() {
 }*/
 
 export async function generate2fa() {
-  const res = await fetch("http://localhost:3001/api/auth/2fa/generate", {
+  const res = await fetch("http://10.11.7.11:3001/api/auth/2fa/generate", {
     method: "POST",
     credentials: "include",
     body: "",
@@ -31,7 +31,7 @@ export async function generate2fa() {
 export async function turnOn2FA(code: string) {
   return axios
     .post(
-      "http://localhost:3001/api/auth/2fa/turn-on",
+      "http://10.11.7.11:3001/api/auth/2fa/turn-on",
       { code },
       {
         withCredentials: true,

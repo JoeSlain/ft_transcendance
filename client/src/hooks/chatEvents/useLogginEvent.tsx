@@ -50,7 +50,7 @@ export default function useLogginEvent({ user, setUser, setIsLogged }: IProps) {
     chatSocket.on("loggedOut", () => {
       console.log("logout");
       axios
-        .post("http://localhost:3001/api/auth/logout", {
+        .post("http://10.11.7.11:3001/api/auth/logout", {
           withCredentials: true,
         })
         .then(() => {

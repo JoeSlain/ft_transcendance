@@ -1,6 +1,6 @@
 API ROUTES
 
-BaseUrl = http://localhost:3001/api
+BaseUrl = http://10.11.7.11:3001/api
 
 I. AUTHENTICATION
 
@@ -8,11 +8,11 @@ I. AUTHENTICATION
 /auth/login
     - description: redirige l'utilisateur sur l'ecran de connexion de 42api puis redirige vers notre application
     - reponse: pas de reponse mais l'utilisateur est redirige vers l'adresse :
-	.http://localhost:3000/profile/$(user-id) si la double authentification n'est pas activee
-	.http://localhost:3000/login/2fa si la double authentification est activee
+	.http://10.11.7.11:3000/profile/$(user-id) si la double authentification n'est pas activee
+	.http://10.11.7.11:3000/login/2fa si la double authentification est activee
     - args : non
     - withCredentials : non
-    - utilisation: window.top.location = 'http://localhost:3001/api/auth/login'
+    - utilisation: window.top.location = 'http://10.11.7.11:3001/api/auth/login'
 
 @POST
 /auth/2fa/generate
@@ -24,7 +24,7 @@ I. AUTHENTICATION
     l'URL dans une balise <img src=URL> pour render le qrcode dans la page
 
     const [qrCode, setQrCode] = useState('');
-    const res = await fetch('http://localhost:3001/api/auth/2fa/generate, {
+    const res = await fetch('http://10.11.7.11:3001/api/auth/2fa/generate, {
 	method: 'POST', credentials: 'include'
     });
     const blob = await res.blob();
@@ -45,7 +45,7 @@ I. AUTHENTICATION
     puis l'envoyer a l'api via axios
 
     const [code, setCode];
-    axios.post('http://localhost:3001/api/auth/2fa/turn-on', {
+    axios.post('http://10.11.7.11:3001/api/auth/2fa/turn-on', {
 	twoFactorAuthentificationCode: code
     }, {
 	withCredentials: true
@@ -58,7 +58,7 @@ I. AUTHENTICATION
     .args : non
     .withCredentials : oui
     .utilisation : 
-    axios.post('http://localhost:3001/api/auth/2fa/turn-off', {}, { withCredentials: true });
+    axios.post('http://10.11.7.11:3001/api/auth/2fa/turn-off', {}, { withCredentials: true });
 
 @POST
 /auth/2fa/authenticate
@@ -71,7 +71,7 @@ I. AUTHENTICATION
 
     const [id, setId] = useState();
     axios
-	.post('http://localhost:3001/api/auth/2fa/authenticate', {
+	.post('http://10.11.7.11:3001/api/auth/2fa/authenticate', {
 	   twoFactorAuthenticationCode: code
 	}, {
 	    withCredentials: true
@@ -98,7 +98,7 @@ II. USERS
     const params = useParams();
     useEffect(() => {
 	axios
-	    .get(`http://localhost:3001/api/users/${params.id}`, {
+	    .get(`http://10.11.7.11:3001/api/users/${params.id}`, {
 		withCredentials: true
 	    })
 	    .then(response => setUser(response.data))

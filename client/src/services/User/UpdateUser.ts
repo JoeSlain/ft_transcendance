@@ -6,7 +6,7 @@ export function updateUser(
   user: userType
 ): Promise<userType> {
   return axios
-    .post(`http://localhost:3001/api/users/updateUser/${id}`, user, {
+    .post(`http://10.11.7.11:3001/api/users/updateUser/${id}`, user, {
       withCredentials: true,
     })
     .then((res) => res.data);
