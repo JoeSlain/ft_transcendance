@@ -6,9 +6,8 @@ import {
   Res,
   Post,
   Body,
-  UnauthorizedException,
 } from "@nestjs/common";
-import { FortyTwoAuthGuard, AuthenticatedGuard } from "./42auth/42.guard";
+import { FortyTwoAuthGuard } from "./42auth/42.guard";
 import { TwoFactorAuthenticationService } from "./2fa/2fa.service";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";

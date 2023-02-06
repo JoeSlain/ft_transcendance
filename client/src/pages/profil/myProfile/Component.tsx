@@ -6,8 +6,6 @@ import "../../../styles/profil.css";
 import ProfileNavbar from "../Navbar";
 import UserInfos from "./userInfos/Component";
 
-//TODO : mettre à jour userauth
-
 export default function MyProfile() {
   const { user } = useContext(User);
   return (

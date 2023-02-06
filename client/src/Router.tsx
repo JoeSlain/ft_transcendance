@@ -18,15 +18,12 @@ import Contact from "./components/contact/contact";
 import "./styles/page.css";
 import Chat from "./pages/chat/Chat";
 import useLogginEvent from "./hooks/chatEvents/useLogginEvent";
-import { notifType } from "./types/notifType";
-import Notif from "./components/notifs/notifs";
 import Stats from "./pages/stats/Stats";
 import { ModalType } from "./types/modalType";
 import { ModalContext } from "./context/modalContext";
 import Modal from "./components/modal";
 import useErrorEvent from "./hooks/chatEvents/useErrorEvents";
 import DirectMessages from "./components/DmsBar/DirectMessages";
-import GameComponent from "./pages/games/GameComponent";
 import { CountdownContext, CountdownType } from "./context/countDownContext";
 import useQueueEvents from "./hooks/gameEvents/useQueueEvents";
 import Login2fa from "./pages/login/Login2fa";
@@ -36,7 +33,6 @@ export default function Router() {
     getSavedItem("isLogged") || false
   );
   const [user, setUser] = useState<userType>(getSavedItem("user"));
-  const [notifs, setNotifs] = useState<notifType[]>([]);
   const [modal, setModal] = useState<ModalType | null>(null);
   const [countdown, setCountdown] = useState<CountdownType | null>(null);
 

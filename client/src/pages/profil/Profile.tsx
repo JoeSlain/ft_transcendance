@@ -12,7 +12,7 @@ import useUserQuery from "../../services/User/useUserIdQuery";
 export default function Profile() {
   const userId = useParams().id || "";
   console.log("profile user id", userId);
-  const { isLoading: avatarLoading, error: avatarErr, data: avatar } = useQuery(
+  const { data: avatar } = useQuery(
     {
       queryKey: ["avatar", userId],
       queryFn: ({ queryKey }) => getAvatar(parseInt(queryKey[1])),

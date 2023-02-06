@@ -17,11 +17,6 @@ export default function TwoFa() {
   } = useGenerate2FA();
   const [code, setCode] = useState("");
 
-  async function localGenerate() {
-    /* deactivate2fa().then(res => {
-      if (!res) alert('error generating qrCode');
-    }*/
-  }
 
   async function localTurnOn2FA(e: React.SyntheticEvent) {
     e.preventDefault();
