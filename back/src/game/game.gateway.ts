@@ -12,7 +12,7 @@ import { QueueService } from "./queue.service";
 
 @WebSocketGateway(3003, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://10.11.7.11:3000",
   },
   namespace: "game",
 })
@@ -39,6 +39,7 @@ export class GameGateway {
       client.to(room.id).emit("leftRoom", roomLeft);
       client.leave(room.id);
     }
+    this.queueService.stopQueue(user.id);
   }
 
   // ROOM
@@ -205,7 +206,12 @@ export class GameGateway {
 
   @SubscribeMessage("startGame")
   startGame(client: Socket, game: GameType) {
+    //let n = 0;
     const gameLoop = setInterval(() => {
+      /*n++;
+      if (n % 60 === 0) {
+        console.log(`interval ${n}`)
+      }*/
       game = this.gameService.games.get(game.gameId);
       // Vérification de la fin de la partie
       if (game.player1.score >= 10) {
@@ -314,24 +320,28 @@ export class GameGateway {
     console.log(`opponent not found, queueing user ${user.username}`);
     const index = this.queueService.queueUp(user);
     const interval = setInterval(() => {
-      console.log(`interval ${n}`);
+      console.log(`interval userId: ${user.id}, id: ${interval}`);
+      console.log(`loop counter : ${n}`)
       n++;
       eloRange += 50;
       if (!this.queueService.checkQueued(index, user.id)) {
         console.log(`user ${user.username} not queued, exiting`);
-        clearInterval(interval);
+        //clearInterval(interval);
         //this.emitOpponent(client, user, opponent);
         return;
       }
       opponent = this.queueService.findOpponent(user.id, user.elo, eloRange);
       if (opponent) {
         console.log(`opponent found ${opponent.username}`);
-        this.queueService.queue.splice(index, 1);
-        clearInterval(interval);
+        //this.queueService.queue.splice(index, 1);
+        //clearInterval(interval);
+        this.queueService.stopQueue(user.id, index);
         this.emitOpponent(client, user, opponent);
         return;
       }
     }, 10000);
+    
+    this.queueService.addInterval(user.id, interval);
     console.log("out interval");
   }
 

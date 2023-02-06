@@ -29,6 +29,7 @@ import DirectMessages from "./components/DmsBar/DirectMessages";
 import GameComponent from "./pages/games/GameComponent";
 import { CountdownContext, CountdownType } from "./context/countDownContext";
 import useQueueEvents from "./hooks/gameEvents/useQueueEvents";
+import Login2fa from "./pages/login/Login2fa";
 
 export default function Router() {
   const [isLogged, setIsLogged] = React.useState(
@@ -60,6 +61,7 @@ export default function Router() {
                       <Redirect setIsLogged={setIsLogged} setUser={setUser} />
                     }
                   />
+                  <Route path="/login/2fa" element={<Login2fa />} />
                   <Route element={<AuthRoute />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/home" element={<Home />} />

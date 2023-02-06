@@ -12,7 +12,7 @@ export default function useNotifsEvent(setNotifs: (props: any) => void) {
   useEffect(() => {
     // GET NOTIFS
     axios
-      .get("http://localhost:3001/api/users/notifs", { withCredentials: true })
+      .get("http://10.11.7.11:3001/api/users/notifs", { withCredentials: true })
       .then((response) => {
         if (response.data) setNotifs(response.data);
       });

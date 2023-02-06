@@ -1,19 +1,38 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Game, User } from "src/database";
+import { Game, Secret, User } from "src/database";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Secret) private secretRepo: Repository<Secret>,
     @InjectRepository(Game) private gameRepo: Repository<Game>
   ) {}
 
-  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-    return this.usersRepository.update(userId, {
-      twoFactorAuthenticationSecret: secret,
+  async getUserWithSecret(userId: number) {
+    const userWithSecret = await this.usersRepository.findOne({
+      relations: {
+        secret: true,
+      },
+      where: {
+        id: userId,
+      },
     });
+
+    return userWithSecret;
+  }
+
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    let newSecret = this.secretRepo.create({
+      key: secret,
+    });
+
+    newSecret = await this.secretRepo.save(newSecret);
+    const userWithSecret = await this.getUserWithSecret(userId);
+    userWithSecret.secret = newSecret;
+    return await this.usersRepository.save(userWithSecret);
   }
 
   async turnOnTwoFactorAuthentication(userId: number) {
@@ -23,9 +42,14 @@ export class UsersService {
   }
 
   async turnOffTwoFactorAuthentication(userId: number) {
-    return this.usersRepository.update(userId, {
+    let user = await this.usersRepository.findOneBy({ id: userId });
+
+    if (!user) return false;
+    user = await this.usersRepository.save({
+      ...user,
       isTwoFactorAuthenticationEnabled: false,
     });
+    return user.isTwoFactorAuthenticationEnabled === false;
   }
 
   async getById(userId: number) {
@@ -179,13 +203,24 @@ export class UsersService {
     const user = await this.getById(userId);
 
     if (me && user) {
-      if (me.blocked && me.blocked.includes(userId)) return;
-      if (!me.blocked) me.blocked = [userId];
-      else me.blocked.push(userId);
+      if (me.blocked && me.blocked.includes(userId)) {
+        console.log('already blocked')
+        return null;
+      } 
+      if (!me.blocked) {
+        console.log('blocked null, adding new', me.blocked)
+        me.blocked = [userId];
+        console.log('new blocked added', me.blocked);
+      } 
+      else {
+        console.log('blocking new')
+        me.blocked.push(userId);
+        console.log('new blocked added', me.blocked);
+      } 
       return await this.usersRepository.save(me);
     }
     console.log("me", me);
-    return me;
+    return null;
   }
 
   async checkBlocked(myId: number, userId: number) {

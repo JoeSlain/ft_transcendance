@@ -14,6 +14,7 @@ import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { TwoFactorGuard } from "./2fa/2fa.guard";
 import { LocalAuthenticationGuard } from "./local.guard";
+import { JwtGuard } from "./2fa/jwt.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -50,9 +51,9 @@ export class AuthController {
     console.log("redirect");
     req.res.setHeader("Set-Cookie", [accessTokenCookie]);
     if (req.user.isTwoFactorAuthenticationEnabled)
-      res.redirect(`http://localhost:3000/login/2fa`);
+      res.redirect(`http://10.11.7.11:3000/login/2fa`);
     else {
-      res.redirect("http://localhost:3000/login/redirect");
+      res.redirect("http://10.11.7.11:3000/login/redirect");
       console.log("2fa is off, redirected ");
     }
   }
@@ -93,14 +94,11 @@ export class AuthController {
 
   @Post("2fa/turn-on")
   @UseGuards(TwoFactorGuard)
-  async turnOnTwoFactorAuthentication(
-    @Req() req,
-    @Body() { twoFactorAuthenticationCode }
-  ) {
-    console.log("turn on");
+  async turnOnTwoFactorAuthentication(@Req() req, @Body() { code }) {
+    console.log("turn on", code);
     const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
+      await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+        code,
         req.user
       );
 
@@ -108,7 +106,7 @@ export class AuthController {
         console.log(isCodeValid)*/
 
     if (!isCodeValid) {
-      throw new UnauthorizedException("Wrong authentication code");
+      return false;
     }
     await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
@@ -116,26 +114,31 @@ export class AuthController {
       true
     );
     req.res.setHeader("Set-Cookie", [accessTokenCookie]);
+    console.log("true");
+    return true;
   }
 
   @Post("2fa/turn-off")
   @UseGuards(TwoFactorGuard)
   async turnOffTwoFactorAuthentication(@Req() req) {
-    await this.usersService.turnOffTwoFactorAuthentication(req.user.id);
+    const ret = await this.usersService.turnOffTwoFactorAuthentication(
+      req.user.id
+    );
+
+    return ret;
   }
 
   @Post("2fa/authenticate")
-  @UseGuards(TwoFactorGuard)
-  async authenticate(@Req() req, @Body() { twoFactorAuthenticationCode }) {
+  @UseGuards(JwtGuard)
+  async authenticate(@Req() req, @Body() { code }) {
+    console.log("2fa auth");
     const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
+      await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+        code,
         req.user
       );
 
-    if (!isCodeValid) {
-      throw new UnauthorizedException("Wrong authentication code");
-    }
+    if (!isCodeValid) return null;
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
       req.user.id,
       true

@@ -3,10 +3,15 @@ import { User } from "src/database";
 import { authenticator } from "otplib";
 import { UsersService } from "src/users/users.service";
 import { toFileStream } from "qrcode";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class TwoFactorAuthenticationService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    @InjectRepository(User) private userRepo: Repository<User>
+  ) {}
 
   async generateTwoFactorAuthenticationSecret(user: User) {
     const secret = authenticator.generateSecret();
@@ -17,24 +22,27 @@ export class TwoFactorAuthenticationService {
     );
 
     await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
-    return { secret, otpauthUrl };
+    return { otpauthUrl };
   }
 
   async pipeQrCodeStream(stream, otpauthUrl: string) {
     return toFileStream(stream, otpauthUrl);
   }
 
-  isTwoFactorAuthenticationCodeValid(
+  async isTwoFactorAuthenticationCodeValid(
     twoFactorAuthenticationCode: string,
     user: User
   ) {
-    /*console.log('verify 2fa')
-        console.log(twoFactorAuthenticationCode)
-        console.log(user.twoFactorAuthenticationSecret)*/
+    const userWithSecret = await this.usersService.getUserWithSecret(user.id);
+    console.log("user", user);
+    console.log("userWithSecret", userWithSecret);
+
+    console.log("code valid code", twoFactorAuthenticationCode);
+    console.log("user2fa secret", userWithSecret.secret);
 
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
-      secret: user.twoFactorAuthenticationSecret,
+      secret: userWithSecret.secret.key,
     });
   }
 }

@@ -11,7 +11,7 @@ declare module "express" {
 }
 
 @Injectable()
-export class TwoFactorStrategy extends PassportStrategy(Strategy, "2fa") {
+export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   constructor(private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -26,17 +26,6 @@ export class TwoFactorStrategy extends PassportStrategy(Strategy, "2fa") {
   async validate(payload) {
     const user = await this.usersService.getById(payload.userId);
 
-    /*console.log('validate 2fa');
-        console.log('payload id');
-        console.log(payload.userId);
-        console.log(user);*/
-    if (!user.isTwoFactorAuthenticationEnabled) {
-      console.log("validate 2fa if1");
-      return user;
-    }
-    if (payload.isSecondFactorAuthenticated) {
-      console.log("validate 2fa if2");
-      return user;
-    }
+    return user;
   }
 }

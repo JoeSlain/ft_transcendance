@@ -25,7 +25,7 @@ export default function UserInfos() {
     url: user.avatar != null ? user.avatar : user.profile_pic,
     file: null,
   });
-  console.log("is2fa: ", user.twoFactorAuthenticationSecret);
+
   useEffect(() => {
     if (user.avatar != null) {
       console.log("effect");
@@ -60,6 +60,7 @@ export default function UserInfos() {
         });
       user.avatar = await getAvatar(user.id);
       setAvatar({ ...avatar, url: user.avatar });
+      saveItem('user', user);
     }
     if (formValue.username !== user.username) {
       const isValidUsername = validateUserInput(formValue.username);
@@ -133,7 +134,7 @@ export default function UserInfos() {
             />
           </div>
           <button
-            className="btn mt-2 normal-case text-slate-200 center"
+            className="btn btn-sm md:btn-md gap-2 normal-case text-slate lg:gap-3 ml-2 mt-2  min-w-[10rem]"
             type="submit"
           >
             Submit

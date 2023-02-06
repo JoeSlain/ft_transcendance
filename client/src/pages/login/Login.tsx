@@ -16,14 +16,14 @@ export default function Login() {
 
   const buttonAuth = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    window.location.assign("http://localhost:3001/api/auth/login");
+    window.location.assign("http://10.11.7.11:3001/api/auth/login");
   };
 
   const handleDevLogin = (e: React.SyntheticEvent) => {
     e.preventDefault();
     axios
       .post(
-        "http://localhost:3001/api/auth/devlog",
+        "http://10.11.7.11:3001/api/auth/devlog",
         {
           username,
           password: "password",

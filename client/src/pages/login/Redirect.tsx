@@ -15,7 +15,7 @@ const Redirect: React.FC<IRedirectProps> = ({ setIsLogged, setUser }) => {
   const socket = useContext(ChatContext);
 
   useEffect(() => {
-    axios(`http://localhost:3001/api/users`, { withCredentials: true })
+    axios(`http://10.11.7.11:3001/api/users`, { withCredentials: true })
       .then((res) => {
         /*console.log("User found: " + res.data.username);
         setUser(res.data);
@@ -23,6 +23,7 @@ const Redirect: React.FC<IRedirectProps> = ({ setIsLogged, setUser }) => {
         saveItem("user", res.data);
         saveItem("isLogged", true);
         navigate("/home");*/
+        console.log("res", res.data);
         socket.emit("login", res.data);
       })
       .catch((e) => {
