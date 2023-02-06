@@ -18,9 +18,13 @@ ft_transcendance is an online pong game with a twist! Not only can you play the 
 
 ## Key Features
 Multiplayer Pong: Play against other players in real-time and test your skills.
+
 Chat: Connect with other players and make new friends while playing.
+
 Direct Messages: Send private messages to other players for a more personalized experience.
+
 Personalized Dashboard: Track your game stats and see how you compare to other players.
+
 
 ## Conclusion
 ft_transcendance is a unique and fun project that showcases our ability to create interactive web experiences using modern technologies. Whether you're a recruiter looking for talented developers or just a fan of pong and chat games, we invite you to check out our project and see for yourself what we can do.
